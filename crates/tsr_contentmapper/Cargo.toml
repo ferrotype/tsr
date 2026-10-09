@@ -1,6 +1,6 @@
 [package]
 name = "tsr_contentmapper"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,18 +13,18 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_diagnostics = { version = "0.3.0", path = "../tsr_diagnostics" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsonrpc = { version = "0.3.0", path = "../tsr_jsonrpc" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_locale = { version = "0.3.0", path = "../tsr_locale" }
-tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
-tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.4.0", path = "../tsr_ast" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.4.0", path = "../tsr_diagnostics" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsonrpc = { version = "0.4.0", path = "../tsr_jsonrpc" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_locale = { version = "0.4.0", path = "../tsr_locale" }
+tsr_parser = { version = "0.4.0", path = "../tsr_parser" }
+tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
 
 [lints]

@@ -1,6 +1,6 @@
 [package]
 name = "tsr_api"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,30 +13,30 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_astnav = { version = "0.3.0", path = "../tsr_astnav" }
-tsr_nodebuilder = { version = "0.3.0", path = "../tsr_nodebuilder" }
-tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
-tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_compiler = { version = "0.3.0", path = "../tsr_compiler" }
-tsr_diagnostics = { version = "0.3.0", path = "../tsr_diagnostics" }
-tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
-tsr_transpile = { version = "0.3.0", path = "../tsr_transpile" }
-tsr_encoder = { version = "0.3.0", path = "../tsr_encoder" }
-tsr_format = { version = "0.3.0", path = "../tsr_format" }
-tsr_printer = { version = "0.3.0", path = "../tsr_printer" }
-tsr_project = { version = "0.3.0", path = "../tsr_project" }
-tsr_contentmapper = { version = "0.3.0", path = "../tsr_contentmapper" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsonrpc = { version = "0.3.0", path = "../tsr_jsonrpc" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_ls = { version = "0.3.0", path = "../tsr_ls" }
-tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
-tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_astnav = { version = "0.4.0", path = "../tsr_astnav" }
+tsr_nodebuilder = { version = "0.4.0", path = "../tsr_nodebuilder" }
+tsr_ast = { version = "0.4.0", path = "../tsr_ast" }
+tsr_checker = { version = "0.4.0", path = "../tsr_checker" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_compiler = { version = "0.4.0", path = "../tsr_compiler" }
+tsr_diagnostics = { version = "0.4.0", path = "../tsr_diagnostics" }
+tsr_parser = { version = "0.4.0", path = "../tsr_parser" }
+tsr_transpile = { version = "0.4.0", path = "../tsr_transpile" }
+tsr_encoder = { version = "0.4.0", path = "../tsr_encoder" }
+tsr_format = { version = "0.4.0", path = "../tsr_format" }
+tsr_printer = { version = "0.4.0", path = "../tsr_printer" }
+tsr_project = { version = "0.4.0", path = "../tsr_project" }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsonrpc = { version = "0.4.0", path = "../tsr_jsonrpc" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_ls = { version = "0.4.0", path = "../tsr_ls" }
+tsr_lsproto = { version = "0.4.0", path = "../tsr_lsproto" }
+tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
 
 [features]
 # A test-only control for the Phase 6 panic witness: the private test
@@ -44,8 +44,8 @@ tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
 fault-injection = []
 
 [dev-dependencies]
-tsr_arena = { version = "0.3.0", path = "../tsr_arena", features = ["harness"] }
-tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena", features = ["harness"] }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 

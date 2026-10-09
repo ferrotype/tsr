@@ -1,6 +1,6 @@
 [package]
 name = "tsr_ast"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -24,13 +24,13 @@ creation-trace = ["dep:serde_json"]
 serde_json = { version = "1", optional = true }
 hashbrown = { version = "=0.17.1", default-features = false }
 stacker = "=0.1.25"
-tsr_core = { path = "../tsr_core", version = "0.3.0" }
-tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.3.0" }
-tsr_locale = { path = "../tsr_locale", version = "0.3.0" }
-tsr_arena = { path = "../tsr_arena", version = "0.3.0" }
-tsr_jsnum = { path = "../tsr_jsnum", version = "0.3.0" }
-tsr_jsstring = { path = "../tsr_jsstring", version = "0.3.0" }
-tsr_json = { path = "../tsr_json", version = "0.3.0" }
+tsr_core = { path = "../tsr_core", version = "0.4.0" }
+tsr_diagnostics = { path = "../tsr_diagnostics", version = "0.4.0" }
+tsr_locale = { path = "../tsr_locale", version = "0.4.0" }
+tsr_arena = { path = "../tsr_arena", version = "0.4.0" }
+tsr_jsnum = { path = "../tsr_jsnum", version = "0.4.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.4.0" }
+tsr_json = { path = "../tsr_json", version = "0.4.0" }
 
 [lints]
 workspace = true

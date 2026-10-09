@@ -1,6 +1,6 @@
 [package]
 name = "tsr_sourcemap"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -14,11 +14,11 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [dependencies]
 hashbrown = { version = "=0.17.1", default-features = false }
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 
 [lints]
 workspace = true

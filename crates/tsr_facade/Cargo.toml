@@ -1,6 +1,6 @@
 [package]
 name = "tsr"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -15,43 +15,43 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 # One re-export per public library, with its default features. tsr_wasm is left
 # out (it targets wasm32), as are the command-line layers behind tsrust.
 [dependencies]
-tsr_api = { version = "0.3.0", path = "../tsr_api" }
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
-tsr_astnav = { version = "0.3.0", path = "../tsr_astnav" }
-tsr_binder = { version = "0.3.0", path = "../tsr_binder" }
-tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
-tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
-tsr_compiler = { version = "0.3.0", path = "../tsr_compiler" }
-tsr_contentmapper = { version = "0.3.0", path = "../tsr_contentmapper" }
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_diagnostics = { version = "0.3.0", path = "../tsr_diagnostics" }
-tsr_embed = { version = "0.3.0", path = "../tsr_embed" }
-tsr_encoder = { version = "0.3.0", path = "../tsr_encoder" }
-tsr_format = { version = "0.3.0", path = "../tsr_format" }
-tsr_glob = { version = "0.3.0", path = "../tsr_glob" }
-tsr_incremental = { version = "0.3.0", path = "../tsr_incremental" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
-tsr_jsnum = { version = "0.3.0", path = "../tsr_jsnum" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
-tsr_jsonrpc = { version = "0.3.0", path = "../tsr_jsonrpc" }
-tsr_lsproto = { version = "0.3.0", path = "../tsr_lsproto" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_locale = { version = "0.3.0", path = "../tsr_locale" }
-tsr_module = { version = "0.3.0", path = "../tsr_module" }
-tsr_nodebuilder = { version = "0.3.0", path = "../tsr_nodebuilder" }
-tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
-tsr_printer = { version = "0.3.0", path = "../tsr_printer" }
-tsr_project = { version = "0.3.0", path = "../tsr_project" }
-tsr_pseudochecker = { version = "0.3.0", path = "../tsr_pseudochecker" }
-tsr_scanner = { version = "0.3.0", path = "../tsr_scanner" }
-tsr_semver = { version = "0.3.0", path = "../tsr_semver" }
-tsr_sourcemap = { version = "0.3.0", path = "../tsr_sourcemap" }
-tsr_transformers = { version = "0.3.0", path = "../tsr_transformers" }
-tsr_transpile = { version = "0.3.0", path = "../tsr_transpile" }
-tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
+tsr_api = { version = "0.4.0", path = "../tsr_api" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.4.0", path = "../tsr_ast" }
+tsr_astnav = { version = "0.4.0", path = "../tsr_astnav" }
+tsr_binder = { version = "0.4.0", path = "../tsr_binder" }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled" }
+tsr_checker = { version = "0.4.0", path = "../tsr_checker" }
+tsr_compiler = { version = "0.4.0", path = "../tsr_compiler" }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_diagnostics = { version = "0.4.0", path = "../tsr_diagnostics" }
+tsr_embed = { version = "0.4.0", path = "../tsr_embed" }
+tsr_encoder = { version = "0.4.0", path = "../tsr_encoder" }
+tsr_format = { version = "0.4.0", path = "../tsr_format" }
+tsr_glob = { version = "0.4.0", path = "../tsr_glob" }
+tsr_incremental = { version = "0.4.0", path = "../tsr_incremental" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
+tsr_jsnum = { version = "0.4.0", path = "../tsr_jsnum" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
+tsr_jsonrpc = { version = "0.4.0", path = "../tsr_jsonrpc" }
+tsr_lsproto = { version = "0.4.0", path = "../tsr_lsproto" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_locale = { version = "0.4.0", path = "../tsr_locale" }
+tsr_module = { version = "0.4.0", path = "../tsr_module" }
+tsr_nodebuilder = { version = "0.4.0", path = "../tsr_nodebuilder" }
+tsr_parser = { version = "0.4.0", path = "../tsr_parser" }
+tsr_printer = { version = "0.4.0", path = "../tsr_printer" }
+tsr_project = { version = "0.4.0", path = "../tsr_project" }
+tsr_pseudochecker = { version = "0.4.0", path = "../tsr_pseudochecker" }
+tsr_scanner = { version = "0.4.0", path = "../tsr_scanner" }
+tsr_semver = { version = "0.4.0", path = "../tsr_semver" }
+tsr_sourcemap = { version = "0.4.0", path = "../tsr_sourcemap" }
+tsr_transformers = { version = "0.4.0", path = "../tsr_transformers" }
+tsr_transpile = { version = "0.4.0", path = "../tsr_transpile" }
+tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
 
 [lints]
 workspace = true

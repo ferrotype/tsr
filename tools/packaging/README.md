@@ -7,9 +7,9 @@ defaults to `publish = false`. This policy and the dependency order below track
 the current source tree; they are not a record of registry releases. The Node
 addon is a separate distribution artifact.
 
-The published 0.2.0 release is recorded in [RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md);
-the source tree is versioned 0.3.0, and [RELEASE-0.3.0.md](../../docs/RELEASE-0.3.0.md)
-is its publishing checklist.
+The published 0.2.0 and 0.3.0 releases are recorded in [RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md)
+and [RELEASE-0.3.0.md](../../docs/RELEASE-0.3.0.md); the source tree is versioned 0.4.0, and
+[RELEASE-0.4.0.md](../../docs/RELEASE-0.4.0.md) is its publishing checklist.
 
 ## Reproduction
 
@@ -98,8 +98,9 @@ keywords and the compiler category.
 
 28 libraries were published at `0.1.0` on 2026-09-20 from tag `v0.1.0`
 (`039226a`). The public packages are released together at one version; the published `0.2.0` release has its historical record in
-[docs/RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md). The 0.3.0 release follows
-[docs/RELEASE-0.3.0.md](../../docs/RELEASE-0.3.0.md). crates.io's
+[docs/RELEASE-0.2.0.md](../../docs/RELEASE-0.2.0.md). 0.3.0 followed
+[docs/RELEASE-0.3.0.md](../../docs/RELEASE-0.3.0.md); the 0.4.0 release follows
+[docs/RELEASE-0.4.0.md](../../docs/RELEASE-0.4.0.md). crates.io's
 [limiter](https://github.com/rust-lang/crates.io/blob/main/src/rate_limiter.rs)
 allows five new crates in a burst and replenishes one slot per ten minutes;
 updates to existing crates have a separate allowance (a burst of 30, then one

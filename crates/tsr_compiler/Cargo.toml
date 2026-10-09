@@ -1,6 +1,6 @@
 [package]
 name = "tsr_compiler"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -68,46 +68,46 @@ required-features = ["s08-allocation"]
 
 [dependencies]
 stacker = "=0.1.25"
-tsr_core = { version = "0.3.0", path = "../tsr_core" }
-tsr_tspath = { version = "0.3.0", path = "../tsr_tspath" }
-tsr_vfs = { version = "0.3.0", path = "../tsr_vfs" }
-tsr_bundled = { version = "0.3.0", path = "../tsr_bundled" }
-tsr_tsoptions = { version = "0.3.0", path = "../tsr_tsoptions" }
-tsr_module = { version = "0.3.0", path = "../tsr_module" }
-tsr_arena = { version = "0.3.0", path = "../tsr_arena" }
-tsr_ast = { version = "0.3.0", path = "../tsr_ast" }
-tsr_parser = { version = "0.3.0", path = "../tsr_parser" }
-tsr_scanner = { version = "0.3.0", path = "../tsr_scanner" }
-tsr_binder = { version = "0.3.0", path = "../tsr_binder" }
-tsr_transformers = { version = "0.3.0", path = "../tsr_transformers" }
-tsr_printer = { version = "0.3.0", path = "../tsr_printer" }
-tsr_sourcemap = { version = "0.3.0", path = "../tsr_sourcemap" }
-tsr_checker = { version = "0.3.0", path = "../tsr_checker" }
-tsr_jsstring = { version = "0.3.0", path = "../tsr_jsstring" }
-tsr_diagnostics = { version = "0.3.0", path = "../tsr_diagnostics" }
-tsr_locale = { version = "0.3.0", path = "../tsr_locale" }
-tsr_contentmapper = { version = "0.3.0", path = "../tsr_contentmapper" }
+tsr_core = { version = "0.4.0", path = "../tsr_core" }
+tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
+tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled" }
+tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
+tsr_module = { version = "0.4.0", path = "../tsr_module" }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
+tsr_ast = { version = "0.4.0", path = "../tsr_ast" }
+tsr_parser = { version = "0.4.0", path = "../tsr_parser" }
+tsr_scanner = { version = "0.4.0", path = "../tsr_scanner" }
+tsr_binder = { version = "0.4.0", path = "../tsr_binder" }
+tsr_transformers = { version = "0.4.0", path = "../tsr_transformers" }
+tsr_printer = { version = "0.4.0", path = "../tsr_printer" }
+tsr_sourcemap = { version = "0.4.0", path = "../tsr_sourcemap" }
+tsr_checker = { version = "0.4.0", path = "../tsr_checker" }
+tsr_jsstring = { version = "0.4.0", path = "../tsr_jsstring" }
+tsr_diagnostics = { version = "0.4.0", path = "../tsr_diagnostics" }
+tsr_locale = { version = "0.4.0", path = "../tsr_locale" }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper" }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
 # The retirement contention observer of the ownership scenarios.
-tsr_arena = { version = "0.3.0", path = "../tsr_arena", features = ["harness"] }
+tsr_arena = { version = "0.4.0", path = "../tsr_arena", features = ["harness"] }
 serde = { version = "1", features = ["derive"] }
-tsr_nodebuilder = { version = "0.3.0", path = "../tsr_nodebuilder" }
-tsr_astnav = { version = "0.3.0", path = "../tsr_astnav" }
+tsr_nodebuilder = { version = "0.4.0", path = "../tsr_nodebuilder" }
+tsr_astnav = { version = "0.4.0", path = "../tsr_astnav" }
 # Path-only: tsr_project depends on this crate, and a versioned test entry here
 # would make the two unpublishable at a new version (Cargo drops this one).
 tsr_project = { path = "../tsr_project" }
 # The harness's in-process content mappers, which the corpus examples serve.
 tsr_contentmappertest = { path = "../tsr_contentmappertest" }
-tsr_ipc = { version = "0.3.0", path = "../tsr_ipc" }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc" }
 serde_json = "1"
 sha2 = "0.10"
 # The Phase 3 baseline writers' source-map record and map decoding.
-tsr_sourcemap = { version = "0.3.0", path = "../tsr_sourcemap" }
-tsr_json = { version = "0.3.0", path = "../tsr_json" }
+tsr_sourcemap = { version = "0.4.0", path = "../tsr_sourcemap" }
+tsr_json = { version = "0.4.0", path = "../tsr_json" }
 mimalloc = "=0.1.48"
 # The Phase 3 corpus harness's createProgram wraps incremental programs.
 tsr_incremental = { path = "../tsr_incremental" }

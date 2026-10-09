@@ -1,6 +1,6 @@
 [package]
 name = "tsr_encoder"
-version = "0.3.0"
+version = "0.4.0"
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,10 +13,10 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [dependencies]
-tsr_ast = { path = "../tsr_ast", version = "0.3.0" }
-tsr_arena = { path = "../tsr_arena", version = "0.3.0" }
-tsr_core = { path = "../tsr_core", version = "0.3.0" }
-tsr_jsstring = { path = "../tsr_jsstring", version = "0.3.0" }
+tsr_ast = { path = "../tsr_ast", version = "0.4.0" }
+tsr_arena = { path = "../tsr_arena", version = "0.4.0" }
+tsr_core = { path = "../tsr_core", version = "0.4.0" }
+tsr_jsstring = { path = "../tsr_jsstring", version = "0.4.0" }
 
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }

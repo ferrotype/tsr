@@ -18,12 +18,12 @@ compose the host with `tsr_bundled::BundledFs`.
 
 ```toml
 [dependencies]
-tsr_embed = "0.3.0"
-tsr_arena = "0.3.0"
-tsr_core = "0.3.0"
-tsr_jsstring = "0.3.0"
-tsr_tsoptions = "0.3.0"
-tsr_vfs = "0.3.0"
+tsr_embed = "0.4.0"
+tsr_arena = "0.4.0"
+tsr_core = "0.4.0"
+tsr_jsstring = "0.4.0"
+tsr_tsoptions = "0.4.0"
+tsr_vfs = "0.4.0"
 ```
 
 ```rust
@@ -87,7 +87,7 @@ for file in &output.files {
 
 ## Parser only
 
-Use `tsr_embed = { version = "0.3.0", default-features = false }` to omit the
+Use `tsr_embed = { version = "0.4.0", default-features = false }` to omit the
 checker. `parse` returns an immutable syntax tree; `parse_and_encode` returns
 owned protocol-8 bytes. Both take loaded `SourceText`, a `ScriptKind` and explicit
 `SourceFileParseOptions`. Physical-file BOM and encoding conversion belong to
