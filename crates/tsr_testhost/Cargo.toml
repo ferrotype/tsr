@@ -29,7 +29,7 @@ tsr_lsproto = { version = "0.4.0", path = "../tsr_lsproto" }
 tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions" }
 
 [dev-dependencies]
-tsr_project = { version = "0.3.0", path = "../tsr_project", features = ["test-support"] }
+tsr_project = { version = "0.4.0", path = "../tsr_project", features = ["test-support"] }
 
 [[bin]]
 name = "phase5_testserver"
