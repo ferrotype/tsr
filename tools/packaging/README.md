@@ -110,8 +110,9 @@ check the actual response rather than treating an estimate as a schedule.
 ## Dependency-first release order
 
 This order includes retained internal development dependencies as well as normal,
-build and optional dependencies. `tsr` depends on every library it re-exports and
-goes last:
+build and optional dependencies, since `cargo publish` resolves all of them against
+the registry; `scripts/package_assets.py --check` fails when a package is listed
+before one of them. `tsr` depends on every library it re-exports and goes last:
 
 1. `tsr_fswatch`
 2. `tsr_jsstring`
@@ -152,9 +153,9 @@ goes last:
 37. `tsr_autoimport`
 38. `tsr_project`
 39. `tsr_ls`
-40. `tsr_lsp`
-41. `tsr_transpile`
-42. `tsr_api`
+40. `tsr_transpile`
+41. `tsr_api`
+42. `tsr_lsp`
 43. `tsr_tsc`
 44. `tsr_wasm`
 45. `tsr_build`

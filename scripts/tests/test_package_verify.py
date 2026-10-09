@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import package_verify
@@ -79,6 +80,30 @@ esac
                 else:
                     with self.assertRaisesRegex(ValueError, 'packaged tsrust ' + name):
                         package_verify.cli_smoke(executable, root / 'smoke', dict(os.environ))
+
+
+class ChecklistTests(unittest.TestCase):
+    """The release checklist's publish lines follow the checked README order."""
+
+    def check(self, names):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            if names is not None:
+                (root / 'docs').mkdir()
+                lines = ''.join(f'cargo publish -p {name} --locked\n' for name in names)
+                (root / 'docs/RELEASE-9.9.9.md').write_text('```sh\n' + lines + '```\n')
+            with mock.patch.object(package_verify, 'ROOT', root), \
+                    mock.patch.object(package_verify, 'release_order', lambda: ['tsr_core', 'tsr_api', 'tsr_lsp']):
+                package_verify.check_checklist('9.9.9')
+
+    def test_matching_lines_and_a_missing_checklist_pass(self):
+        self.check(['tsr_core', 'tsr_api', 'tsr_lsp'])
+        self.check(None)
+
+    def test_reordered_or_missing_lines_fail(self):
+        for names in (['tsr_core', 'tsr_lsp', 'tsr_api'], ['tsr_core', 'tsr_api']):
+            with self.subTest(names=names), self.assertRaisesRegex(ValueError, 'differs from tools/packaging/README.md'):
+                self.check(names)
 
 
 if __name__ == '__main__':

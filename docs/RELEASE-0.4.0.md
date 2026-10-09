@@ -96,9 +96,9 @@ cargo publish -p tsr_incremental --locked
 cargo publish -p tsr_autoimport --locked
 cargo publish -p tsr_project --locked
 cargo publish -p tsr_ls --locked
-cargo publish -p tsr_lsp --locked
 cargo publish -p tsr_transpile --locked
 cargo publish -p tsr_api --locked
+cargo publish -p tsr_lsp --locked
 cargo publish -p tsr_tsc --locked
 cargo publish -p tsr_wasm --locked
 cargo publish -p tsr_build --locked
@@ -110,6 +110,15 @@ cargo publish -p tsr --locked
 `tsr` goes last because it depends on every library it re-exports; nothing
 depends on it. The order is the dependency order of
 [tools/packaging/README.md](../tools/packaging/README.md).
+
+0.4.0 was published on 2026-10-09 in two runs. The first followed an earlier
+copy of this list that put `tsr_lsp` before `tsr_api`, its dependency since
+Phase 6: the first 39 packages went out, and Cargo refused `tsr_lsp` before
+uploading it. The remaining nine were then published in dependency order. The
+list above is corrected; `scripts/package_assets.py --check` now rejects a
+README order that lists a package before one of its dependencies, and
+`scripts/package_verify.py` rejects a checklist whose publish lines differ
+from the README.
 
 ### Rate limits
 

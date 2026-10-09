@@ -65,7 +65,30 @@ def publication_policy():
             done.add(name)
     for name in sorted(retained):
         visit(name)
+    check_release_order(release_order(), retained, {r['name'] for r in rows if r['publish']})
     return rows
+
+
+def release_order():
+    """The publish order listed in tools/packaging/README.md."""
+    readme = (ROOT / 'tools/packaging/README.md').read_text()
+    section = readme.partition('\n## Dependency-first release order\n')[2].partition('\n## ')[0]
+    return re.findall(r'^\d+\. `([^`]+)`', section, re.M)
+
+
+def check_release_order(order, retained, public):
+    """`cargo publish` resolves every retained dependency against the registry,
+    so each public package must come after all of them."""
+    missing, extra = sorted(public - set(order)), sorted(set(order) - public)
+    twice = sorted({name for name in order if order.count(name) > 1})
+    if missing or extra or twice:
+        raise ValueError(f'release order must name every public package once: '
+                         f'missing {missing}, unknown {extra}, repeated {twice}')
+    position = {name: index for index, name in enumerate(order)}
+    for name in order:
+        later = sorted(dep for dep in retained.get(name, ()) if position[dep] > position[name])
+        if later:
+            raise ValueError(f'release order lists {name} before its dependencies: ' + ', '.join(later))
 
 
 def expected_assets(rows):

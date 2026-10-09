@@ -5,13 +5,14 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tarfile
 import tempfile
 import tomllib
 
-from package_assets import ROOT, publication_policy, run as check_assets
+from package_assets import ROOT, publication_policy, release_order, run as check_assets
 
 
 def digest(path):
@@ -71,6 +72,16 @@ def cli_smoke(executable, directory, env):
             'type_error': {'source': CLI_ERROR_SOURCE, 'exit': checked.returncode, 'stdout': checked.stdout}}
 
 
+def check_checklist(release):
+    """The release checklist's publish lines are what gets run; they must match
+    the README order, which can change after the checklist is written."""
+    checklist = ROOT / f'docs/RELEASE-{release}.md'
+    if checklist.is_file():
+        published = re.findall(r'^cargo publish -p (\S+)', checklist.read_text(), re.M)
+        if published != release_order():
+            raise ValueError(f'docs/RELEASE-{release}.md publish order differs from tools/packaging/README.md')
+
+
 def run(output):
     check_assets(True)
     policy = publication_policy()
@@ -81,6 +92,7 @@ def run(output):
     if len(set(versions.values())) != 1:
         raise ValueError('public packages are released at one version: ' + json.dumps(versions))
     release = versions[rows[0]['name']]
+    check_checklist(release)
     output.mkdir(parents=True, exist_ok=True)
     # A failed rerun must never leave an earlier passing summary in place.
     (output / 'verified.json').unlink(missing_ok=True)
