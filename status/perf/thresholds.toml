@@ -120,8 +120,9 @@ peak_rss_8 = 0.70
 # Phase 7 owner decision 7 (2026-10-10): the pin's JS API benchmarks against the
 # Rust server, one ratio per server-dependent task and sync/async mode (median
 # latency over the rounds) and the servers' peak RSS per mode. Client-only tasks
-# (`TS - ...`, `materialize ...`, test/nodelist.bench.ts) are controls without a
-# ratio (tools/phase7/api/capture.py).
+# (`TS - ...`, `materialize ...`, the async `spawn API`, which spawns nothing,
+# and test/nodelist.bench.ts) are controls without a ratio
+# (tools/phase7/api/capture.py).
 [api]
 elapsed_sync_spawn_api = 1.25
 elapsed_sync_load_snapshot = 1.25
@@ -133,7 +134,6 @@ elapsed_sync_getsymbolatposition_identifiers = 1.25
 elapsed_sync_getsymbolatposition_identifiers_batched = 1.25
 elapsed_sync_getsymbolatlocation_identifiers = 1.25
 elapsed_sync_getsymbolatlocation_identifiers_batched = 1.25
-elapsed_async_spawn_api = 1.25
 elapsed_async_load_snapshot = 1.25
 elapsed_async_transfer_debug_ts = 1.25
 elapsed_async_transfer_program_ts = 1.25

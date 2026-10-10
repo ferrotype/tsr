@@ -237,8 +237,9 @@ class ApiReaderTests(unittest.TestCase):
         self.assertEqual(api.key('getSymbolAtPosition - 2894 identifiers (batched)'),
                          'getsymbolatposition_identifiers_batched')
         self.assertEqual(api.key('transfer program.ts'), 'transfer_program_ts')
-        self.assertTrue(api.is_control('TS - load project') and api.is_control('materialize checker.ts'))
-        self.assertFalse(api.is_control('spawn API'))
+        self.assertTrue(api.is_control('sync', 'TS - load project') and api.is_control('sync', 'materialize checker.ts'))
+        self.assertFalse(api.is_control('sync', 'spawn API'))
+        self.assertTrue(api.is_control('async', 'spawn API'))
 
     def test_server_tasks_get_ratios_and_controls_do_not(self):
         report, _ = api_report()
@@ -246,12 +247,13 @@ class ApiReaderTests(unittest.TestCase):
             (Path(directory) / 'capture.json').write_text(json.dumps(report))
             measurement = api.read_capture(directory)
         self.assertEqual(sorted(measurement['ratios']), sorted(
-            f'{prefix}_{mode}{suffix}' for mode in ('sync', 'async') for prefix, suffix in
-            (('elapsed', '_spawn_api'), ('elapsed', '_getsymbolatposition_identifiers_batched'), ('peak_rss', ''))))
+            ['elapsed_sync_spawn_api'] + [f'{prefix}_{mode}{suffix}' for mode in ('sync', 'async') for prefix, suffix in
+                                          (('elapsed', '_getsymbolatposition_identifiers_batched'), ('peak_rss', ''))]))
         self.assertEqual(measurement['ratios']['elapsed_sync_spawn_api'], 2.0)
         self.assertEqual(measurement['ratios']['peak_rss_async'], 0.75)
         self.assertEqual(measurement['samples']['rust']['elapsed_sync_spawn_api'], [2.0, 2.0, 2.0])
         self.assertIn('sync: TS - load project', measurement['metadata']['controls_median_ms'])
+        self.assertIn('async: spawn API', measurement['metadata']['controls_median_ms'])
 
     def test_runtimes_that_ran_different_tasks_are_refused(self):
         report, tasks = api_report()

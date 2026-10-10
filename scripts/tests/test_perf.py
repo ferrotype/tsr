@@ -442,7 +442,8 @@ class CommittedFiles(unittest.TestCase):
             **{f"{mode}-{scenario}": {**{f"elapsed_{n}": 1.0 for n in (2, 4, 8)},
                                       **{f"peak_rss_{n}": 0.70 for n in (2, 4, 8)}}
                for scenario in perf.SCENARIOS for mode in perf.SCENARIO_MODES},
-            "api": {**{f"elapsed_{mode}_{task}": 1.25 for mode in ("sync", "async") for task in API_TASKS},
+            "api": {**{f"elapsed_{mode}_{task}": 1.25 for mode in ("sync", "async") for task in API_TASKS
+                        if (mode, task) != ("async", "spawn_api")},
                     "peak_rss_sync": 0.85, "peak_rss_async": 0.85},
         })
         self.assertEqual(tomllib.loads(perf.THRESHOLDS.read_text()), tables)

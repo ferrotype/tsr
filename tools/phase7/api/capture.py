@@ -18,8 +18,10 @@ task's ratio is the median of Rust's round medians over Go's.
 Tasks named `TS - ...` run the legacy JS compiler and `materialize ...` tasks
 decode an already transferred buffer in the client; both are client controls,
 recorded without a ratio, as is test/nodelist.bench.ts, which starts no server.
-The other tasks are server-dependent: spawn, project load, transfer and queries,
-each its own ratio. Both runtimes must run the same tasks without an error,
+So is the async file's `spawn API`: the async client spawns its server on the
+first request, so that task only constructs the client (the sync client
+spawns in its constructor). The other tasks are server-dependent: spawn,
+project load, transfer and queries, each its own ratio. Both runtimes must run the same tasks without an error,
 and the task names embed the identifier count each server's transferred AST
 yields, so a server that transfers a different tree runs differently named
 tasks and the capture fails.
@@ -54,6 +56,7 @@ PACKAGE = ROOT / 'upstream/packages/typescript'
 FILES = {'sync': 'test/sync/api.bench.ts', 'async': 'test/async/api.bench.ts'}
 CONTROL_FILE = 'test/nodelist.bench.ts'
 CONTROL_PREFIXES = ('TS - ', 'materialize ')
+CLIENT_ONLY = {('async', 'spawn API')}
 FORMAT = 1
 ROUNDS = 3
 TIMEOUT_SECONDS = 1800
@@ -65,8 +68,8 @@ def key(name):
     return re.sub(r'[^a-z0-9]+', '_', re.sub(r'\b\d+ ', '', name).lower()).strip('_')
 
 
-def is_control(name):
-    return name.startswith(CONTROL_PREFIXES)
+def is_control(mode, name):
+    return name.startswith(CONTROL_PREFIXES) or (mode, name) in CLIENT_ONLY
 
 
 def node_command(node, bench, out, single=False):
@@ -195,7 +198,7 @@ def read_capture(path):
                 middle, count = latency(task)
                 rounds[run['runtime']].append(middle)
                 counts[run['runtime']] += count
-            if is_control(name):
+            if is_control(mode, name):
                 controls[f'{mode}: {name}'] = {runtime: median(values) for runtime, values in rounds.items()}
                 continue
             ratio = f'elapsed_{mode}_{key(name)}'
