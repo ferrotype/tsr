@@ -1,0 +1,219 @@
+{
+  "workload": "emit-vscode",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "5468cf024c2b1334bce19bd20002e38a605730a3",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "owner host (macOS arm64, 18 CPUs)"
+  },
+  "recorded_at": "2026-10-10T19:55:37Z",
+  "ratios": {
+    "elapsed_2": 4.149600616782789,
+    "elapsed_4": 3.7527645299554004,
+    "elapsed_8": 3.0270061848113006,
+    "peak_rss_2": 0.762014470836919,
+    "peak_rss_4": 0.7622925921707104,
+    "peak_rss_8": 0.7522807390774662
+  },
+  "samples": {
+    "go": {
+      "wall_ns_2": [8138907083, 8213020792, 8186388542, 8163384375, 8122223334, 8168947791, 8514945167],
+      "peak_rss_bytes_2": [7886815232, 7792902144, 7825719296, 7890976768, 7843938304, 7783383040, 8118239232],
+      "operation_ns_2": [7402000000, 7438000000, 7472000000, 7424000000, 7406000000, 7382000000, 7573000000],
+      "check_ns_2": [4941000000, 4930000000, 4979000000, 4936000000, 4947000000, 4919000000, 4958000000],
+      "user_ns_2": [34114491000, 33340462000, 34120263000, 34262488000, 33955164000, 33218074000, 35010454000],
+      "system_ns_2": [5197072000, 5519555000, 5349956000, 5077860000, 4978263000, 5413333000, 9389906000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [5640236709, 5808969792, 6197355750, 5831062875, 6120577250, 5779499209, 5685130125],
+      "peak_rss_bytes_4": [8436711424, 8682913792, 8527462400, 8881750016, 8810201088, 8630108160, 8442396672],
+      "operation_ns_4": [4795000000, 4898000000, 5363000000, 4926000000, 5265000000, 4919000000, 4863000000],
+      "check_ns_4": [2980000000, 2967000000, 3001000000, 2970000000, 2959000000, 2951000000, 2991000000],
+      "user_ns_4": [34560727000, 36744798000, 34673938000, 37094762000, 37473856000, 36591583000, 34779332000],
+      "system_ns_4": [5165204000, 4909285000, 9662121000, 4897969000, 9986252000, 4973630000, 6606619000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [4815821333, 4805340625, 4803689500, 4774864375, 4888626833, 4762387625, 4823372875],
+      "peak_rss_bytes_8": [9846554624, 9857744896, 9877880832, 9871491072, 9832628224, 9170583552, 9871802368],
+      "operation_ns_8": [3636000000, 3635000000, 3668000000, 3575000000, 3759000000, 3770000000, 3649000000],
+      "check_ns_8": [2045000000, 2020000000, 2057000000, 2023000000, 2051000000, 2123000000, 2053000000],
+      "user_ns_8": [41430000000, 40873091000, 41440687000, 40724833000, 41474939000, 39080164000, 41521308000],
+      "system_ns_8": [5791801000, 5560353000, 5540026000, 5157482000, 6398647000, 5768278000, 5575068000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    },
+    "rust": {
+      "wall_ns_2": [33897870792, 33854546000, 33839612542, 33714365208, 34128642875, 33979470791, 34093370083],
+      "peak_rss_bytes_2": [6010617856, 5977194496, 5974671360, 5976571904, 5989793792, 5966069760, 5988319232],
+      "operation_ns_2": [33315000000, 33277000000, 33250000000, 33126000000, 33518000000, 33404000000, 33507000000],
+      "check_ns_2": [15874000000, 15841000000, 15826000000, 15812000000, 15898000000, 15878000000, 15857000000],
+      "user_ns_2": [55629920000, 55305474000, 55347511000, 55233646000, 55452289000, 55576670000, 55673711000],
+      "system_ns_2": [2672933000, 2670986000, 2636293000, 2549466000, 2573800000, 2707127000, 2710557000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [21766770792, 21787677167, 21960431958, 21800712084, 21815337958, 21799695791, 21751603167],
+      "peak_rss_bytes_4": [6593462272, 6564659200, 6578667520, 6585958400, 6565920768, 6574866432, 6578667520],
+      "operation_ns_4": [21113000000, 21149000000, 21284000000, 21177000000, 21177000000, 21164000000, 21109000000],
+      "check_ns_4": [8858000000, 8847000000, 8916000000, 8833000000, 8830000000, 8780000000, 8818000000],
+      "user_ns_4": [57422667000, 57297379000, 57861622000, 57090510000, 57418692000, 57123209000, 57067556000],
+      "system_ns_4": [2864468000, 2780710000, 2806693000, 2769422000, 2806841000, 2770186000, 2750244000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [14593517750, 14592332667, 14545795792, 14341501917, 14492687541, 14510074041, 14554860959],
+      "peak_rss_bytes_8": [7406092288, 7424032768, 7414988800, 7409876992, 7419953152, 7415791616, 7417135104],
+      "operation_ns_8": [13882000000, 13885000000, 13850000000, 13647000000, 13765000000, 13746000000, 13846000000],
+      "check_ns_8": [5072000000, 5138000000, 5113000000, 5038000000, 5077000000, 5040000000, 5046000000],
+      "user_ns_8": [63426916000, 63489374000, 63382681000, 62758827000, 62859022000, 62636953000, 62855000000],
+      "system_ns_8": [3204853000, 3249593000, 3203382000, 3094535000, 3120690000, 3141086000, 3154983000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    }
+  },
+  "summaries": {
+    "elapsed_2": {
+      "samples_per_runtime": 7,
+      "go_median": 8168947791,
+      "rust_median": 33897870792,
+      "ratio": 4.149600616782789,
+      "go_relative_mad": 0.0036774268569933623,
+      "rust_relative_mad": 0.0024072308110649194,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 4.122057749199474,
+        "upper": 4.176376918794786,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_2": {
+      "samples_per_runtime": 7,
+      "go_median": 7843938304,
+      "rust_median": 5977194496,
+      "ratio": 0.762014470836919,
+      "go_relative_mad": 0.005996791685117262,
+      "rust_relative_mad": 0.0018611969223094192
+    },
+    "elapsed_4": {
+      "samples_per_runtime": 7,
+      "go_median": 5808969792,
+      "rust_median": 21799695791,
+      "ratio": 3.7527645299554004,
+      "go_relative_mad": 0.021318697021036257,
+      "rust_relative_mad": 0.0007175406092803306,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 3.55974220683188,
+        "upper": 3.8346900782679976,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_4": {
+      "samples_per_runtime": 7,
+      "go_median": 8630108160,
+      "rust_median": 6578667520,
+      "ratio": 0.7622925921707104,
+      "go_relative_mad": 0.02086798040779132,
+      "rust_relative_mad": 0.00110826090204966
+    },
+    "elapsed_8": {
+      "samples_per_runtime": 7,
+      "go_median": 4805340625,
+      "rust_median": 14545795792,
+      "ratio": 3.0270061848113006,
+      "go_relative_mad": 0.0037525435566807502,
+      "rust_relative_mad": 0.0031993350976090755,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 3.004679073458529,
+        "upper": 3.048224999898557,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_8": {
+      "samples_per_runtime": 7,
+      "go_median": 9857744896,
+      "rust_median": 7415791616,
+      "ratio": 0.7522807390774662,
+      "go_relative_mad": 0.0014260332508405785,
+      "rust_relative_mad": 0.0005611721870691788
+    }
+  },
+  "metadata": {
+    "scenario": "vscode",
+    "mode": "emit",
+    "source": {
+      "repository": "https://github.com/microsoft/vscode",
+      "commit": "a44adf7f53e00964ab890f9f8758a334f1fc15bc",
+      "origin": "typescript-benchmarking cases/scenarios/vscode (unpinned there); the commit of the S07 parse-bind inventory"
+    },
+    "project": "src",
+    "arguments": ["--noEmit", "false", "--outDir", "@OUT@"],
+    "work": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 9628,
+      "listed": 9628,
+      "inputs_sha256": "1df951cde4cdece0d22a507fe58a3cf338f9a4ad4a93ae1f33c17c0552497766",
+      "options_sha256": "4f9e1db8c613396d1afbe342887e4a117055093cef8c5d62d3417a71065cc360",
+      "output_sha256": "7a4e91c3353391aa5879a1e18d935ccf034fdf87fd12714df5e18791a66bea5d",
+      "diagnostics": 347,
+      "types": 2803957,
+      "emitted": 8616,
+      "emitted_sha256": "32412d77122d1d730ed12c8459b9e9e51e1975b08de39056b12aa4f87ab1ff39",
+      "oracle_runs": 3
+    },
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsgo",
+        "sha256": "57ab2bcc2c59862d56fe53a3c87240f22bcd692316e7d261a012f736ae5f4d87",
+        "bytes": 39040034
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsrust",
+        "sha256": "5abc9fb5b89a3276335c49cffecd7a1413540462ea0442faeb8c85175f8ad247",
+        "bytes": 46788464
+      }
+    },
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "load": {
+      "2": {
+        "before": [8.99, 7.83, 8.38],
+        "after": [5.89, 6.48, 7.49],
+        "other_cpu_before": {
+          "percent": 191.6,
+          "busiest": [["ApplicationsStorageExtension", 58.0], ["StorageManagementService", 54.2], ["Storage", 53.9], ["coreaudiod", 3.4], ["WindowServer", 3.0]]
+        }
+      },
+      "4": {
+        "before": [5.89, 6.48, 7.49],
+        "after": [6.59, 6.68, 7.33],
+        "other_cpu_before": {
+          "percent": 502.0,
+          "busiest": [["fseventsd", 282.0], ["ApplicationsStorageExtension", 115.8], ["CloudflareWARP", 16.4], ["mds", 10.0], ["Finder", 8.5]]
+        }
+      },
+      "8": {
+        "before": [6.59, 6.68, 7.33],
+        "after": [13.45, 9.73, 8.49],
+        "other_cpu_before": {
+          "percent": 464.4,
+          "busiest": [["fseventsd", 243.5], ["ApplicationsStorageExtension", 125.1], ["mds", 8.9], ["Finder", 8.2], ["StorageManagementService", 6.7]]
+        }
+      }
+    },
+    "host_busy": true,
+    "host_busy_rule": "other processes above 200% of one CPU before a configuration",
+    "sampling": "one warm-up pair, then 7 alternating pairs, once extended to 14",
+    "elapsed": "process launch to exit; operation_ns is the binary's own Total time"
+  }
+}

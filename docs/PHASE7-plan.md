@@ -1,7 +1,8 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **R0 in progress** (2026-10-10); owner decisions 7, 9 and 11 accepted,
-the others open. The detailed plan for
+Status: **R0 recorded** (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md));
+Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
+7, 9 and 11 accepted, the others open. The detailed plan for
 [PLAN Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over),
 the last phase: it turns PLAN section 5's exit criteria and the
 [acceptance matrix](S12-acceptance.md) of ADR 0020 into checkpoints with

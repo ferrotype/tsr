@@ -1,0 +1,216 @@
+{
+  "workload": "check-mui-docs",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "5468cf024c2b1334bce19bd20002e38a605730a3",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "owner host (macOS arm64, 18 CPUs)"
+  },
+  "recorded_at": "2026-10-10T19:55:37Z",
+  "ratios": {
+    "elapsed_2": 1.885965204044722,
+    "elapsed_4": 1.560751736655364,
+    "elapsed_8": 1.27668567721563,
+    "peak_rss_2": 0.7960474908495015,
+    "peak_rss_4": 0.7562543152678208,
+    "peak_rss_8": 0.7120558770220156
+  },
+  "samples": {
+    "go": {
+      "wall_ns_2": [8341343333, 8265101834, 8258361041, 8473803166, 8597408667, 8868419041, 8522359083],
+      "peak_rss_bytes_2": [5280776192, 5209997312, 5090754560, 5179031552, 5191303168, 5118853120, 5143494656],
+      "operation_ns_2": [7934000000, 7855000000, 7856000000, 8061000000, 8206000000, 8404000000, 8116000000],
+      "check_ns_2": [7182000000, 7109000000, 7124000000, 7303000000, 7464000000, 7648000000, 7325000000],
+      "user_ns_2": [23550294000, 22557878000, 22991739000, 23859169000, 24274157000, 23795013000, 23812785000],
+      "system_ns_2": [3082379000, 3141862000, 3491275000, 3143062000, 3689635000, 3376595000, 3292356000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [7775927917, 7777510167, 7765571708, 7809831917, 7748985209, 7945806833, 7874594542],
+      "peak_rss_bytes_4": [7954481152, 8023146496, 7830011904, 7617232896, 7422935040, 7360331776, 7447298048],
+      "operation_ns_4": [7155000000, 7134000000, 7182000000, 7213000000, 7166000000, 7322000000, 7255000000],
+      "check_ns_4": [6383000000, 6361000000, 6435000000, 6434000000, 6405000000, 6537000000, 6454000000],
+      "user_ns_4": [38533184000, 38200849000, 40458400000, 39801916000, 39487883000, 39852709000, 39342926000],
+      "system_ns_4": [4215388000, 3818784000, 3712428000, 3850059000, 4319378000, 3840555000, 3918367000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [10638729458, 10265112125, 10057315792, 10536110875, 10244437291, 9958510333, 10388887792],
+      "peak_rss_bytes_8": [10622844928, 11055775744, 11261067264, 10514464768, 10802053120, 10897997824, 10621632512],
+      "operation_ns_8": [9631000000, 9138000000, 9052000000, 9192000000, 9314000000, 8895000000, 9454000000],
+      "check_ns_8": [8808000000, 8328000000, 8188000000, 8389000000, 8445000000, 8063000000, 8676000000],
+      "user_ns_8": [67291496000, 66727306000, 66788597000, 66687872000, 68058644000, 65703493000, 69648363000],
+      "system_ns_8": [8247111000, 5756383000, 6143729000, 7753104000, 5042069000, 5762936000, 5723790000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    },
+    "rust": {
+      "wall_ns_2": [15981297917, 15699220167, 15796067792, 16705842292, 16511522833, 15886862000, 16285304084],
+      "peak_rss_bytes_2": [4145512448, 4117889024, 4117807104, 4130209792, 4136124416, 4119691264, 4122755072],
+      "operation_ns_2": [15627000000, 15389000000, 15463000000, 16361000000, 16161000000, 15568000000, 15939000000],
+      "check_ns_2": [13530000000, 13322000000, 13383000000, 14314000000, 13924000000, 13531000000, 13795000000],
+      "user_ns_2": [23846946000, 23557941000, 23735892000, 25015201000, 24671281000, 23893184000, 24306473000],
+      "system_ns_2": [2628683000, 2607767000, 2615000000, 2655301000, 2751764000, 2665109000, 2645496000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [12237778750, 12495253334, 12096965875, 12019700958, 12050101917, 12138762500, 12681299042],
+      "peak_rss_bytes_4": [5763596288, 5743902720, 5766332416, 5760565248, 5745623040, 5779013632, 5749669888],
+      "operation_ns_4": [11787000000, 12059000000, 11653000000, 11558000000, 11600000000, 11703000000, 12233000000],
+      "check_ns_4": [9635000000, 9938000000, 9500000000, 9485000000, 9460000000, 9613000000, 10059000000],
+      "user_ns_4": [37650994000, 38484120000, 37317120000, 37162166000, 37115107000, 37431103000, 38790689000],
+      "system_ns_4": [2960190000, 3023957000, 2847316000, 2790976000, 2842012000, 2869767000, 3145196000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [12979136500, 12986375750, 13582052417, 12372461042, 13385175542, 13105321625, 13194987416],
+      "peak_rss_bytes_8": [7672381440, 7687225344, 7683194880, 7694974976, 7702200320, 7714455552, 7691665408],
+      "operation_ns_8": [12484000000, 12491000000, 12998000000, 11822000000, 12887000000, 12589000000, 12507000000],
+      "check_ns_8": [10191000000, 10217000000, 10561000000, 9428000000, 10548000000, 10286000000, 10170000000],
+      "user_ns_8": [61074930000, 60810883000, 63338218000, 57688922000, 62350189000, 60800963000, 60274851000],
+      "system_ns_8": [3691558000, 3734223000, 4179052000, 3632590000, 4067086000, 3769765000, 4060687000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    }
+  },
+  "summaries": {
+    "elapsed_2": {
+      "samples_per_runtime": 7,
+      "go_median": 8473803166,
+      "rust_median": 15981297917,
+      "ratio": 1.885965204044722,
+      "go_relative_mad": 0.01563168631665618,
+      "rust_relative_mad": 0.01765049068386002,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.847866329883746,
+        "upper": 1.9794800638018528,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_2": {
+      "samples_per_runtime": 7,
+      "go_median": 5179031552,
+      "rust_median": 4122755072,
+      "ratio": 0.7960474908495015,
+      "go_relative_mad": 0.006861687487939058,
+      "rust_relative_mad": 0.0012001605512790452
+    },
+    "elapsed_4": {
+      "samples_per_runtime": 7,
+      "go_median": 7777510167,
+      "rust_median": 12138762500,
+      "ratio": 1.560751736655364,
+      "go_relative_mad": 0.003667620792195359,
+      "rust_relative_mad": 0.008157030010266698,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.5362017447983547,
+        "upper": 1.6069147589038795,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_4": {
+      "samples_per_runtime": 7,
+      "go_median": 7617232896,
+      "rust_median": 5760565248,
+      "ratio": 0.7562543152678208,
+      "go_relative_mad": 0.027933898162905795,
+      "rust_relative_mad": 0.0018913699491178821
+    },
+    "elapsed_8": {
+      "samples_per_runtime": 7,
+      "go_median": 10265112125,
+      "rust_median": 13105321625,
+      "ratio": 1.27668567721563,
+      "go_relative_mad": 0.020242967682147943,
+      "rust_relative_mad": 0.009628540879094984,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.231871670105218,
+        "upper": 1.3159921701915855,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_8": {
+      "samples_per_runtime": 7,
+      "go_median": 10802053120,
+      "rust_median": 7691665408,
+      "ratio": 0.7120558770220156,
+      "go_relative_mad": 0.016702436656782522,
+      "rust_relative_mad": 0.0011012605919115924
+    }
+  },
+  "metadata": {
+    "scenario": "mui-docs",
+    "mode": "check",
+    "source": {
+      "repository": "https://github.com/mui/material-ui",
+      "commit": "6780195595c12252a130aa5ae5c5bd461229c6b7",
+      "origin": "typescript-benchmarking cases/scenarios/mui-docs, at its pinned commit"
+    },
+    "project": "docs",
+    "arguments": ["--noEmit", "--incremental", "false"],
+    "work": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 16766,
+      "listed": 16766,
+      "inputs_sha256": "a7607e734997c6debe79badc686f90afd10d8f89d898bb1960ffe0e4126c3133",
+      "options_sha256": "d3c0382c19956bf6937906dcecdbfff92fa5ad4b88f3a7bf462aeb8f7a8d98a6",
+      "output_sha256": "e9e86fd0da3a0182bbe91c2c8daa8f25aaf69fc11c055e4737592c238d1b0bb1",
+      "diagnostics": 0,
+      "types": 1564419
+    },
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsgo",
+        "sha256": "57ab2bcc2c59862d56fe53a3c87240f22bcd692316e7d261a012f736ae5f4d87",
+        "bytes": 39040034
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsrust",
+        "sha256": "5abc9fb5b89a3276335c49cffecd7a1413540462ea0442faeb8c85175f8ad247",
+        "bytes": 46788464
+      }
+    },
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "load": {
+      "2": {
+        "before": [8.07, 8.95, 8.31],
+        "after": [6.07, 7.52, 7.83],
+        "other_cpu_before": {
+          "percent": 151.1,
+          "busiest": [["StorageManagementService", 69.8], ["ApplicationsStorageExtension", 33.8], ["WindowServer", 7.3], ["WallpaperAerialsExtension", 4.9], ["sysmond", 3.9]]
+        }
+      },
+      "4": {
+        "before": [6.07, 7.52, 7.83],
+        "after": [9.31, 8.08, 7.98],
+        "other_cpu_before": {
+          "percent": 156.4,
+          "busiest": [["StorageManagementService", 67.5], ["WindowServer", 35.9], ["Google Chrome Helper (Renderer)", 9.2], ["Google Chrome Helper (Renderer)", 6.1], ["coreaudiod", 3.6]]
+        }
+      },
+      "8": {
+        "before": [9.31, 8.08, 7.98],
+        "after": [13.67, 10.85, 9.18],
+        "other_cpu_before": {
+          "percent": 302.0,
+          "busiest": [["StorageManagementService", 74.2], ["ApplicationsStorageExtension", 52.0], ["WindowServer", 39.8], ["searchpartyd", 35.2], ["Storage", 20.9]]
+        }
+      }
+    },
+    "host_busy": true,
+    "host_busy_rule": "other processes above 200% of one CPU before a configuration",
+    "sampling": "one warm-up pair, then 7 alternating pairs, once extended to 14",
+    "elapsed": "process launch to exit; operation_ns is the binary's own Total time"
+  }
+}
