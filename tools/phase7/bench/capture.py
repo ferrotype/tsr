@@ -52,7 +52,12 @@ from s07_benchmark_stats import ratio_summary  # noqa: E402
 
 FORMAT = 1
 PAIRS = (7, 14)
-BUSY_LOAD = 2.0
+# Other processes' CPU before a configuration, in percent of one CPU (ps's
+# decaying average); above this the configuration ran on a busy host. The load
+# average is kept too, but just after a measured compile it reflects that
+# compile, not the host.
+BUSY_OTHER_CPU = 200.0
+OWN_PROCESSES = {'tsgo', 'tsrust'}
 THRESHOLDS = {'elapsed': 1.0, 'peak_rss': 0.70}
 CONTROLS = {'check': ['--noCheck'], 'emit': ['--noEmit']}
 
@@ -183,6 +188,19 @@ def load_average():
     return [round(value, 2) for value in os.getloadavg()]
 
 
+def other_cpu():
+    """The CPU the host's other processes use, in percent of one CPU, with
+    the five busiest by name (names only, never arguments)."""
+    rows = []
+    for line in subprocess.check_output(['ps', '-Ao', 'pcpu=,comm='], text=True).splitlines():
+        cpu, _, command = line.strip().partition(' ')
+        name = Path(command.strip()).name
+        if name not in OWN_PROCESSES and name != Path(sys.executable).name:
+            rows.append((float(cpu), name))
+    rows.sort(reverse=True)
+    return {'percent': round(sum(cpu for cpu, _ in rows), 1), 'busiest': [[name, cpu] for cpu, name in rows[:5]]}
+
+
 def summaries(pairs):
     """Per metric: the S07 ratio summary over complete pairs."""
     result = {}
@@ -198,7 +216,8 @@ def measure(descriptor, mode, checkers, binaries, pairs, log, reference=None):
     """One configuration: a warm-up pair, then `pairs` alternating pairs, once
     extended to the larger count when the elapsed summary asks for it."""
     config = {'scenario': descriptor['name'], 'mode': mode, 'checkers': checkers,
-              'load_before': load_average(), 'warmup': {}, 'pairs': [], 'failures': []}
+              'load_before': load_average(), 'other_cpu_before': other_cpu(),
+              'warmup': {}, 'pairs': [], 'failures': []}
     for runtime in ('go', 'rust'):
         measured, _, found = validated(binaries[runtime], descriptor, mode, checkers, runtime, reference)
         config['warmup'][runtime] = {'wall_ns': measured['wall_ns'], 'problems': found}
@@ -223,7 +242,7 @@ def measure(descriptor, mode, checkers, binaries, pairs, log, reference=None):
         print(f"{descriptor['name']} {mode} {checkers}: elapsed {elapsed['ratio']:.3f} "
               f"[{elapsed['bootstrap']['lower']:.3f}, {elapsed['bootstrap']['upper']:.3f}], "
               f"peak RSS {config['summaries']['peak_rss']['ratio']:.3f}, {len(config['pairs'])} pairs, "
-              f"load {config['load_before'][0]}", file=log, flush=True)
+              f"other CPU {config['other_cpu_before']['percent']:.0f}%", file=log, flush=True)
     else:
         print(f"{descriptor['name']} {mode} {checkers}: FAILED {config['failures'][:3]}", file=log, flush=True)
     return config
@@ -305,13 +324,15 @@ def read_capture(path, scenario, mode):
             for field in ('wall_ns', 'peak_rss_bytes', 'operation_ns', 'check_ns', 'user_ns', 'system_ns',
                           'effective_checkers'):
                 samples[runtime][f'{field}_{checkers}'] = [pair[runtime][field] for pair in pairs]
-        loads[str(checkers)] = {'before': config['load_before'], 'after': config['load_after']}
+        loads[str(checkers)] = {'before': config['load_before'], 'after': config['load_after'],
+                                'other_cpu_before': config.get('other_cpu_before')}
     work = report['scenarios'][scenario]['work'][mode]
-    busy = any(load['before'][0] > BUSY_LOAD for load in loads.values())
+    busy = any((load['other_cpu_before'] or {}).get('percent', 0) > BUSY_OTHER_CPU for load in loads.values())
     metadata = {'scenario': scenario, 'mode': mode, 'source': report['scenarios'][scenario]['source'],
                 'project': report['scenarios'][scenario]['project'],
                 'arguments': report['scenarios'][scenario]['modes'][mode], 'work': work,
-                'binaries': report['binaries'], 'pin': report['pin'], 'load_average': loads, 'host_busy': busy,
+                'binaries': report['binaries'], 'pin': report['pin'], 'load': loads, 'host_busy': busy,
+                'host_busy_rule': f'other processes above {BUSY_OTHER_CPU:.0f}% of one CPU before a configuration',
                 'sampling': f'one warm-up pair, then {PAIRS[0]} alternating pairs, once extended to {PAIRS[1]}',
                 'elapsed': 'process launch to exit; operation_ns is the binary\'s own Total time'}
     return {'ratios': ratios, 'samples': samples, 'summaries': summary, 'metadata': metadata,

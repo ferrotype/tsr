@@ -166,11 +166,12 @@ def pair(index, go_wall, rust_wall):
             'go': sample(go_wall), 'rust': sample(rust_wall)}
 
 
-def synthetic_capture(directory, **changes):
+def synthetic_capture(directory, busy=150.0, **changes):
     configurations = []
     for checkers in common.CHECKERS:
         configurations.append({'scenario': 'xstate', 'mode': 'check', 'checkers': checkers, 'failures': [],
-                               'load_before': [1.0, 1.0, 1.0], 'load_after': [1.0, 1.0, 1.0],
+                               'load_before': [9.0, 9.0, 9.0], 'load_after': [9.0, 9.0, 9.0],
+                               'other_cpu_before': {'percent': 150.0 if checkers != 8 else busy, 'busiest': []},
                                'pairs': [pair(index, 1_000_000_000 + index, 2_000_000_000 + index) for index in range(7)]})
     report = {'format': capture.FORMAT, 'complete': True, 'dirty': False, 'revision': 'f' * 40, 'pin': 'e' * 40,
               'finished': '2026-10-10T00:00:00Z', 'modes': ['check'], 'host': {'os': 'darwin', 'architecture': 'arm64', 'cpu_capacity': 18},
@@ -189,7 +190,10 @@ class ReaderTests(unittest.TestCase):
         self.assertAlmostEqual(measurement['ratios']['elapsed_4'], 2.0, places=2)
         self.assertEqual(measurement['ratios']['peak_rss_8'], 1.0)
         self.assertEqual(len(measurement['samples']['rust']['wall_ns_2']), 7)
-        self.assertFalse(measurement['metadata']['host_busy'])
+        self.assertFalse(measurement['metadata']['host_busy'], 'a high load average alone is the capture itself')
+        with tempfile.TemporaryDirectory() as directory:
+            busy = capture.read_capture(synthetic_capture(directory, busy=450.0), 'xstate', 'check')
+        self.assertTrue(busy['metadata']['host_busy'])
 
     def test_incomplete_dirty_or_disordered_captures_are_refused(self):
         def disorder(report):
