@@ -75,8 +75,11 @@ def node_command(node, bench, out, single=False):
 
 
 def run_file(node, bench, out, env=None, single=False):
+    # Its own session: when the client cannot spawn its server, its error
+    # path calls kill() on a child without a pid, which node sends as
+    # kill(0, SIGTERM) to the whole process group.
     result = subprocess.run(node_command(node, bench, out, single), cwd=PACKAGE, env=env or os.environ,
-                            capture_output=True, text=True, timeout=TIMEOUT_SECONDS)
+                            capture_output=True, text=True, timeout=TIMEOUT_SECONDS, start_new_session=True)
     if result.returncode != 0 or not Path(out).is_file():
         raise ValueError(f'{bench} exited {result.returncode}: {result.stderr[-2000:]}')
     benches = json.loads(Path(out).read_text())['benches']
@@ -108,11 +111,16 @@ def prerequisites():
 
 
 def capture(output, rounds=ROUNDS, log=sys.stdout):
+    # node runs in the client's package directory: name files absolutely.
+    output = Path(output).resolve()
     if output.exists() and any(output.iterdir()):
         raise ValueError(f'{output} is not empty; a capture is never overwritten')
     output.mkdir(parents=True, exist_ok=True)
     node, version = prerequisites()
     binaries = common.binaries()
+    server = HERE / 'server_rss.py'
+    if not os.access(server, os.X_OK):
+        raise ValueError(f'{server} is not executable: the client spawns it directly in the memory pass')
     host = host_info(minimum_cpus=1)
     reject_concurrent_builds()
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
@@ -134,7 +142,6 @@ def capture(output, rounds=ROUNDS, log=sys.stdout):
                     report['runs'].append({'mode': mode, 'round': index, 'runtime': runtime, 'tasks': tasks})
                     print(f'api {mode} round {index} {runtime}: {len(tasks)} tasks', file=log, flush=True)
                     path.write_text(json.dumps(report) + '\n')
-        server = HERE / 'server_rss.py'
         for mode, bench in FILES.items():
             report['memory'][mode] = {}
             for runtime in ('go', 'rust'):
