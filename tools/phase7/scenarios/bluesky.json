@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "name": "bluesky",
+  "source": {
+    "repository": "https://github.com/bluesky-social/social-app",
+    "commit": "c1c090dd4ef68f7a107e1b13e67a0525f5d643f6",
+    "origin": "not in typescript-benchmarking: the Bluesky client at a commit frozen for Phase 7"
+  },
+  "install": {
+    "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0",
+    "commands": [
+      "npx -y pnpm@11.28.5 install --frozen-lockfile --ignore-scripts",
+      "npx -y pnpm@11.28.5 run postinstall"
+    ]
+  },
+  "project": ".",
+  "modes": {
+    "check": [
+      "--noEmit"
+    ],
+    "emit": [
+      "--noEmit",
+      "false",
+      "--rewriteRelativeImportExtensions",
+      "--outDir",
+      "@OUT@"
+    ]
+  },
+  "notes": "Installed with pnpm 11.28.5, the version its lockfile records under packageManagerDependencies, without dependency scripts, then the root postinstall, which generates the lexicons and the compiled locale messages the sources import. The configuration sets allowImportingTsExtensions with noEmit; checking plus emit adds rewriteRelativeImportExtensions, without which the options error stops checking.",
+  "work": {
+    "check": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 6090,
+      "listed": 6090,
+      "inputs_sha256": "94780bce8ccb766acb50209b6e2994c7ab0cda3163e386b4986de5119bd5a431",
+      "options_sha256": "26cb613aed8c2894e44b5fddffc789b7cab38008ccbe40a0d782756c74cdef35",
+      "output_sha256": "b4179e90f87f331a3e0d1f31c25dfd578c7e1785ac62642dc472908bdb9830f1",
+      "diagnostics": 263,
+      "types": 1186682
+    },
+    "emit": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 6090,
+      "listed": 6090,
+      "inputs_sha256": "94780bce8ccb766acb50209b6e2994c7ab0cda3163e386b4986de5119bd5a431",
+      "options_sha256": "1bf7a14e816e2931851b64f6bccdb8102529638a02d9f4e7950469ffb85c2979",
+      "output_sha256": "b4179e90f87f331a3e0d1f31c25dfd578c7e1785ac62642dc472908bdb9830f1",
+      "diagnostics": 263,
+      "types": 1186682,
+      "emitted": 2669,
+      "emitted_sha256": "76c0a00fb747d746b36ca81c0cf69f8efd0f59dc1f44dce8801c35f9d441d1cc",
+      "oracle_runs": 3
+    }
+  }
+}

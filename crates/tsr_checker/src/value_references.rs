@@ -403,6 +403,12 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.markIdentifierAliasReferenced
     fn mark_value_identifier_alias(&mut self, node: NodeId, symbol: SymbolId) -> Result<(), Error> {
+        // checkIdentifier reaches this through markLinkedReferences, which
+        // ignores ambient references: they never retain a JS import (the
+        // property-declaration exception cannot apply to an identifier).
+        if self.node(node)?.flags() & nf::AMBIENT != 0 {
+            return Ok(());
+        }
         let parent = self.node(node)?.parent();
         if let Some(parent) = parent {
             let read = self.node(parent)?;

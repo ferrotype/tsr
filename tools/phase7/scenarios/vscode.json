@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "name": "vscode",
+  "source": {
+    "repository": "https://github.com/microsoft/vscode",
+    "commit": "a44adf7f53e00964ab890f9f8758a334f1fc15bc",
+    "origin": "typescript-benchmarking cases/scenarios/vscode (unpinned there); the commit of the S07 parse-bind inventory"
+  },
+  "install": {
+    "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0",
+    "commands": [
+      "npm ci --ignore-scripts"
+    ]
+  },
+  "project": "src",
+  "modes": {
+    "check": [
+      "--noEmit"
+    ],
+    "emit": [
+      "--noEmit",
+      "false",
+      "--outDir",
+      "@OUT@"
+    ]
+  },
+  "notes": "Installed as typescript-benchmarking installs it (npm ci --ignore-scripts), so the electron types stay unresolved there as here: 181 of the 347 diagnostics name Electron.",
+  "work": {
+    "check": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 9628,
+      "listed": 9628,
+      "inputs_sha256": "1df951cde4cdece0d22a507fe58a3cf338f9a4ad4a93ae1f33c17c0552497766",
+      "options_sha256": "329b6b1e526a92fb440e94e2f8d07697362accffdcf66691f7f3536b3c2f8b57",
+      "output_sha256": "7a4e91c3353391aa5879a1e18d935ccf034fdf87fd12714df5e18791a66bea5d",
+      "diagnostics": 347,
+      "types": 2796771
+    },
+    "emit": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 9628,
+      "listed": 9628,
+      "inputs_sha256": "1df951cde4cdece0d22a507fe58a3cf338f9a4ad4a93ae1f33c17c0552497766",
+      "options_sha256": "4f9e1db8c613396d1afbe342887e4a117055093cef8c5d62d3417a71065cc360",
+      "output_sha256": "7a4e91c3353391aa5879a1e18d935ccf034fdf87fd12714df5e18791a66bea5d",
+      "diagnostics": 347,
+      "types": 2803957,
+      "emitted": 8616,
+      "emitted_sha256": "32412d77122d1d730ed12c8459b9e9e51e1975b08de39056b12aa4f87ab1ff39",
+      "oracle_runs": 3
+    }
+  }
+}

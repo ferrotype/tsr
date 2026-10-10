@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "mui-docs",
+  "source": {
+    "repository": "https://github.com/mui/material-ui",
+    "commit": "6780195595c12252a130aa5ae5c5bd461229c6b7",
+    "origin": "typescript-benchmarking cases/scenarios/mui-docs, at its pinned commit"
+  },
+  "install": {
+    "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0",
+    "commands": [
+      "npx -y pnpm@12.6.0 install --frozen-lockfile --ignore-scripts"
+    ]
+  },
+  "project": "docs",
+  "modes": {
+    "check": [
+      "--noEmit",
+      "--incremental",
+      "false"
+    ],
+    "emit": [
+      "--noEmit",
+      "false",
+      "--incremental",
+      "false",
+      "--rootDir",
+      ".",
+      "--outDir",
+      "@OUT@"
+    ]
+  },
+  "notes": "The docs project sets incremental, allowJs, and includes workspace sources outside docs/. Both modes disable incremental so that every run is cold and writes no build info into the checkout; checking plus emit sets rootDir to the checkout, without which the pin requires it (TS5011) and maps those files onto themselves (TS5055) and the options errors stop checking. The pin emits a varying subset of the workspace sources that the docs project reaches both through node_modules symlinks and through their real paths: twelve runs emitted 13,372 to 13,399 files, different ones each time. The descriptor records the union; Rust, which emits all of them every run, must match it, and the oracle may omit up to 1% of it but change no file.",
+  "oracle_emit_varies": true,
+  "work": {
+    "check": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 16766,
+      "listed": 16766,
+      "inputs_sha256": "a7607e734997c6debe79badc686f90afd10d8f89d898bb1960ffe0e4126c3133",
+      "options_sha256": "d3c0382c19956bf6937906dcecdbfff92fa5ad4b88f3a7bf462aeb8f7a8d98a6",
+      "output_sha256": "e9e86fd0da3a0182bbe91c2c8daa8f25aaf69fc11c055e4737592c238d1b0bb1",
+      "diagnostics": 0,
+      "types": 1564419
+    },
+    "emit": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 16766,
+      "listed": 16766,
+      "inputs_sha256": "a7607e734997c6debe79badc686f90afd10d8f89d898bb1960ffe0e4126c3133",
+      "options_sha256": "7d95e2c80aecfdb76850ab12d0cff9b4d4cf980fb35425d18ef351ce97dd41f9",
+      "output_sha256": "e9e86fd0da3a0182bbe91c2c8daa8f25aaf69fc11c055e4737592c238d1b0bb1",
+      "diagnostics": 0,
+      "types": 1564419,
+      "emitted": 13399,
+      "emitted_sha256": "07c18e9210a2b3edaba53474b140fd74c9178312e78a73e53bbcba27a52c905a",
+      "oracle_runs": 12,
+      "emitted_in_every_run": 13364
+    }
+  }
+}

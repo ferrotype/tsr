@@ -1,6 +1,7 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **detailed plan, proposed** (2026-10-08). The detailed plan for
+Status: **R0 in progress** (2026-10-10); owner decisions 7, 9 and 11 accepted,
+the others open. The detailed plan for
 [PLAN Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over),
 the last phase: it turns PLAN section 5's exit criteria and the
 [acceptance matrix](S12-acceptance.md) of ADR 0020 into checkpoints with
@@ -662,21 +663,24 @@ again.
    with dependency additions handled under ADR 0017.
 6. **Native binary size.** Not in PLAN or ADR 0020; proposed target 1.0 of
    `tsgo` per target, measured in R6 after the release profile is chosen.
-7. **API benchmark targets.** Not in PLAN or ADR 0020; proposed 1.0 of the
-   pin per server-dependent named task and sync/async mode, recorded as
-   workload `api`. Client-only controls carry no server budget.
+7. **API benchmark targets.** Not in PLAN or ADR 0020. **Decided by the
+   owner 2026-10-10:** elapsed at most 1.25 of the pin per server-dependent
+   named task and sync/async mode, and the servers' peak memory at most 0.85,
+   recorded as workload `api`. Client-only controls carry no server budget.
 8. **Release layout and packaging.** The staged platform package resolved by
    the pinned client and extension; npm publishing stays a non-goal;
    0.4.0 as the proposed next lockstep version, prepared at R6. Publishing
    the verified candidate remains an explicit release decision.
 9. **Phase 5's L8 work** starts alongside R0 (recommended) or before it.
+   **Decided by the owner 2026-10-10:** alongside R0.
    The audit may require implementation and direct-test ports; it is complete
    before R6, and Phase 5's status line changes only when it is resolved.
 10. **Dogfood scope.** Which projects, and that the four weeks start when R6
     is merged; crashes get reproducers for their actual entry points.
 11. **Allocation.** Proposed: Claude builds R0 and R7's records and reviews
     every checkpoint PR; Astra builds R1, R2 and R6; R3, R4 and R5 are split
-    by crate after R0, as Phase 6's A5 was.
+    by crate after R0, as Phase 6's A5 was. **Accepted by the owner
+    2026-10-10.**
 12. **The pin bump rehearsal** in R7 (recommended) or after cut-over.
 13. **Plan review:** completed by Codex/Astra on 2026-10-09, with amendments
     on this PR. This review does not approve the remaining owner choices.

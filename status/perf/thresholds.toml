@@ -31,3 +31,117 @@ completion = 1.0
 hover = 1.0
 references = 1.0
 rename = 1.0
+
+# Phase 7 targets (PLAN section 5, docs/S12-acceptance.md, docs/PHASE7-plan.md
+# R0): full checking and checking plus emit of each benchmarking scenario at 2,
+# 4 and 8 checkers. Elapsed is launch to exit of a fresh process, peak RSS that
+# process's own; acceptance is four consecutive weekly runs, not one record.
+
+[check-vscode]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[emit-vscode]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[check-self-compiler]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[emit-self-compiler]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[check-mui-docs]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[emit-mui-docs]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[check-xstate]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[emit-xstate]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[check-bluesky]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+[emit-bluesky]
+elapsed_2 = 1.0
+elapsed_4 = 1.0
+elapsed_8 = 1.0
+peak_rss_2 = 0.70
+peak_rss_4 = 0.70
+peak_rss_8 = 0.70
+
+# Phase 7 owner decision 7 (2026-10-10): the pin's JS API benchmarks against the
+# Rust server, one ratio per server-dependent task and sync/async mode (median
+# latency over the rounds) and the servers' peak RSS per mode. Client-only tasks
+# (`TS - ...`, `materialize ...`, test/nodelist.bench.ts) are controls without a
+# ratio (tools/phase7/api/capture.py).
+[api]
+elapsed_sync_spawn_api = 1.25
+elapsed_sync_load_snapshot = 1.25
+elapsed_sync_transfer_debug_ts = 1.25
+elapsed_sync_transfer_program_ts = 1.25
+elapsed_sync_transfer_checker_ts = 1.25
+elapsed_sync_getsymbolatposition_one_location = 1.25
+elapsed_sync_getsymbolatposition_identifiers = 1.25
+elapsed_sync_getsymbolatposition_identifiers_batched = 1.25
+elapsed_sync_getsymbolatlocation_identifiers = 1.25
+elapsed_sync_getsymbolatlocation_identifiers_batched = 1.25
+elapsed_async_spawn_api = 1.25
+elapsed_async_load_snapshot = 1.25
+elapsed_async_transfer_debug_ts = 1.25
+elapsed_async_transfer_program_ts = 1.25
+elapsed_async_transfer_checker_ts = 1.25
+elapsed_async_getsymbolatposition_one_location = 1.25
+elapsed_async_getsymbolatposition_identifiers = 1.25
+elapsed_async_getsymbolatposition_identifiers_batched = 1.25
+elapsed_async_getsymbolatlocation_identifiers = 1.25
+elapsed_async_getsymbolatlocation_identifiers_batched = 1.25
+peak_rss_sync = 0.85
+peak_rss_async = 0.85
