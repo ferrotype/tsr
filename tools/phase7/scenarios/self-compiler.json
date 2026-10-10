@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "name": "self-compiler",
+  "source": {
+    "repository": "https://github.com/microsoft/TypeScript",
+    "commit": "b465fdbfe175304d9b977da137b2c178ae1091d3",
+    "origin": "typescript-benchmarking cases/scenarios/self-compiler, renamed strada-compiler: the strada branch"
+  },
+  "install": {
+    "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0",
+    "commands": [
+      "npm ci",
+      "npx hereby generate-diagnostics"
+    ]
+  },
+  "project": "src/compiler",
+  "modes": {
+    "check": [
+      "--noEmit",
+      "--incremental",
+      "false",
+      "--composite",
+      "false"
+    ],
+    "emit": [
+      "--noEmit",
+      "false",
+      "--incremental",
+      "false",
+      "--composite",
+      "false",
+      "--outDir",
+      "@OUT@"
+    ]
+  },
+  "notes": "src/compiler is a composite project, which implies incremental: both modes disable both so that every run is cold and writes no build info into the checkout.",
+  "work": {
+    "check": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 249,
+      "listed": 249,
+      "inputs_sha256": "6f6b3708637c90098782e93eff5581a3fa4c38088c5f169e95d3191fc7bcd110",
+      "options_sha256": "1a5b02715545ba553595cc6dbfc71240d1e136db33916d754c5fed5640cf5dbc",
+      "output_sha256": "07492584e74fc2d41c2525e159c2dd5790dc0cebd1a52a5dff8e14b0c4c434f3",
+      "diagnostics": 0,
+      "types": 198830
+    },
+    "emit": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 249,
+      "listed": 249,
+      "inputs_sha256": "6f6b3708637c90098782e93eff5581a3fa4c38088c5f169e95d3191fc7bcd110",
+      "options_sha256": "050a897b10d3b72efa5c38ba21c66786727a02d399fa870c5f1c5c423f466776",
+      "output_sha256": "07492584e74fc2d41c2525e159c2dd5790dc0cebd1a52a5dff8e14b0c4c434f3",
+      "diagnostics": 0,
+      "types": 198830,
+      "emitted": 156,
+      "emitted_sha256": "f321984d16f50aaf3d53fdf71c7e90d46d3da1a62c40f602bd0255d7337df3b1",
+      "oracle_runs": 3
+    }
+  }
+}

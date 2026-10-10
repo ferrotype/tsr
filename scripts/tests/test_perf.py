@@ -19,6 +19,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import perf  # noqa: E402
 
 RUN_KEYS = {"workload", "pin", "revision", "host", "recorded_at", "ratios", "samples"}
+API_TASKS = ("spawn_api", "load_snapshot", "transfer_debug_ts", "transfer_program_ts", "transfer_checker_ts",
+             "getsymbolatposition_one_location", "getsymbolatposition_identifiers",
+             "getsymbolatposition_identifiers_batched", "getsymbolatlocation_identifiers",
+             "getsymbolatlocation_identifiers_batched")
+SCENARIO_WORKLOADS = {f"{mode}-{scenario}" for scenario in perf.SCENARIOS for mode in perf.SCENARIO_MODES}
 REVISION = "0123456789abcdef0123456789abcdef01234567"
 HOST = {"os": "darwin", "architecture": "arm64", "release": "25.6.0", "cpu_capacity": 18,
         "physical_cpus": 18, "memory_bytes": 68719476736, "initial_load_average": [1.0, 1.0, 1.0]}
@@ -432,6 +437,13 @@ class CommittedFiles(unittest.TestCase):
                            "peak_rss": 0.85, "allocated_bytes": 0.85},
             "checker": {"type_footprint": 0.85},
             "lsp": dict.fromkeys(perf.LSP_SCENARIOS, 1.0),
+            # Phase 7: PLAN's 1.0/0.70 on each scenario and mode, and owner
+            # decision 7's 1.25/0.85 on each API task and mode.
+            **{f"{mode}-{scenario}": {**{f"elapsed_{n}": 1.0 for n in (2, 4, 8)},
+                                      **{f"peak_rss_{n}": 0.70 for n in (2, 4, 8)}}
+               for scenario in perf.SCENARIOS for mode in perf.SCENARIO_MODES},
+            "api": {**{f"elapsed_{mode}_{task}": 1.25 for mode in ("sync", "async") for task in API_TASKS},
+                    "peak_rss_sync": 0.85, "peak_rss_async": 0.85},
         })
         self.assertEqual(tomllib.loads(perf.THRESHOLDS.read_text()), tables)
         for workload in tables:
@@ -446,7 +458,8 @@ class CommittedFiles(unittest.TestCase):
             for run, path in perf.runs(workload):
                 found += 1
                 with self.subTest(path=path.name):
-                    self.assertEqual(set(run), RUN_KEYS | ({"summaries", "metadata"} & set(run) if workload == "lsp" else set()))
+                    detailed = workload == "lsp" or workload == "api" or workload in SCENARIO_WORKLOADS
+                    self.assertEqual(set(run), RUN_KEYS | ({"summaries", "metadata"} & set(run) if detailed else set()))
                     self.assertEqual(run["workload"], workload)
                     self.assertEqual(perf.run_path(perf.PERF, run), path)
                     self.assertRegex(run["revision"], r"^[0-9a-f]{40}$")
@@ -458,7 +471,9 @@ class CommittedFiles(unittest.TestCase):
                     for runtime, lists in run["samples"].items():
                         self.assertIn(runtime, ("rust", "go"))
                         self.assertEqual(set(lists), set(run["samples"]["rust"]))
-                        self.assertTrue(all(len(values) in ((20, 40) if workload == "lsp" else (7,)) for values in lists.values()))
+                        counts = ((20, 40) if workload == "lsp" else (7, 14) if workload in SCENARIO_WORKLOADS
+                                  else None if workload == "api" else (7,))
+                        self.assertTrue(all(len(values) in counts if counts else values for values in lists.values()))
                     rows = perf.compare(run, thresholds.get(workload, {}))
                     # Recorded misses remain evidence; perf.check reports failure.
                     # The committed-data check still rejects absent ratios/intervals.
