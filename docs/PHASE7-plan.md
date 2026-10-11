@@ -279,6 +279,13 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
   commands, the numbers at exit and what the next checkpoint inherits.
   `status/perf` recordings are the owner's host's; a development number is
   labelled as such everywhere it appears.
+- **Capture location.** Keep benchmark captures, profiles and the exact saved
+  comparison binaries outside Cargo's `target/`, under the sibling
+  `../ts-rust-benchmarks/` directory (or an explicitly chosen external path).
+  `target/` is for disposable build outputs. Give each run a new output directory;
+  do not replace earlier results. The 2026-10-11 archive preserves existing
+  captures under `../ts-rust-benchmarks/2026-10-11/target/`, with verified file
+  hashes and materialized executable symlinks.
 - **Measurement cost.** Use focused parity and bounded concurrent candidate/
   control pairs while developing. Screen connected storage/CPU changes as
   one combined candidate; component measurements explain costs, not additive

@@ -122,17 +122,19 @@ Finish builds, tests and profiling before timing. These scripts never build
 or replace the supplied executables.
 
 ```sh
+BENCHMARK_RUNS=../ts-rust-benchmarks
+BENCHMARK_ARCHIVE="$BENCHMARK_RUNS/2026-10-11/target"
 GOGC=100 python3 tools/phase7/lsp/pairs.py \
-  --control target/phase7/r1/bin/candidate \
-  --candidate target/phase7/r2/bin/candidate \
-  --fixture target/phase5/latency/typescript-proposal \
+  --control "$BENCHMARK_ARCHIVE"/phase7/r1/bin/candidate \
+  --candidate "$BENCHMARK_ARCHIVE"/phase7/r2/bin/candidate \
+  --fixture "$BENCHMARK_ARCHIVE"/phase5/latency/typescript-proposal \
   --scenario tools/phase5/latency/proposals/typescript-pull.json \
-  --pairs 20 --output target/phase7/r2/NEW_LSP_SCREEN
+  --pairs 20 --output "$BENCHMARK_RUNS"/phase7/r2/NEW_LSP_SCREEN
 GOGC=100 python3 tools/phase7/api/pairs.py \
-  --control target/phase7/r1/bin/candidate \
-  --candidate target/phase7/r2/bin/candidate \
+  --control "$BENCHMARK_ARCHIVE"/phase7/r1/bin/candidate \
+  --candidate "$BENCHMARK_ARCHIVE"/phase7/r2/bin/candidate \
   --mode sync --task location --pairs 5 --iterations 10 \
-  --output target/phase7/r2/NEW_API_SCREEN
+  --output "$BENCHMARK_RUNS"/phase7/r2/NEW_API_SCREEN
 ```
 
 Repeat the API command with `--mode async` and `--task position` to cover both
@@ -161,17 +163,21 @@ not change.
 Profile separately, for example:
 
 ```sh
+BENCHMARK_RUNS=../ts-rust-benchmarks
+BENCHMARK_ARCHIVE="$BENCHMARK_RUNS/2026-10-11/target"
 python3 tools/phase7/lsp/profile.py \
-  --binary target/phase7/r1/bin/candidate \
-  --fixture target/phase5/latency/typescript-proposal \
+  --binary "$BENCHMARK_ARCHIVE"/phase7/r1/bin/candidate \
+  --fixture "$BENCHMARK_ARCHIVE"/phase5/latency/typescript-proposal \
   --scenario tools/phase5/latency/proposals/typescript-pull.json \
   --metric completion --repeats 1000 \
-  --output target/phase7/r2/NEW_PROFILE
+  --output "$BENCHMARK_RUNS"/phase7/r2/NEW_PROFILE
 ```
 
 Open the saved `cpu.json.gz` with `samply load`. The profile helper and paired
-runners are committed; binaries and captures under `target/` are disposable
-artifacts. Copy them outside that directory if they must survive `cargo clean`.
+runners are committed. Historical `target/` paths in this record now have
+verified copies under `../ts-rust-benchmarks/2026-10-11/target/`. The commands
+above use the archived binaries and fixture and write new runs outside the
+build directory. Captures and saved comparison binaries must survive `cargo clean`.
 
 ## Remaining checkpoint work
 
