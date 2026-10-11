@@ -338,6 +338,7 @@ impl CheckerState {
             )
         {
             let source = self.check_expression_ex(right, mode)?;
+            // checkchildren-allow: right operand was checked; check_destructuring_assignment checks left pattern
             return self.check_destructuring_assignment(
                 left,
                 source,
@@ -347,6 +348,23 @@ impl CheckerState {
         }
         let a = self.check_expression_ex(left, mode)?;
         let b = self.check_expression_ex(right, mode)?;
+        self.check_binary_operands(node, left, right, op, a, b)
+    }
+
+    /// Operator semantics shared by native recursive evaluation and the wasm
+    /// continuation driver. Both operands have been checked, left before right,
+    /// with this binary expression restored as the current node.
+    pub(crate) fn check_binary_operands(
+        &mut self,
+        node: NodeId,
+        left: NodeId,
+        right: NodeId,
+        op: NodeId,
+        a: TypeId,
+        b: TypeId,
+    ) -> Result<TypeId, Error> {
+        let operator = self.node(op)?.kind();
+        let mode = self.expression_mode;
         match operator.known() {
             Some(
                 K::AmpersandAmpersandToken

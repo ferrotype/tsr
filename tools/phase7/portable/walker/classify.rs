@@ -1,4 +1,4 @@
-//! Syntax predicates used by the native type/symbol baseline traversal.
+//! Syntax predicates used by the shared type/symbol observation traversal.
 use super::Result;
 use tsr_arena::NodeId;
 use tsr_ast::{AstView, SyntaxKind as K};

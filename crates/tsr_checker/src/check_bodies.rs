@@ -137,6 +137,7 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkFunctionOrMethodDeclaration
     pub(crate) fn check_function_declaration(&mut self, function: NodeId) -> Result<(), Error> {
         if self.node(function)?.kind() == K::Constructor {
+            // checkchildren-allow: check_constructor_body checks the constructor signature and body
             return self.check_constructor_body(function);
         }
         if matches!(

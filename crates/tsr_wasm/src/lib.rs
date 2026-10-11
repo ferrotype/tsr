@@ -20,6 +20,11 @@ mod checker;
 #[cfg(feature = "checker")]
 pub use checker::{MemoryHost, WasmSession};
 
+#[cfg(feature = "checker")]
+mod transpile;
+#[cfg(feature = "checker")]
+pub use transpile::{transpile_declaration, transpile_module};
+
 fn options(file_name: &[u8], jsx: bool, force: bool) -> SourceFileParseOptions {
     SourceFileParseOptions {
         file_name: JsString::from_bytes(file_name),

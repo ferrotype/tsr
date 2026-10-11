@@ -2,7 +2,7 @@
 """Suite parity against the pin, as expectation files (docs/EVIDENCE-plan.md).
 
     parity.py list   <suite> [--runner PATH]
-    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH]
+    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH] [--consumer PATH]
     parity.py check  <suite> --results DIR [DIR ...]
     parity.py accept <suite> --results DIR [DIR ...]
 
@@ -17,6 +17,15 @@ baseline output under DIR/local). `check` merges the result directories,
 compares the failing set with status/parity/<suite>.json and exits non-zero
 on any difference; `accept` rewrites that file, keeping every approved
 reason and refreshing the mechanical labels from the run.
+
+`compiler-embed` and `transpile-embed` enumerate their native rosters and grade
+the external Rust consumer. Only `run` needs the consumer: `--consumer` supplies a prebuilt
+executable, otherwise Cargo builds tools/s10/rust-consumer in release. An
+explicit `--runner` bypasses the runner build only; it does not bypass consumer
+selection. `list`, `check` and `accept` never build the consumer.
+`compiler-wasm` and `transpile-wasm` use the same external byte protocols with a separately
+provided wasm host executable; `run` requires an explicit `--consumer` and
+never builds or substitutes a native consumer.
 """
 from __future__ import annotations
 
@@ -28,6 +37,7 @@ import os
 from pathlib import Path
 import platform
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -62,6 +72,10 @@ SUITES = {
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
+    "transpile-embed": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile", "--backend", "embed"), 60),
+    "transpile-wasm": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile", "--backend", "embed"), 60),
+    "compiler-embed": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single", "--backend", "embed"), 600),
+    "compiler-wasm": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single", "--backend", "embed"), 600),
     "tsc": Suite("phase4_tsctests", "phase4_tsctests", ("--suite", "tsc"), 120),
 }
 
@@ -71,6 +85,7 @@ def pin():
 
 
 BATCH_SUITES = ("fourslash", "lsp", "jsapi")
+PORTABLE_SUITES = ("transpile-embed", "transpile-wasm", "compiler-embed", "compiler-wasm")
 
 
 def bridge(suite):
@@ -120,8 +135,71 @@ def runner_path(suite, explicit=None):
     return Path(executables[-1])
 
 
-def runner_command(suite, runner, *rest):
-    return [str(runner), *SUITES[suite].arguments, *rest]
+def consumer_path(explicit=None):
+    """Resolve the external consumer only for `run`; honor Cargo's artifact
+    selection rather than assuming a target directory or host target."""
+    if explicit:
+        executable = Path(explicit).resolve()
+    else:
+        manifest = ROOT / "tools/s10/rust-consumer/Cargo.toml"
+        binary = "s10_rust_consumer"
+        command = ["cargo", "build", "--release", "--locked", "--manifest-path", str(manifest),
+                   "--bin", binary, "--message-format=json-render-diagnostics"]
+        completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        if completed.returncode != 0:
+            sys.stderr.write(completed.stderr)
+            sys.exit("cargo build failed for the embedding consumer")
+        executables = []
+        for line in completed.stdout.splitlines():
+            if not line.startswith("{"):
+                continue
+            artifact = json.loads(line)
+            target = artifact.get("target", {})
+            if (artifact.get("reason") == "compiler-artifact"
+                    and target.get("name") == binary and "bin" in target.get("kind", [])
+                    and artifact.get("manifest_path")
+                    and Path(artifact["manifest_path"]).resolve() == manifest.resolve()
+                    and artifact.get("executable")):
+                executables.append(Path(artifact["executable"]))
+        if len(executables) != 1:
+            sys.exit("cargo did not report exactly one embedding consumer executable")
+        executable = executables[0].resolve()
+    if not executable.is_file() or not os.access(executable, os.X_OK):
+        sys.exit(f"embedding consumer is not an executable file: {executable}")
+    return executable
+
+
+def runner_command(suite, runner, *rest, consumer=None):
+    arguments = [str(runner), *SUITES[suite].arguments]
+    if consumer is not None:
+        if suite not in PORTABLE_SUITES:
+            raise ValueError("a consumer applies only to compiler/transpile embed or wasm suites")
+        arguments.extend(("--consumer", str(consumer)))
+    return [*arguments, *rest]
+
+
+def run_embed_command(command, timeout):
+    """The runner's deadline also kills its external consumer descendants."""
+    with subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          text=True, start_new_session=os.name == "posix") as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except BaseException:
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            elif os.name == "nt":
+                subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                               capture_output=True, check=False)
+                if process.poll() is None:
+                    process.kill()
+            else:
+                process.kill()
+            process.communicate()
+            raise
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
 
 
 def list_variants(suite, runner):
@@ -144,12 +222,15 @@ def shard(variants, spec):
     return variants[index - 1::count], (index, count)
 
 
-def run_variant(suite, runner, variant, local, timeout):
+def run_variant(suite, runner, variant, local, timeout, consumer=None):
     """The result lines of one variant; a crash or a deadline fails the whole variant."""
-    command = runner_command(suite, runner, "run", "--id", variant, "--local", str(local))
+    command = runner_command(suite, runner, "run", "--id", variant, "--local", str(local), consumer=consumer)
     started = time.monotonic()
     try:
-        completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
+        if consumer is not None:
+            completed = run_embed_command(command, timeout)
+        else:
+            completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
         return [{"id": variant, "state": "fail", "reason": f"deadline: {timeout} s"}], time.monotonic() - started
     elapsed = time.monotonic() - started
@@ -177,12 +258,18 @@ def run_variant(suite, runner, variant, local, timeout):
 
 def run(args):
     suite = args.suite
+    explicit_consumer = getattr(args, "consumer", None)
+    if explicit_consumer and suite not in PORTABLE_SUITES:
+        sys.exit("--consumer applies only to compiler/transpile embed or wasm suites")
+    if suite in PORTABLE_SUITES and suite.endswith("-wasm") and not explicit_consumer:
+        sys.exit(suite + " requires --consumer with an explicit wasm host executable")
     # The pinned client's getExePath reads one repository symlink, which the
     # runner points at the binary under test before each file; parallel
     # workers would point it at each other's binary.
     if suite == "jsapi" and (args.jobs or 1) > 1:
         sys.exit("jsapi runs one file at a time: --jobs must be 1")
     runner = runner_path(suite, args.runner)
+    consumer = consumer_path(explicit_consumer) if suite in PORTABLE_SUITES else None
     roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
     variants = args.id or roster
     if args.id and SUITES[suite].batch and (len(set(variants)) != len(variants) or not set(variants) <= set(roster)):
@@ -209,6 +296,8 @@ def run(args):
             "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
     if SUITES[suite].batch:
         meta["native_selection"] = {key: runner[key] for key in ("goos", "goarch", "compiled_sources")}
+    if consumer is not None:
+        meta["consumer"] = str(consumer)
     counts = dict.fromkeys(STATES, 0)
     slowest = []
     with (output / "results.ndjson").open("w") as results, ThreadPoolExecutor(jobs) as pool:
@@ -231,7 +320,7 @@ def run(args):
                 timings = future.result()
                 slowest = sorted(slowest + [(seconds, name) for name, seconds in timings.items()], reverse=True)[:5]
         else:
-            futures = {pool.submit(run_variant, suite, runner, variant, local, timeout): variant for variant in selected}
+            futures = {pool.submit(run_variant, suite, runner, variant, local, timeout, consumer): variant for variant in selected}
             for done, future in enumerate(as_completed(futures), 1):
                 rows, elapsed = future.result()
                 slowest = sorted(slowest + [(elapsed, futures[future])], reverse=True)[:5]
@@ -404,6 +493,7 @@ def main(argv=None):
         if name in ("list", "run"):
             command.add_argument("--runner", help="a prebuilt runner binary, or a Phase 5 prepared.json, instead of building")
         if name == "run":
+            command.add_argument("--consumer", help="external executable: optional for embed suites (otherwise build); required for wasm suites")
             command.add_argument("--output", required=True)
             command.add_argument("--shard", help="i/n: this shard of the sorted variant list")
             command.add_argument("--jobs", type=int)

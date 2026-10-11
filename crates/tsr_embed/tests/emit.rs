@@ -209,6 +209,8 @@ fn emit_returns_the_bytes_checked_program_emit_writes() {
         }
         assert_eq!(observed(&session.emit(&all).unwrap()), expected);
         drop(session);
+        assert!(output.program().is_some());
+        drop(output);
         assert_eq!(counters.snapshot(), Counts::default());
     }
 }

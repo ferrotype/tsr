@@ -50,12 +50,17 @@ impl From<iofs::IoError> for Error {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SnapshotId(u64);
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
-fn snapshot_id() -> SnapshotId {
-    SnapshotId(
-        NEXT_SNAPSHOT
-            .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
-            .expect("filesystem snapshot identities exhausted"),
-    )
+impl SnapshotId {
+    /// Allocate an identity for one immutable filesystem state. A host returns
+    /// `Some(id)` only while all observable contents remain unchanged; changed
+    /// contents require a new identity. Live hosts should return `None`.
+    pub fn fresh() -> Self {
+        Self(
+            NEXT_SNAPSHOT
+                .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+                .expect("filesystem snapshot identities exhausted"),
+        )
+    }
 }
 #[derive(Clone, Debug)]
 pub struct FileContent {
@@ -254,7 +259,7 @@ impl MemoryBuilder {
             cwd: self.cwd,
             case_sensitive: self.case_sensitive,
             entries: self.entries,
-            id: snapshot_id(),
+            id: SnapshotId::fresh(),
         }
     }
 }

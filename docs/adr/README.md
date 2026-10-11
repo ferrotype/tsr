@@ -27,6 +27,7 @@ One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` o
 | [0021](0021-parse-and-bind-performance-thresholds.md) | Parse-and-bind performance thresholds re-based on measured evidence | Accepted |
 | [0022](0022-checker-type-footprint-threshold.md) | Checker per-type footprint threshold | Accepted |
 | [0023](0023-expectation-files-replace-recorded-evidence.md) | Expectation files computed by CI replace recorded evidence | Accepted |
+| [0024](0024-profiling-compatibility-out-of-scope.md) | Profiling compatibility is out of scope | Accepted |
 
 The three contracts (0006, 0007, 0013) were accepted by the owner on 2026-09-05 after review of their design notes: [ownership](../design/ownership.md), [symbols](../design/symbols.md) and [text](../design/text.md). Each note cites the pinned upstream code it reproduces and lists what E3 or E4 asserts. ADR 0019 was accepted by the owner on 2026-09-19 with server-owned options, a raw plugin stream tunnel and explicit Phase 5 limitations. ADR 0020 was accepted on 2026-09-20: the owner approved the amended prototype limits, Phase 7 budgets and S12 closure using the indexed recent evidence. Normal current-source freshness checks remain unchanged.
 

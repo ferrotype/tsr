@@ -8,6 +8,12 @@
       "reason": "Repository-only Phase 4 command-line test harness"
     },
     {
+      "name": "phase7_wasm_compiler",
+      "manifest": "tools/phase7/portable/wasm-compiler/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only WebAssembly compiler consumer of the public embedding API"
+    },
+    {
       "name": "s08_relater_prototype",
       "manifest": "tools/s08/relater-prototype/Cargo.toml",
       "publish": false,

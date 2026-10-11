@@ -50,6 +50,8 @@ pub(crate) struct Relations {
 #[cfg(feature = "recursion-probe")]
 #[derive(Default)]
 pub(crate) struct RecursionProbe {
+    /// Exercise the wasm expression continuation driver on native hosts.
+    pub iterative_expressions: bool,
     pub calls: usize,
     pub maximum_depth: usize,
     /// Nesting of `checkExpressionEx`, the deep path of left-nested binary

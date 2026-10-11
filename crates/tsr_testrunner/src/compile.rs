@@ -124,9 +124,9 @@ pub struct Inputs {
 /// resolution trace and everything the writers read.
 pub struct Compilation {
     /// The post-emit program (`createProgram`'s, incremental when asked).
-    pub program: HarnessProgram,
-    /// `Program.Emit`'s result; `None` is Go's nil.
-    pub emit: Option<EmitResult>,
+    pub backend: CompilationBackend,
+    /// `Program.Emit`'s raw result in its backend's representation.
+    pub emit: CompilationEmit,
     /// `OutputRecorderFS` outputs in written order: real path and text.
     pub recorded: Vec<(Vec<u8>, Vec<u8>)>,
     /// The post-emit diagnostics, or the shorter list plus the ad hoc
@@ -140,14 +140,23 @@ pub struct Compilation {
     pub trace: Vec<u8>,
     pub inputs: Inputs,
     /// The writers' view of `program`, which `result()` borrows.
-    facts: ProgramFacts,
-    /// The pre-emit program, retained only when the counts differ: its
-    /// diagnostics may then be among `diagnostics`, and a diagnostic names
-    /// its file by an identity that does not retain the file (Go's
-    /// `*SourceFile` pointer does). The two programs share every file the
-    /// cache could reuse, so this keeps alive only what the pre-emit
-    /// program loaded on its own.
-    pre_program: Option<HarnessProgram>,
+    pub(crate) facts: ProgramFacts,
+    pub(crate) maps: Option<Vec<SourceMapEmitResult>>,
+    pub(crate) config: ParsedCommandLine,
+}
+
+pub enum CompilationEmit {
+    Native(Option<EmitResult>),
+    Portable(Option<crate::compiler_protocol::EmitSnapshot>),
+}
+
+/// The backend retains every source owner named by its raw diagnostics.
+pub enum CompilationBackend {
+    Native {
+        program: HarnessProgram,
+        pre_program: Option<HarnessProgram>,
+    },
+    Portable(crate::portable_compiler::Session),
 }
 
 impl Compilation {
@@ -167,7 +176,7 @@ impl Compilation {
             &inputs.current_directory,
             false,
         )?;
-        compile_files_ex(inputs, testdata)
+        self.compile_followup(inputs, testdata)
     }
 
     /// The writers' view (`newCompilationResult` over the recorded outputs):
@@ -183,7 +192,7 @@ impl Compilation {
             &self.facts,
             &recorded,
             self.diagnostics.len(),
-            source_maps(self.emit.as_ref()),
+            self.maps.clone(),
         )
     }
 
@@ -202,7 +211,90 @@ impl Compilation {
     /// post-emit one (see `diagnostics`), so a renderer can resolve the
     /// files of the pre-emit diagnostics it reports.
     pub fn pre_program(&self) -> Option<&HarnessProgram> {
-        self.pre_program.as_ref()
+        match &self.backend {
+            CompilationBackend::Native { pre_program, .. } => pre_program.as_ref(),
+            CompilationBackend::Portable(_) => None,
+        }
+    }
+
+    pub fn native_program(&self) -> Option<&HarnessProgram> {
+        match &self.backend {
+            CompilationBackend::Native { program, .. } => Some(program),
+            CompilationBackend::Portable(_) => None,
+        }
+    }
+    pub fn portable_session(&self) -> Option<&crate::portable_compiler::Session> {
+        match &self.backend {
+            CompilationBackend::Portable(session) => Some(session),
+            CompilationBackend::Native { .. } => None,
+        }
+    }
+    pub fn config(&self) -> &ParsedCommandLine {
+        &self.config
+    }
+    pub fn diagnostic_sources(&self) -> &dyn tsr_compiler::diagnostic_writer::DiagnosticSources {
+        self
+    }
+    pub fn sources(&self) -> &dyn crate::harness::errors::ContentMapperSources {
+        self
+    }
+    /// Declaration and noCheck recompilations stay on this backend. A child
+    /// failure is returned directly, never retried through the native compiler.
+    pub fn compile_followup(
+        &self,
+        inputs: Inputs,
+        testdata: &TestData,
+    ) -> Result<Self, CompileError> {
+        match &self.backend {
+            CompilationBackend::Native { .. } => compile_files_ex(inputs, testdata),
+            CompilationBackend::Portable(session) => session.compile_followup(inputs, testdata),
+        }
+    }
+}
+
+impl tsr_compiler::diagnostic_writer::DiagnosticSources for Compilation {
+    fn diagnostic_source(
+        &self,
+        id: NodeId,
+    ) -> Result<tsr_ast::SourceFileRead<'_>, tsr_compiler::Error> {
+        match &self.backend {
+            CompilationBackend::Native {
+                program,
+                pre_program,
+            } => match program.program().diagnostic_source(id) {
+                Err(tsr_compiler::Error::Ast(tsr_arena::Error::WrongOwner)) => pre_program
+                    .as_ref()
+                    .ok_or(tsr_arena::Error::WrongOwner)?
+                    .program()
+                    .diagnostic_source(id),
+                result => result,
+            },
+            CompilationBackend::Portable(session) => session.sources().diagnostic_source(id),
+        }
+    }
+    fn supplemental_sources(&self, id: NodeId) -> Result<Vec<NodeId>, tsr_compiler::Error> {
+        match &self.backend {
+            CompilationBackend::Native {
+                program,
+                pre_program,
+            } => match program.program().supplemental_sources(id) {
+                Err(tsr_compiler::Error::Ast(tsr_arena::Error::WrongOwner)) => pre_program
+                    .as_ref()
+                    .ok_or(tsr_arena::Error::WrongOwner)?
+                    .program()
+                    .supplemental_sources(id),
+                result => result,
+            },
+            CompilationBackend::Portable(session) => session.sources().supplemental_sources(id),
+        }
+    }
+}
+impl crate::harness::errors::ContentMapperSources for Compilation {
+    fn mapped_files(&self) -> Result<Vec<(NodeId, Vec<JsString>)>, Box<dyn std::error::Error>> {
+        match &self.backend {
+            CompilationBackend::Native { program, .. } => program.program().mapped_files(),
+            CompilationBackend::Portable(session) => session.sources().mapped_files(),
+        }
     }
 }
 
@@ -307,10 +399,34 @@ pub fn compile_files(
 /// pin's deferred closes run.
 // port: tsc/internal/testutil/harnessutil/harnessutil.go:CompileFilesEx
 // port: tsc/internal/testutil/harnessutil/harnessutil.go:createCompilerHost
-pub fn compile_files_ex(
+pub fn compile_files_ex_with_consumer(
+    inputs: Inputs,
+    testdata: &TestData,
+    consumer: &Path,
+) -> Result<Compilation, CompileError> {
+    crate::portable_compiler::compile(inputs, testdata, consumer)
+}
+
+pub fn compile_files_ex(inputs: Inputs, testdata: &TestData) -> Result<Compilation, CompileError> {
+    compile_prepared_native(prepare(inputs, testdata)?)
+}
+
+/// The common host preparation, before a backend loads or checks a program.
+/// The ordered physical files and symlinks are also the external backend's
+/// input; a compiler child never reads fixture files from the host checkout.
+pub(crate) struct PreparedCompilation {
+    pub inputs: Inputs,
+    pub config: ParsedCommandLine,
+    pub files: Vec<(Vec<u8>, Arc<[u8]>)>,
+    /// Symlinks follow fixture files but precede the copied test library.
+    pub symlinks_after: usize,
+    pub symlinks: Vec<(Vec<u8>, Vec<u8>)>,
+}
+
+pub(crate) fn prepare(
     mut inputs: Inputs,
     testdata: &TestData,
-) -> Result<Compilation, CompileError> {
+) -> Result<PreparedCompilation, CompileError> {
     let current_directory = inputs.current_directory.clone();
     let cwd = current_directory.as_slice();
     let mut program_file_names = Vec::new();
@@ -345,23 +461,26 @@ pub fn compile_files_ex(
 
     absolutize_option_paths(&mut inputs.compiler_options, cwd);
 
-    // Create fake FS for testing
-    let mut fs =
-        tsr_vfs::MemoryBuilder::new(cwd, inputs.harness_options.use_case_sensitive_file_names);
-    for file in inputs.input_files.iter().chain(&inputs.other_files) {
-        fs.insert_physical(&absolute(&file.unit_name, cwd), file.content.clone());
-    }
-    for (src, target) in &inputs.symlinks {
-        fs.insert_symlink(&absolute(src, cwd), &absolute(target, cwd));
-    }
+    let mut files: Vec<(Vec<u8>, Arc<[u8]>)> = inputs
+        .input_files
+        .iter()
+        .chain(&inputs.other_files)
+        .map(|file| {
+            (
+                absolute(&file.unit_name, cwd),
+                Arc::from(file.content.clone()),
+            )
+        })
+        .collect();
+    let symlinks = inputs
+        .symlinks
+        .iter()
+        .map(|(src, target)| (absolute(src, cwd), absolute(target, cwd)))
+        .collect();
+    let symlinks_after = files.len();
     if include_lib_dir {
-        let lib_folder = test_lib_folder_map(testdata)?;
-        for (name, content) in &*lib_folder {
-            fs.insert_physical(name, content.clone());
-        }
+        files.extend(test_lib_folder_map(testdata)?.iter().cloned());
     }
-    let host: Arc<dyn tsr_vfs::FileSystem> =
-        Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish())));
 
     let mut config = ParsedCommandLine::new(inputs.compiler_options.clone(), program_file_names);
     let mut specs = None;
@@ -382,11 +501,44 @@ pub fn compile_files_ex(
     // comparePathsOptions: an empty directory and case-insensitive matching.
     config.set_config_specs(specs, JsString::default(), false);
 
+    Ok(PreparedCompilation {
+        inputs,
+        config,
+        files,
+        symlinks_after,
+        symlinks,
+    })
+}
+
+fn compile_prepared_native(prepared: PreparedCompilation) -> Result<Compilation, CompileError> {
+    let PreparedCompilation {
+        inputs,
+        config,
+        files,
+        symlinks_after,
+        symlinks,
+    } = prepared;
+    let cwd = inputs.current_directory.as_slice();
+    // The insertion order is the same as the shared prepared request.
+    let mut fs =
+        tsr_vfs::MemoryBuilder::new(cwd, inputs.harness_options.use_case_sensitive_file_names);
+    for (name, content) in &files[..symlinks_after] {
+        fs.insert_physical(name, content.clone());
+    }
+    for (name, target) in symlinks {
+        fs.insert_symlink(&name, &target);
+    }
+    for (name, content) in &files[symlinks_after..] {
+        fs.insert_physical(name, content.clone());
+    }
+    let fs: Arc<dyn tsr_vfs::FileSystem> =
+        Arc::new(tsr_bundled::BundledFs::new(Arc::new(fs.finish())));
+
     // Content mappers, when trusted, are served in-process by the test mapper (see contentmappertest).
     // The host is shared by the pre- and post-emit programs and torn down when this compilation finishes.
     let scope = ContentMapperScope::open(&config);
     let host = HarnessHost {
-        fs: host,
+        fs,
         current_directory: JsString::from_bytes(cwd),
         content_mapper_project: scope.project.clone(),
         mode: inputs.mode,
@@ -396,9 +548,13 @@ pub fn compile_files_ex(
     let compilation = Compilation {
         options: compiled.program.program().options().clone(),
         facts: compiled.facts,
-        program: compiled.program,
-        pre_program: compiled.pre_program,
-        emit: compiled.emit,
+        backend: CompilationBackend::Native {
+            program: compiled.program,
+            pre_program: compiled.pre_program,
+        },
+        maps: source_maps(compiled.emit.as_ref()),
+        config,
+        emit: CompilationEmit::Native(compiled.emit),
         recorded: compiled.recorded,
         diagnostics: compiled.diagnostics,
         harness_options: inputs.harness_options.clone(),
@@ -496,14 +652,14 @@ fn walk_lib_folder(
 /// options trust external code and the configuration declares mappers, the
 /// test mappers served in process. Dropping the scope closes the project,
 /// then the host, in the order the pin's deferred closes run.
-struct ContentMapperScope {
+pub(crate) struct ContentMapperScope {
     host: Option<tsr_contentmapper::HostImpl>,
-    project: Option<Arc<dyn tsr_contentmapper::Project>>,
+    pub(crate) project: Option<Arc<dyn tsr_contentmapper::Project>>,
 }
 
 impl ContentMapperScope {
     // port: tsc/internal/testutil/harnessutil/harnessutil.go:CompileFilesEx
-    fn open(config: &ParsedCommandLine) -> Self {
+    pub(crate) fn open(config: &ParsedCommandLine) -> Self {
         let mappers = config.content_mappers.as_deref().unwrap_or_default();
         if !config.options.run_external_code.is_true() || mappers.is_empty() {
             return Self {
@@ -619,14 +775,15 @@ fn compile_files_with_host(
     )?;
 
     let counts_match = pre_errors.len() == post_errors.len();
-    let errors = settle_diagnostics(
-        pre_errors,
-        post_errors,
-        &[
-            post_program.program().as_ref(),
-            pre_program.program().as_ref(),
-        ],
-    )
+    let errors = settle_diagnostics(pre_errors, post_errors, &|id| {
+        diagnostic_file_name(
+            &[
+                post_program.program().as_ref(),
+                pre_program.program().as_ref(),
+            ],
+            id,
+        )
+    })
     .map_err(tsr_compiler::Error::from)?;
 
     let facts = ProgramFacts::new(post_program.program().clone())?;
@@ -693,10 +850,10 @@ fn emit(
 /// diagnostic of the longer list that `CompareDiagnostics` matches with none
 /// of the shorter. `programs` resolve the diagnostics' files by name.
 // port: tsc/internal/testutil/harnessutil/harnessutil.go:compileFilesWithHost
-fn settle_diagnostics(
+pub(crate) fn settle_diagnostics<'a>(
     pre_errors: Vec<Diagnostic>,
     post_errors: Vec<Diagnostic>,
-    programs: &[&Program],
+    file_name: &impl Fn(NodeId) -> Result<&'a [u8], tsr_arena::Error>,
 ) -> Result<Vec<Diagnostic>, tsr_arena::Error> {
     if post_errors.len() == pre_errors.len() {
         return Ok(post_errors);
@@ -716,11 +873,10 @@ fn settle_diagnostics(
         .push(Arc::new(ad_hoc_compiler_diagnostic(
             b"The excess diagnostics are:",
         )));
-    let file_name = |id: NodeId| diagnostic_file_name(programs, id);
     for d in &longer_errors {
         let mut matched = false;
         for d2 in &shorter_errors {
-            if tsr_ast::compare_diagnostics(d, d2, &file_name)? == Ordering::Equal {
+            if tsr_ast::compare_diagnostics(d, d2, file_name)? == Ordering::Equal {
                 matched = true;
                 break;
             }
@@ -828,6 +984,73 @@ mod tests {
         let (mut options, _) = resolve_options(None, None, b"/.src").unwrap();
         options.module = ModuleKind::ESNEXT;
         options
+    }
+
+    #[test]
+    fn prepared_request_preserves_root_order_files_and_finalized_paths() {
+        let mut input = inputs(
+            vec![
+                unit("b.ts", B),
+                unit("settings.json", "{}"),
+                unit("a.ts", A),
+            ],
+            esnext(),
+        );
+        input.other_files = vec![
+            unit("extra.ts", "export {};"),
+            unit("a.ts", "export const a = 2;"),
+        ];
+        input
+            .symlinks
+            .insert(b"alias.ts".to_vec(), b"a.ts".to_vec());
+        input.compiler_options.out_dir = JsString::from_bytes(b"out".as_slice());
+        input.compiler_options.root_dirs = Some(vec![JsString::from_bytes(b"roots".as_slice())]);
+        let prepared = super::prepare(input, &testdata()).unwrap();
+        assert_eq!(
+            prepared.config.root_file_names,
+            [
+                JsString::from_bytes(b"/.src/b.ts".as_slice()),
+                JsString::from_bytes(b"/.src/a.ts".as_slice()),
+            ]
+        );
+        assert_eq!(prepared.config.options.out_dir.as_bytes(), b"/.src/out");
+        assert_eq!(
+            prepared.inputs.compiler_options.out_dir.as_bytes(),
+            b"/.src/out"
+        );
+        assert_eq!(
+            prepared.config.options.root_dirs.as_ref().unwrap()[0].as_bytes(),
+            b"/.src/roots"
+        );
+        let names: Vec<_> = prepared
+            .files
+            .iter()
+            .map(|(name, _)| name.as_slice())
+            .collect();
+        assert_eq!(
+            names,
+            [
+                b"/.src/b.ts".as_slice(),
+                b"/.src/settings.json",
+                b"/.src/a.ts",
+                b"/.src/extra.ts",
+                b"/.src/a.ts"
+            ]
+        );
+        assert_eq!(
+            prepared.symlinks,
+            [(b"/.src/alias.ts".to_vec(), b"/.src/a.ts".to_vec())]
+        );
+        let compilation = super::compile_prepared_native(prepared).unwrap();
+        assert!(compilation.diagnostics.is_empty());
+        assert!(compilation
+            .result()
+            .unwrap()
+            .js
+            .get(b"/.src/out/a.js")
+            .unwrap()
+            .content
+            .ends_with(b"export const a = 2;\r\n"));
     }
 
     #[test]
@@ -1019,7 +1242,13 @@ mod tests {
         assert!(compilation.diagnostics.is_empty());
         assert_eq!(compilation.options.out_dir.as_bytes(), b"/.src/out");
         assert_eq!(compilation.options.new_line, NewLineKind::CRLF);
-        assert!(compilation.program.program().config().config_file.is_some());
+        assert!(compilation
+            .native_program()
+            .unwrap()
+            .program()
+            .config()
+            .config_file
+            .is_some());
         let result = compilation.result().unwrap();
         assert_eq!(
             names(result.js.files()),
@@ -1050,7 +1279,7 @@ mod tests {
             esnext(),
         );
         let compilation = compile_files_ex(lib_files.clone(), &testdata()).unwrap();
-        let program = compilation.program.program();
+        let program = compilation.native_program().unwrap().program();
         assert!(program.source_file(b"/.lib/react.d.ts").is_some());
         assert!(program.source_file(b"/.lib/react16.d.ts").is_none());
 
@@ -1058,7 +1287,7 @@ mod tests {
         lib_files.input_files = vec![unit("/.src/a.ts", A)];
         lib_files.harness_options.lib_files = vec![b"react16.d.ts".to_vec(), b"lib.d.ts".to_vec()];
         let compilation = compile_files_ex(lib_files, &testdata()).unwrap();
-        let program = compilation.program.program();
+        let program = compilation.native_program().unwrap().program();
         assert!(program.source_file(b"/.lib/react16.d.ts").is_some());
         // `lib.d.ts` is no root without `noLib`: a root would be missing.
         assert!(program.source_file(b"/.lib/lib.d.ts").is_none());
@@ -1067,6 +1296,39 @@ mod tests {
             "{:?}",
             compilation.diagnostics
         );
+    }
+
+    #[test]
+    fn copied_test_library_overwrites_a_colliding_symlink() {
+        let mut input = inputs(
+            vec![unit(
+                "a.ts",
+                "/// <reference path=\"/.lib/react.d.ts\" />\nexport const a = 1;\n",
+            )],
+            esnext(),
+        );
+        input.other_files = vec![unit(
+            "impostor.d.ts",
+            "declare const collision: unique symbol;",
+        )];
+        input.symlinks.insert(
+            b"/.lib/react.d.ts".to_vec(),
+            b"/.src/impostor.d.ts".to_vec(),
+        );
+        let data = testdata();
+        let expected = std::fs::read(data.lib().join("react.d.ts")).unwrap();
+        let compilation = compile_files_ex(input, &data).unwrap();
+        let source = compilation
+            .native_program()
+            .unwrap()
+            .program()
+            .source_file(b"/.lib/react.d.ts")
+            .unwrap()
+            .bound()
+            .view()
+            .source_file()
+            .unwrap();
+        assert_eq!(source.text().as_bytes(), expected);
     }
 
     /// The pre- and post-emit programs read the same parsed files, as the
@@ -1117,7 +1379,10 @@ mod tests {
         let text = |d: &tsr_ast::Diagnostic| d.ad_hoc_message.as_ref().unwrap().text().to_vec();
 
         // Equal counts keep the post-emit list, whatever it holds.
-        let settled = settle_diagnostics(vec![first.clone()], vec![second.clone()], &[]).unwrap();
+        let settled = settle_diagnostics(vec![first.clone()], vec![second.clone()], &|_| {
+            Err(tsr_arena::Error::WrongOwner)
+        })
+        .unwrap();
         assert_eq!(settled, std::slice::from_ref(&second));
 
         for (pre, post) in [
@@ -1125,7 +1390,8 @@ mod tests {
             (vec![first.clone()], vec![first.clone(), second.clone()]),
         ] {
             let (pre_count, post_count) = (pre.len(), post.len());
-            let settled = settle_diagnostics(pre, post, &[]).unwrap();
+            let settled =
+                settle_diagnostics(pre, post, &|_| Err(tsr_arena::Error::WrongOwner)).unwrap();
             assert_eq!(settled.len(), 2);
             assert_eq!(settled[0], first);
             let diag = &settled[1];

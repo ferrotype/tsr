@@ -1,7 +1,23 @@
 //! Expression forms retained in generated parameter and computed-property names.
-use super::{comments::CommentTarget, guard, statements::Operand, Session, Span, WriteKind};
+use super::{
+    comments::{CommentTarget, PrinterState},
+    guard,
+    statements::Operand,
+    Session, Span, WriteKind,
+};
 use crate::{emit_flags as ef, list_format as lf, Error};
 use tsr_ast::{operator_precedence as op, NodeId, NodeKind, SyntaxKind as K};
+
+pub(super) struct BinaryEmission {
+    pub(super) left: NodeId,
+    pub(super) right: NodeId,
+    pub(super) left_precedence: i32,
+    pub(super) right_precedence: i32,
+    left_operand: Operand,
+    operator: NodeId,
+    comma: bool,
+    state: PrinterState,
+}
 
 impl Session<'_, '_> {
     pub(super) fn binary_parts(&self, node: NodeId) -> Result<(NodeId, NodeId, NodeId), Error> {
@@ -273,6 +289,19 @@ impl Session<'_, '_> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitBinaryExpression
     pub(super) fn emit_binary_expression(&mut self, node: NodeId) -> Result<(), Error> {
+        let emission = self.begin_binary_expression(node)?;
+        self.emit_expression(emission.left, emission.left_precedence)?;
+        let (before, after) = self.between_binary_operands(node, &emission)?;
+        self.emit_expression(emission.right, emission.right_precedence)?;
+        self.end_binary_expression(node, &emission, before, after)
+    }
+
+    // Shared with the wasm continuation: comment/source-map entry, operand
+    // precedence, separators and exit have exactly one implementation.
+    pub(super) fn begin_binary_expression(
+        &mut self,
+        node: NodeId,
+    ) -> Result<BinaryEmission, Error> {
         let (left, operator, right) = self.binary_parts(node)?;
         let (left_operand, right_operand) = (self.left_operand(left), Operand::plain(right));
         let (mut left_prec, mut right_prec) =
@@ -303,25 +332,50 @@ impl Session<'_, '_> {
             }
         }
         let state = self.enter_node(node)?;
-        self.emit_expression(left, left_prec)?;
+        Ok(BinaryEmission {
+            left,
+            right,
+            left_precedence: left_prec,
+            right_precedence: right_prec,
+            left_operand,
+            operator,
+            comma: outer == K::CommaToken,
+            state,
+        })
+    }
+
+    pub(super) fn between_binary_operands(
+        &mut self,
+        node: NodeId,
+        emission: &BinaryEmission,
+    ) -> Result<(i64, i64), Error> {
         let before = self.get_lines_between_nodes(
             node,
-            self.operand_span(left_operand)?,
-            Span::of(&self.node(operator)?),
+            self.operand_span(emission.left_operand)?,
+            Span::of(&self.node(emission.operator)?),
         )?;
         let after = self.get_lines_between_nodes(
             node,
-            Span::of(&self.node(operator)?),
-            Span::of(&self.node(right)?),
+            Span::of(&self.node(emission.operator)?),
+            Span::of(&self.node(emission.right)?),
         )?;
-        self.write_lines_and_indent(before, outer != K::CommaToken);
-        self.emit_token_node_ex(Some(operator), super::tef::NO_SOURCE_MAPS)?;
+        self.write_lines_and_indent(before, !emission.comma);
+        self.emit_token_node_ex(Some(emission.operator), super::tef::NO_SOURCE_MAPS)?;
         // Binary operators should have a space before the comment starts
         self.write_lines_and_indent(after, true);
-        self.emit_expression(right, right_prec)?;
+        Ok((before, after))
+    }
+
+    pub(super) fn end_binary_expression(
+        &mut self,
+        node: NodeId,
+        emission: &BinaryEmission,
+        before: i64,
+        after: i64,
+    ) -> Result<(), Error> {
         self.decrease_indent_if(after > 0);
         self.decrease_indent_if(before > 0);
-        self.exit_node(node, state)?;
+        self.exit_node(node, emission.state)?;
         Ok(())
     }
 }

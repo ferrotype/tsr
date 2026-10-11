@@ -1,18 +1,20 @@
-use super::{ast, classify, Result, Row, Walker};
+use super::super::walker_api::{
+    builder_flags, builder_internal_flags, ff, symbol_format_flags, tf, TypeRef,
+};
+use super::{ast, classify, Collector, Display, Result, Row, SymbolDeclaration};
 use serde_json::{json, Value};
 use tsr_arena::NodeId;
 use tsr_ast::SyntaxKind as K;
-use tsr_checker::{type_flags as tf, type_format_flags as ff, TypeRef};
 use tsr_printer::{EmitTextWriter, Printer, PrinterOptions, TextWriter};
 
 const TYPE_FLAGS: u32 = ff::NO_TRUNCATION
     | ff::ALLOW_UNIQUE_ES_SYMBOL_TYPE
     | ff::GENERATE_NAMES_FOR_SHADOWED_TYPE_PARAMS;
 // Keep the separate native builder flag domains visible in recorded requests.
-const IGNORE_ERRORS: u32 = tsr_nodebuilder::flags::IGNORE_ERRORS;
-const ALLOW_UNRESOLVED_NAMES: i32 = tsr_nodebuilder::internal_flags::ALLOW_UNRESOLVED_NAMES;
+const IGNORE_ERRORS: u32 = builder_flags::IGNORE_ERRORS;
+const ALLOW_UNRESOLVED_NAMES: i32 = builder_internal_flags::ALLOW_UNRESOLVED_NAMES;
 
-impl Walker<'_, '_, '_> {
+impl Collector<'_, '_> {
     pub(super) fn stamp(&self, source: NodeId, id: NodeId, operation: &str) -> Result<Value> {
         let view = ast(self.program, id)?;
         let node = view.node(id)?;
@@ -29,8 +31,8 @@ impl Walker<'_, '_, '_> {
         let typ = if self.trace.record_queries {
             let mut q = self.stamp(source, id, "GetTypeAtLocation")?;
             self.trace.active = q.clone();
-            let typ = self.op.current_mut().get_type_at_location(id)?;
-            q["result_flags"] = json!(self.op.current_mut().type_flags(typ)?);
+            let typ = self.op.get_type_at_location(id)?;
+            q["result_flags"] = json!(self.op.type_flags(typ)?);
             q["type_id"] = json!(typ.id());
             self.trace.queries.push(q);
             typ
@@ -38,7 +40,7 @@ impl Walker<'_, '_, '_> {
             self.timing.pause();
             self.trace.count("GetTypeAtLocation");
             self.timing.resume();
-            self.op.current_mut().get_type_at_location(id)?
+            self.op.get_type_at_location(id)?
         };
         self.timing.pause();
         if self.trace.retain_types {
@@ -50,7 +52,7 @@ impl Walker<'_, '_, '_> {
             } else {
                 json!({})
             };
-            self.type_strings.push((stamp, typ, self.op.current()));
+            self.type_strings.push((stamp, typ, self.owner_key));
         }
         self.timing.resume();
         Ok(typ)
@@ -81,7 +83,7 @@ impl Walker<'_, '_, '_> {
         if symbols {
             return self.symbol(source, id, parent, line, source_text);
         }
-        if self.op.current_mut().is_part_of_type_node(id)?
+        if self.op.is_part_of_type_node(id)?
             || matches!(
                 node.kind().known(),
                 Some(K::AsExpression | K::SatisfiesExpression)
@@ -106,12 +108,7 @@ impl Walker<'_, '_, '_> {
             None
         };
         if typ
-            .map(|t| {
-                self.op
-                    .current_mut()
-                    .type_flags(t)
-                    .map(|f| f & tf::ANY != 0)
-            })
+            .map(|t| self.op.type_flags(t).map(|f| f & tf::ANY != 0))
             .transpose()?
             .unwrap_or(true)
         {
@@ -119,7 +116,7 @@ impl Walker<'_, '_, '_> {
         }
         let typ = typ.ok_or("type query result")?;
         let plain_any = !self.had_errors
-            && self.op.current_mut().type_flags(typ)? & tf::ANY != 0
+            && self.op.type_flags(typ)? & tf::ANY != 0
             && !matches!(
                 parent_node.kind().known(),
                 Some(
@@ -134,11 +131,7 @@ impl Walker<'_, '_, '_> {
             && !classify::import_or_export_name(view, id, parent)?
             && !classify::intrinsic_jsx(view, id, parent, &source_text)?;
         let display = if plain_any {
-            self.op
-                .current_mut()
-                .intrinsic_type_name(typ)?
-                .as_bytes()
-                .to_vec()
+            self.op.intrinsic_type_name(typ)?.as_bytes().to_vec()
         } else {
             let flags = (TYPE_FLAGS & ff::NODE_BUILDER_FLAGS_MASK) | IGNORE_ERRORS;
             self.timing.pause();
@@ -154,7 +147,7 @@ impl Walker<'_, '_, '_> {
                 self.trace.count("TypeToTypeNode");
             }
             self.timing.resume();
-            let mut builder = self.op.current_mut().node_builder();
+            let mut builder = self.op.node_builder();
             let mut generated =
                 builder.type_to_type_node(typ, Some(parent), flags, ALLOW_UNRESOLVED_NAMES)?;
             let retry = if let Some(generated) = generated {
@@ -205,7 +198,7 @@ impl Walker<'_, '_, '_> {
         Ok(Some(Row {
             line,
             source_text,
-            display,
+            display: Display::Type { text: display },
         }))
     }
 
@@ -220,7 +213,7 @@ impl Walker<'_, '_, '_> {
         let symbol = if self.trace.record_queries {
             let mut q = self.stamp(source, id, "GetSymbolAtLocation")?;
             self.trace.active = q.clone();
-            let symbol = self.op.current_mut().get_symbol_at_location(id)?;
+            let symbol = self.op.get_symbol_at_location(id)?;
             if symbol.is_none() {
                 q["absent"] = json!(true);
             }
@@ -230,7 +223,7 @@ impl Walker<'_, '_, '_> {
             self.timing.pause();
             self.trace.count("GetSymbolAtLocation");
             self.timing.resume();
-            self.op.current_mut().get_symbol_at_location(id)?
+            self.op.get_symbol_at_location(id)?
         };
         let Some(symbol) = symbol else {
             return Ok(None);
@@ -238,7 +231,7 @@ impl Walker<'_, '_, '_> {
         self.timing.pause();
         if self.trace.record_queries {
             let mut q = self.stamp(source, parent, "SymbolToStringEx")?;
-            q["flags"] = json!(tsr_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND);
+            q["flags"] = json!(symbol_format_flags::ALLOW_ANY_NODE_KIND);
             self.trace.active = q.clone();
             self.trace.queries.push(q);
         } else {
@@ -246,23 +239,17 @@ impl Walker<'_, '_, '_> {
         }
         let text = {
             self.timing.resume();
-            self.op.current_mut().symbol_to_string_at(
+            self.op.symbol_to_string_at(
                 symbol,
                 Some(parent),
                 tsr_ast::symbol_flags::NONE,
-                tsr_checker::symbol_format_flags::ALLOW_ANY_NODE_KIND,
+                symbol_format_flags::ALLOW_ANY_NODE_KIND,
             )?
         };
-        let mut display = b"Symbol(".to_vec();
-        display.extend_from_slice(&tsr_ast::escape_all_internal_symbol_names(text.as_bytes()));
-        let declarations = self.op.current_mut().symbol_declarations(symbol)?;
-        for (index, declaration) in declarations.iter().enumerate() {
-            if index >= 5 {
-                display.extend_from_slice(
-                    format!(" ... and {} more", declarations.len() - index).as_bytes(),
-                );
-                break;
-            }
+        let declarations = self.op.symbol_declarations(symbol)?;
+        let declaration_count = declarations.len();
+        let mut positions = Vec::new();
+        for declaration in declarations.iter().take(5) {
             let declaration = declaration.ok_or("nil symbol declaration")?;
             let view = ast(self.program, declaration)?;
             let source = tsr_ast::utilities::get_source_file_of_node(view, Some(declaration))?
@@ -277,22 +264,20 @@ impl Walker<'_, '_, '_> {
             let character = tsr_jsstring::line_map::utf16_len(
                 &file.text().as_bytes()[start..usize::try_from(pos)?],
             );
-            let name = file.parse_options().file_name.as_bytes();
-            let base = tsr_tspath::base_name(name);
-            display.extend_from_slice(b", Decl(");
-            display.extend_from_slice(base);
-            display.extend_from_slice(b", ");
-            if base.starts_with(b"lib.") && base.ends_with(b".d.ts") {
-                display.extend_from_slice(b"--, --)");
-            } else {
-                display.extend_from_slice(format!("{decl_line}, {character})").as_bytes());
-            }
+            positions.push(SymbolDeclaration {
+                file: file.parse_options().file_name.as_bytes().to_vec(),
+                line: decl_line,
+                character,
+            });
         }
-        display.push(b')');
         Ok(Some(Row {
             line,
             source_text,
-            display,
+            display: Display::Symbol {
+                name: text.as_bytes().to_vec(),
+                declarations: positions,
+                declaration_count,
+            },
         }))
     }
 }

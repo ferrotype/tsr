@@ -54,29 +54,56 @@ use subtree_flags::{
 impl AstView<'_> {
     // port: tsc/internal/ast/ast.go:Node.SubtreeFacts
     pub fn subtree_facts(self, id: NodeId) -> SubtreeFacts {
-        Facts { view: self }.facts(id)
+        Facts::new(self).facts(id)
     }
     pub fn propagate_subtree_facts(self, id: Option<NodeId>) -> SubtreeFacts {
-        Facts { view: self }.propagate_node(id)
+        Facts::new(self).propagate_node(id)
     }
     pub fn contains_object_rest_or_spread(self, id: NodeId) -> bool {
-        Facts { view: self }.contains_object_rest_or_spread(id)
+        Facts::new(self).contains_object_rest_or_spread(id)
     }
     /// The subtree-facts home of `IsThisIdentifier`, for AST utilities.
     pub fn is_this_identifier(self, id: NodeId) -> bool {
-        Facts { view: self }.is_this_identifier(id)
+        Facts::new(self).is_this_identifier(id)
     }
     /// The subtree-facts home of `GetTargetOfBindingOrAssignmentElement`.
     pub fn target_of_binding_or_assignment_element(self, id: NodeId) -> Option<NodeId> {
-        Facts { view: self }.target_of_element(Some(id))
+        Facts::new(self).target_of_element(Some(id))
     }
 }
 struct Facts<'a> {
     view: AstView<'a>,
+    #[cfg(test)]
+    iterative_spines: bool,
 }
-impl Facts<'_> {
+impl<'a> Facts<'a> {
+    fn new(view: AstView<'a>) -> Self {
+        Self {
+            view,
+            #[cfg(test)]
+            iterative_spines: false,
+        }
+    }
+
     // port: tsc/internal/ast/ast.go:NodeDefault.SubtreeFacts
     fn facts(&mut self, id: NodeId) -> u32 {
+        #[cfg(any(target_arch = "wasm32", test))]
+        if self.use_iterative_spines() {
+            let node = self
+                .view
+                .node(id)
+                .expect("subtree node belongs to retained storage");
+            if matches!(
+                node.kind().known(),
+                Some(
+                    SyntaxKind::BinaryExpression
+                        | SyntaxKind::ParenthesizedExpression
+                        | SyntaxKind::PartiallyEmittedExpression
+                )
+            ) {
+                return self.facts_spine(id);
+            }
+        }
         stacker::maybe_grow(64 * 1024, 1024 * 1024, || self.facts_worker(id))
     }
     // port: tsc/internal/ast/ast.go:NodeDefault.subtreeFactsWorker
@@ -100,6 +127,24 @@ impl Facts<'_> {
         }
         facts & !COMPUTED
     }
+    // Preserve the binary override's semantic rules in one place for both walks.
+    fn binary_facts(&mut self, left: Option<NodeId>, token: Option<NodeId>, mut facts: u32) -> u32 {
+        let operator = self.kind(token);
+        if operator == SyntaxKind::InKeyword && self.kind(left) == SyntaxKind::PrivateIdentifier {
+            facts |= CLASS_FIELDS | PRIVATE_IDENTIFIER_IN_EXPRESSION;
+        }
+        if operator == SyntaxKind::EqualsToken
+            && matches!(
+                self.kind(left).known(),
+                Some(SyntaxKind::ObjectLiteralExpression | SyntaxKind::ArrayLiteralExpression)
+            )
+            && self.contains_object_rest_or_spread(left.expect("binary left"))
+        {
+            facts |= OBJECT_REST_OR_SPREAD;
+        }
+        facts
+    }
+
     fn modifier_flags(&self, list: Option<NodeListId>) -> u32 {
         list.map_or(0, |id| {
             self.view
@@ -575,25 +620,12 @@ impl Facts<'_> {
             D::TemplateTail(d) => template(d.template_flags()),
             // port: tsc/internal/ast/ast.go:BinaryExpression.computeSubtreeFacts
             D::BinaryExpression(d) => {
-                let mut facts = self.propagate_modifiers(d.modifiers())
+                let facts = self.propagate_modifiers(d.modifiers())
                     | self.propagate_node(d.left())
                     | self.propagate_node(d.r#type())
                     | self.propagate_node(d.operator_token())
                     | self.propagate_node(d.right());
-                let operator = self.kind(d.operator_token());
-                if operator == K::InKeyword && self.kind(d.left()) == K::PrivateIdentifier {
-                    facts |= CLASS_FIELDS | PRIVATE_IDENTIFIER_IN_EXPRESSION;
-                }
-                if operator == K::EqualsToken
-                    && matches!(
-                        self.kind(d.left()).known(),
-                        Some(K::ObjectLiteralExpression | K::ArrayLiteralExpression)
-                    )
-                    && self.contains_object_rest_or_spread(d.left().expect("binary left"))
-                {
-                    facts |= OBJECT_REST_OR_SPREAD;
-                }
-                facts
+                self.binary_facts(d.left(), d.operator_token(), facts)
             }
             // port: tsc/internal/ast/ast.go:ArrowFunction.computeSubtreeFacts
             D::ArrowFunction(d) => {
@@ -770,6 +802,147 @@ fn async_facts(modifiers: u32, generator: bool) -> u32 {
     }
 }
 
+// Only these expression spines change traversal mechanism. Other payloads
+// continue through their existing generated/override semantics and scope masks.
+#[cfg(any(target_arch = "wasm32", test))]
+enum FactsFrame {
+    Transparent(Option<NodeId>),
+    BinaryLeft {
+        id: NodeId,
+        data: crate::BinaryExpressionData,
+        cached: u32,
+        facts: u32,
+    },
+    BinaryRight {
+        id: NodeId,
+        data: crate::BinaryExpressionData,
+        cached: u32,
+        facts: u32,
+    },
+}
+
+#[cfg(any(target_arch = "wasm32", test))]
+impl Facts<'_> {
+    fn use_iterative_spines(&self) -> bool {
+        #[cfg(test)]
+        {
+            cfg!(target_arch = "wasm32") || self.iterative_spines
+        }
+        #[cfg(not(test))]
+        {
+            true
+        }
+    }
+
+    fn propagated_child(&mut self, id: Option<NodeId>, facts: u32) -> u32 {
+        id.map_or(NONE, |id| self.propagate_facts(id, facts))
+    }
+
+    fn facts_spine(&mut self, root: NodeId) -> u32 {
+        let mut frames = Vec::new();
+        let mut next = Some(root);
+        let mut value;
+        loop {
+            if let Some(id) = next.take() {
+                let node = self
+                    .view
+                    .node(id)
+                    .expect("subtree node belongs to retained storage");
+                let cached = node.cached_subtree_facts();
+                if node.data().uses_subtree_cache() && cached & COMPUTED != 0 {
+                    value = cached & !COMPUTED;
+                } else {
+                    match node.data() {
+                        NodeDataRead::BinaryExpression(data) => {
+                            let data = data.to_owned();
+                            // This is the override's exact order, not all AST children.
+                            let facts = self.propagate_modifiers(data.modifiers);
+                            next = data.left;
+                            frames.push(FactsFrame::BinaryLeft {
+                                id,
+                                data,
+                                cached,
+                                facts,
+                            });
+                            if next.is_some() {
+                                continue;
+                            }
+                            value = NONE;
+                        }
+                        NodeDataRead::ParenthesizedExpression(data) => {
+                            next = data.expression();
+                            frames.push(FactsFrame::Transparent(next));
+                            if next.is_some() {
+                                continue;
+                            }
+                            value = NONE;
+                        }
+                        NodeDataRead::PartiallyEmittedExpression(data) => {
+                            next = data.expression();
+                            frames.push(FactsFrame::Transparent(next));
+                            if next.is_some() {
+                                continue;
+                            }
+                            value = NONE;
+                        }
+                        _ => value = self.facts_worker(id),
+                    }
+                }
+            } else {
+                value = NONE;
+            }
+            loop {
+                match frames.pop() {
+                    None => return value,
+                    Some(FactsFrame::Transparent(child)) => {
+                        // These generated payloads have no cache and simply
+                        // propagate the inner expression's scoped facts.
+                        value = self.propagated_child(child, value);
+                    }
+                    Some(FactsFrame::BinaryLeft {
+                        id,
+                        data,
+                        cached,
+                        facts,
+                    }) => {
+                        let facts = facts
+                            | self.propagated_child(data.left, value)
+                            | self.propagate_node(data.r#type)
+                            | self.propagate_node(data.operator_token);
+                        next = data.right;
+                        frames.push(FactsFrame::BinaryRight {
+                            id,
+                            data,
+                            cached,
+                            facts,
+                        });
+                        if next.is_some() {
+                            break;
+                        }
+                        value = NONE;
+                    }
+                    Some(FactsFrame::BinaryRight {
+                        id,
+                        data,
+                        cached,
+                        facts,
+                    }) => {
+                        let facts = facts | self.propagated_child(data.right, value);
+                        let facts = cached
+                            | self.binary_facts(data.left, data.operator_token, facts)
+                            | COMPUTED;
+                        self.view
+                            .node(id)
+                            .expect("subtree binary node")
+                            .store_subtree_facts(facts);
+                        value = facts & !COMPUTED;
+                    }
+                }
+            }
+        }
+    }
+}
+
 impl SubtreeContext for Facts<'_> {
     // port: tsc/internal/ast/subtreefacts.go:propagateSubtreeFacts
     fn propagate_node(&mut self, id: Option<NodeId>) -> u32 {
@@ -788,7 +961,6 @@ impl Facts<'_> {
     /// The per-payload dispatch of a present node; `propagate_node` keeps the
     /// package-level nil check.
     // port: tsc/internal/ast/ast.go:Node.propagateSubtreeFacts
-    #[allow(clippy::match_same_arms)] // Equal current masks remain distinct source overrides.
     fn propagate_present(&mut self, id: NodeId) -> u32 {
         let view = self.view;
         let node = view.node(id).expect("subtree propagated node");
@@ -796,6 +968,12 @@ impl Facts<'_> {
             return propagate_type_syntax();
         }
         let facts = self.facts(id);
+        self.propagate_facts(id, facts)
+    }
+
+    #[allow(clippy::match_same_arms)] // Equal current masks remain distinct source overrides.
+    fn propagate_facts(&mut self, id: NodeId, facts: u32) -> u32 {
+        let node = self.view.node(id).expect("subtree propagated node");
         use NodeDataRead as D;
         let function = COMPUTED | LEXICAL_THIS | LEXICAL_SUPER | AWAIT | OBJECT_REST_OR_SPREAD;
         let property = COMPUTED | LEXICAL_THIS | LEXICAL_SUPER;
@@ -1030,4 +1208,195 @@ pub fn is_left_hand_side_expression_kind(kind: NodeKind) -> bool {
                 | K::MissingDeclaration
         )
     )
+}
+
+#[cfg(test)]
+mod spine_tests {
+    use super::*;
+    use crate::{AstBuilder, Factory, FactoryMethods, JsString, NodeData, RuntimeFactory};
+    use tsr_arena::Counters;
+    use tsr_jsstring::SourceText;
+
+    fn builder() -> AstBuilder {
+        AstBuilder::new(
+            SourceText::from_loaded_bytes(b"".as_slice()),
+            &Counters::new(),
+        )
+    }
+
+    fn observe(builder: &AstBuilder, node: NodeId, iterative: bool) -> (u32, u32, u32) {
+        let mut facts = Facts::new(builder.view());
+        facts.iterative_spines = iterative;
+        let raw = facts.facts(node);
+        let propagated = facts.propagate_node(Some(node));
+        let cached = builder.view().node(node).unwrap().cached_subtree_facts();
+        (raw, propagated, cached)
+    }
+
+    fn scoped_binary() -> (AstBuilder, NodeId) {
+        let mut b = builder();
+        let this = b.new_keyword_expression(SyntaxKind::ThisKeyword.into());
+        let awaited = b.new_await_expression(Some(this));
+        let function = b.new_node(
+            SyntaxKind::FunctionExpression.into(),
+            crate::FunctionExpressionData {
+                modifiers: None,
+                type_parameters: None,
+                parameters: None,
+                r#type: None,
+                full_signature: None,
+                asterisk_token: None,
+                body: Some(awaited),
+                name: None,
+            }
+            .into(),
+        );
+        let partial = b.new_node(
+            SyntaxKind::PartiallyEmittedExpression.into(),
+            crate::PartiallyEmittedExpressionData {
+                expression: Some(function),
+            }
+            .into(),
+        );
+        let parenthesized = b.new_parenthesized_expression(Some(partial));
+        let right = b.new_identifier(JsString::from_bytes(b"rhs".as_slice()));
+        let operator = b.new_token(SyntaxKind::QuestionQuestionToken.into());
+        let binary =
+            b.new_binary_expression(None, Some(parenthesized), None, Some(operator), Some(right));
+        (b, binary)
+    }
+
+    #[test]
+    fn cold_spines_share_scope_masks_and_binary_flags() {
+        let (recursive, recursive_node) = scoped_binary();
+        let (iterative, iterative_node) = scoped_binary();
+        let expected = observe(&recursive, recursive_node, false);
+        assert_eq!(observe(&iterative, iterative_node, true), expected);
+        assert_eq!(
+            expected.0,
+            ANY_AWAIT | FOR_AWAIT_OR_ASYNC_GENERATOR | IDENTIFIER | NULLISH_COALESCING
+        );
+        assert_eq!(expected.2, expected.0 | COMPUTED);
+        assert_eq!(observe(&iterative, iterative_node, true), expected);
+        for use_iterative in [false, true] {
+            let mut b = builder();
+            let private = b.new_private_identifier(JsString::from_bytes(b"#p".as_slice()));
+            let right = b.new_identifier(JsString::from_bytes(b"obj".as_slice()));
+            let operator = b.new_token(SyntaxKind::InKeyword.into());
+            let binary =
+                b.new_binary_expression(None, Some(private), None, Some(operator), Some(right));
+            assert_eq!(
+                observe(&b, binary, use_iterative).0,
+                CLASS_FIELDS | PRIVATE_IDENTIFIER_IN_EXPRESSION | IDENTIFIER | TYPE_SCRIPT
+            );
+            // Object literal propagation strips OBJECT_REST_OR_SPREAD; the
+            // binary assignment override must recover it from the pattern.
+            let spread = b.new_spread_assignment(Some(right));
+            let nodes = b.alloc_nodes(vec![Some(spread)]);
+            let list = b.alloc_list(tsr_core::TextRange::new(-1, -1), nodes);
+            let object = b.new_object_literal_expression(Some(list), false);
+            let equals = b.new_token(SyntaxKind::EqualsToken.into());
+            let assignment =
+                b.new_binary_expression(None, Some(object), None, Some(equals), Some(right));
+            assert_eq!(
+                observe(&b, assignment, use_iterative).0,
+                IDENTIFIER | ES_OBJECT_REST_OR_SPREAD | OBJECT_REST_OR_SPREAD
+            );
+        }
+    }
+
+    #[test]
+    fn cached_binary_exits_before_malformed_children_and_wrappers_remain_uncached() {
+        for iterative in [false, true] {
+            let (mut b, binary) = scoped_binary();
+            let expected = observe(&b, binary, iterative);
+            match b.node_mut(binary).unwrap().data_mut() {
+                NodeData::BinaryExpression(data) => {
+                    data.left = None;
+                    data.right = None;
+                    data.operator_token = None;
+                }
+                _ => unreachable!(),
+            }
+            assert_eq!(observe(&b, binary, iterative), expected);
+            let cloned = b.clone_binary_expression(binary);
+            assert!(
+                std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| observe(
+                    &b, cloned, iterative
+                )))
+                .is_err()
+            );
+            let this = b.new_keyword_expression(SyntaxKind::ThisKeyword.into());
+            let wrapper = b.new_parenthesized_expression(Some(this));
+            assert_eq!(
+                observe(&b, wrapper, iterative),
+                (LEXICAL_THIS, LEXICAL_THIS, NONE)
+            );
+            match b.node_mut(wrapper).unwrap().data_mut() {
+                NodeData::ParenthesizedExpression(data) => data.expression = None,
+                _ => unreachable!(),
+            }
+            assert_eq!(observe(&b, wrapper, iterative), (NONE, NONE, NONE));
+        }
+    }
+
+    #[test]
+    fn iterative_spines_do_not_walk_erased_type_children() {
+        for iterative in [false, true] {
+            let mut b = builder();
+            let malformed = b.new_node(
+                SyntaxKind::CallExpression.into(),
+                crate::CallExpressionData {
+                    expression: None,
+                    question_dot_token: None,
+                    type_arguments: None,
+                    arguments: None,
+                }
+                .into(),
+            );
+            let declaration = b.new_node(
+                SyntaxKind::VariableDeclaration.into(),
+                crate::VariableDeclarationData {
+                    name: None,
+                    exclamation_token: None,
+                    r#type: Some(malformed),
+                    initializer: None,
+                }
+                .into(),
+            );
+            let operator = b.new_token(SyntaxKind::PlusToken.into());
+            let binary =
+                b.new_binary_expression(None, Some(declaration), None, Some(operator), None);
+            assert_eq!(observe(&b, binary, iterative).0, TYPE_SCRIPT);
+        }
+    }
+
+    #[test]
+    fn deep_cold_binary_and_transparent_spines_match_native_facts() {
+        fn build() -> (AstBuilder, NodeId) {
+            let mut b = builder();
+            let this = b.new_keyword_expression(SyntaxKind::ThisKeyword.into());
+            let operator = b.new_token(SyntaxKind::PlusToken.into());
+            let mut node = this;
+            for _ in 0..5000 {
+                node = b.new_binary_expression(None, Some(node), None, Some(operator), Some(this));
+                node = b.new_parenthesized_expression(Some(node));
+                node = b.new_node(
+                    SyntaxKind::PartiallyEmittedExpression.into(),
+                    crate::PartiallyEmittedExpressionData {
+                        expression: Some(node),
+                    }
+                    .into(),
+                );
+            }
+            (b, node)
+        }
+        let (recursive, recursive_node) = build();
+        let (iterative, iterative_node) = build();
+        assert_eq!(
+            observe(&recursive, recursive_node, false),
+            observe(&iterative, iterative_node, true)
+        );
+        assert_eq!(observe(&iterative, iterative_node, true).0, LEXICAL_THIS);
+    }
 }

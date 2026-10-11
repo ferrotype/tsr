@@ -1,0 +1,36 @@
+[package]
+name = "phase7_wasm_compiler"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96"
+publish = false
+
+# Deliberately outside the implementation workspace: no inherited dependencies,
+# features, lints or test access to private checker internals.
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "=0.2.126"
+tsr_embed = { version = "0.4.0", path = "../../../../crates/tsr_embed" }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+serde = { version = "1", features = ["derive"] }
+tsr_ast = { version = "0.4.0", path = "../../../../crates/tsr_ast" }
+tsr_diagnostics = { version = "0.4.0", path = "../../../../crates/tsr_diagnostics" }
+tsr_json = { version = "0.4.0", path = "../../../../crates/tsr_json" }
+tsr_arena = { version = "0.4.0", path = "../../../../crates/tsr_arena" }
+tsr_core = { version = "0.4.0", path = "../../../../crates/tsr_core" }
+tsr_jsstring = { version = "0.4.0", path = "../../../../crates/tsr_jsstring" }
+tsr_tsoptions = { version = "0.4.0", path = "../../../../crates/tsr_tsoptions" }
+tsr_vfs = { version = "0.4.0", path = "../../../../crates/tsr_vfs" }
+tsr_tspath = { version = "0.4.0", path = "../../../../crates/tsr_tspath" }
+tsr_printer = { version = "0.4.0", path = "../../../../crates/tsr_printer" }
+tsr_scanner = { version = "0.4.0", path = "../../../../crates/tsr_scanner" }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"

@@ -6,8 +6,20 @@ export class WasmApiError extends Error {
 const API_ERROR = "ts-wasm-api-error:";
 
 export function createInstance(createBindings, module) {
-  let bindings = createBindings();
+  const bindings = createBindings();
   bindings.initSync({ module });
+  return manageInstance(bindings);
+}
+
+// Browser main threads limit synchronous instantiation of large modules.
+// Keep the same ownership/trap controller after the generated async initializer.
+export async function createInstanceAsync(createBindings, module) {
+  const bindings = createBindings();
+  await bindings({ module_or_path: module });
+  return manageInstance(bindings);
+}
+
+function manageInstance(bindings) {
   let state = "live";
   const resources = new Set();
   function invoke(operation) {
@@ -64,6 +76,7 @@ export function createInstance(createBindings, module) {
     const object = owned(value);
     return Object.freeze({
       diagnostics: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.diagnostics()))),
+      resolutionTrace: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.resolution_trace()))),
       typeAtPosition(path, position) {
         if (!(path instanceof Uint8Array) || !Number.isInteger(position) || position < 0 || position > 0xffffffff) {
           throw new TypeError("type query requires a byte path and unsigned UTF-16 position");
@@ -108,10 +121,23 @@ export function createInstance(createBindings, module) {
     }
     return [source, name, kind, jsx, force];
   }
+  function transpileArgs(source, name, optionsJSON, reportDiagnostics) {
+    sourceArgs(source, name, 0);
+    if (typeof optionsJSON !== "string" || typeof reportDiagnostics !== "boolean") {
+      throw new TypeError("transpile requires raw compiler-options JSON and a diagnostic boolean");
+    }
+    return [source, name, optionsJSON, reportDiagnostics];
+  }
   return Object.freeze({
     parse(source, name, kind, jsx = false, force = false) { return call("parse", sourceArgs(source, name, kind, jsx, force)); },
     parseAndEncode(source, name, kind, jsx = false, force = false) {
       return call("parse_and_encode", sourceArgs(source, name, kind, jsx, force));
+    },
+    transpileModule(source, name, optionsJSON, reportDiagnostics = false) {
+      return call("transpile_module", transpileArgs(source, name, optionsJSON, reportDiagnostics));
+    },
+    transpileDeclaration(source, name, optionsJSON, reportDiagnostics = false) {
+      return call("transpile_declaration", transpileArgs(source, name, optionsJSON, reportDiagnostics));
     },
     createHost(cwd, caseSensitive = true) {
       if (!(cwd instanceof Uint8Array) || typeof caseSensitive !== "boolean") {

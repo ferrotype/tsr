@@ -444,12 +444,84 @@ pub fn library(name: &[u8]) -> Option<&'static [u8]> {
 pub fn is_bundled(path: &[u8]) -> bool {
     path.starts_with(b"bundled:///")
 }
+type LibrarySnapshot = Arc<[(JsString, Arc<[u8]>)]>;
+
 pub struct BundledFs {
     inner: Arc<dyn FileSystem>,
+    libraries: Option<LibrarySnapshot>,
+    snapshot: Option<SnapshotId>,
 }
 impl BundledFs {
     pub fn new(inner: Arc<dyn FileSystem>) -> Self {
-        Self { inner }
+        Self {
+            inner,
+            libraries: None,
+            snapshot: None,
+        }
+    }
+
+    /// Use exactly this ordered immutable library snapshot instead of the
+    /// built-in assets. Names are nonempty bare file names and case-sensitive,
+    /// independent of the inner host. Empty snapshots have no library files;
+    /// missing names never fall back to built-in or inner files.
+    /// Duplicate names and names containing separators, `.` or `..` are invalid.
+    pub fn with_libraries(
+        inner: Arc<dyn FileSystem>,
+        libraries: Vec<(JsString, Arc<[u8]>)>,
+    ) -> Result<Self, Error> {
+        let mut names = std::collections::HashSet::new();
+        for (name, _) in &libraries {
+            let bytes = name.as_bytes();
+            if bytes.is_empty()
+                || matches!(bytes, b"." | b"..")
+                || bytes.iter().any(|byte| matches!(byte, b'/' | b'\\'))
+                || !names.insert(name)
+            {
+                return Err(Error::InvalidPath);
+            }
+        }
+        // An immutable overlay cannot make a live inner host immutable.
+        let snapshot = inner.snapshot_id().map(|_| SnapshotId::fresh());
+        Ok(Self {
+            inner,
+            libraries: Some(libraries.into()),
+            snapshot,
+        })
+    }
+
+    fn library(&self, name: &[u8]) -> Option<&[u8]> {
+        match &self.libraries {
+            None => library(name),
+            Some(libraries) => libraries
+                .iter()
+                .find(|(key, _)| key.as_bytes() == name)
+                .map(|(_, content)| content.as_ref()),
+        }
+    }
+    fn read_library(&self, name: &[u8]) -> Option<FileContent> {
+        match &self.libraries {
+            None => library(name).map(FileContent::loaded),
+            Some(libraries) => libraries
+                .iter()
+                .find(|(key, _)| key.as_bytes() == name)
+                .map(|(_, content)| FileContent::loaded(content.clone())),
+        }
+    }
+    fn library_entries(&self) -> impl Iterator<Item = (&[u8], &[u8])> {
+        let builtin = if self.libraries.is_none() {
+            LIBRARIES
+        } else {
+            &[]
+        };
+        self.libraries
+            .iter()
+            .flat_map(|libraries| libraries.iter())
+            .map(|(name, content)| (name.as_bytes(), content.as_ref()))
+            .chain(
+                builtin
+                    .iter()
+                    .map(|(name, content)| (name.as_bytes(), *content)),
+            )
     }
 }
 // Available only to test consumers that have a source checkout. Cargo's
@@ -473,6 +545,7 @@ fn file_info(name: &[u8], directory: bool, size: u64) -> FileInfo {
 impl BundledFs {
     /// port: tsc/internal/bundled/embed.go:wrappedFS.walkDir
     fn walk_bundled(
+        &self,
         rest: &[u8],
         visit: &mut tsr_vfs::WalkCallback<'_>,
     ) -> Result<tsr_vfs::WalkControl, Error> {
@@ -486,16 +559,16 @@ impl BundledFs {
             match visit(b"bundled:////libs", Some(&entry), None)? {
                 C::SkipAll => return Ok(C::SkipAll),
                 C::SkipDir => return Ok(C::Continue),
-                C::Continue => return Self::walk_bundled(b"libs", visit),
+                C::Continue => return self.walk_bundled(b"libs", visit),
             }
         }
         if rest == b"libs" {
-            for &(name, bytes) in LIBRARIES {
+            for (name, bytes) in self.library_entries() {
                 let mut path = b"bundled:///libs/".to_vec();
-                path.extend_from_slice(name.as_bytes());
+                path.extend_from_slice(name);
                 let entry = WalkEntry {
-                    name: JsString::from_bytes(name.as_bytes()),
-                    info: file_info(name.as_bytes(), false, bytes.len() as u64),
+                    name: JsString::from_bytes(name),
+                    info: file_info(name, false, bytes.len() as u64),
                     symlink: false,
                 };
                 // The embedded implementation treats SkipDir on a file as
@@ -513,14 +586,17 @@ impl FileSystem for BundledFs {
         self.inner.use_case_sensitive_file_names()
     }
     fn snapshot_id(&self) -> Option<SnapshotId> {
-        self.inner.snapshot_id()
+        if self.libraries.is_none() {
+            self.inner.snapshot_id()
+        } else {
+            self.snapshot
+        }
     }
     fn read_file(&self, path: &[u8]) -> Result<Option<FileContent>, Error> {
         if let Some(rest) = path.strip_prefix(b"bundled:///") {
             return Ok(rest
                 .strip_prefix(b"libs/")
-                .and_then(library)
-                .map(FileContent::loaded));
+                .and_then(|name| self.read_library(name)));
         }
         self.inner.read_file(path)
     }
@@ -530,7 +606,8 @@ impl FileSystem for BundledFs {
                 Some(file_info(rest, true, 0))
             } else {
                 rest.strip_prefix(b"libs/").and_then(|name| {
-                    library(name).map(|bytes| file_info(name, false, bytes.len() as u64))
+                    self.library(name)
+                        .map(|bytes| file_info(name, false, bytes.len() as u64))
                 })
             });
         }
@@ -552,9 +629,8 @@ impl FileSystem for BundledFs {
                     .push(JsString::from_bytes(b"libs".as_slice()));
             } else if rest == b"libs" {
                 entries.files = Some(
-                    LIBRARIES
-                        .iter()
-                        .map(|(name, _)| JsString::from_bytes(name.as_bytes()))
+                    self.library_entries()
+                        .map(|(name, _)| JsString::from_bytes(name))
                         .collect(),
                 );
             }
@@ -565,7 +641,7 @@ impl FileSystem for BundledFs {
     /// port: tsc/internal/bundled/embed.go:wrappedFS.WalkDir
     fn walk_dir(&self, root: &[u8], visit: &mut tsr_vfs::WalkCallback<'_>) -> Result<(), Error> {
         if let Some(rest) = root.strip_prefix(b"bundled:///") {
-            Self::walk_bundled(rest, visit).map(|_| ())
+            self.walk_bundled(rest, visit).map(|_| ())
         } else {
             self.inner.walk_dir(root, visit)
         }
@@ -618,6 +694,137 @@ mod tests {
 
     fn name(info: &FileInfo) -> &[u8] {
         info.name.as_bytes()
+    }
+
+    #[test]
+    fn explicit_snapshot_preserves_exact_bundled_policy_and_loaded_backing() {
+        let mut inner = MemoryBuilder::new(b"/", false);
+        inner.insert_loaded(b"bundled:///libs/hidden.d.ts", b"inner".as_slice());
+        inner.insert_loaded(b"/target.d.ts", b"target".as_slice());
+        inner.insert_symlink(b"bundled:///libs/custom.d.ts", b"/target.d.ts");
+        let content: Arc<[u8]> = Arc::from(b"\xef\xbb\xbfinterface Custom {}".as_slice());
+        let fs = BundledFs::with_libraries(
+            Arc::new(inner.finish()),
+            vec![
+                (
+                    JsString::from_bytes(b"z.d.ts".as_slice()),
+                    Arc::from(b"z".as_slice()),
+                ),
+                (
+                    JsString::from_bytes(b"custom.d.ts".as_slice()),
+                    content.clone(),
+                ),
+            ],
+        )
+        .unwrap();
+        let read = fs
+            .read_file(b"bundled:///libs/custom.d.ts")
+            .unwrap()
+            .unwrap();
+        assert!(Arc::ptr_eq(&read.raw, &content));
+        assert_eq!(read.text.as_bytes(), content.as_ref());
+        for missing in [
+            b"bundled:///libs/CUSTOM.d.ts".as_slice(),
+            b"bundled:///libs/hidden.d.ts",
+            b"bundled:///libs/lib.es5.d.ts",
+        ] {
+            assert!(fs.read_file(missing).unwrap().is_none());
+            assert!(fs.stat(missing).unwrap().is_none());
+        }
+        assert_eq!(
+            fs.realpath(b"bundled:///libs/custom.d.ts")
+                .unwrap()
+                .as_bytes(),
+            b"bundled:///libs/custom.d.ts"
+        );
+        assert!(!fs.directory_exists(b"bundled:///").unwrap());
+        assert!(fs.directory_exists(b"bundled:///libs").unwrap());
+        assert_eq!(
+            fs.stat(b"bundled:///").unwrap().unwrap().name.as_bytes(),
+            b""
+        );
+        let info = fs.stat(b"bundled:///libs/custom.d.ts").unwrap().unwrap();
+        assert_eq!(info.name.as_bytes(), b"custom.d.ts");
+        assert_eq!(info.size, content.len() as u64);
+        let entries = fs.entries(b"bundled:///libs").unwrap();
+        assert_eq!(
+            entries
+                .files
+                .unwrap()
+                .iter()
+                .map(JsString::as_bytes)
+                .collect::<Vec<_>>(),
+            [b"z.d.ts".as_slice(), b"custom.d.ts"]
+        );
+        let mut walked = Vec::new();
+        fs.walk_dir(b"bundled:///libs", &mut |path, entry, _| {
+            walked.push((path.to_vec(), entry.unwrap().info.name.clone()));
+            Ok(WalkControl::Continue)
+        })
+        .unwrap();
+        assert_eq!(
+            walked
+                .iter()
+                .map(|(_, name)| name.as_bytes())
+                .collect::<Vec<_>>(),
+            [b"z.d.ts".as_slice(), b"custom.d.ts"]
+        );
+        let empty =
+            BundledFs::with_libraries(Arc::new(MemoryBuilder::new(b"/", true).finish()), vec![])
+                .unwrap();
+        assert!(empty
+            .read_file(b"bundled:///libs/lib.es5.d.ts")
+            .unwrap()
+            .is_none());
+        assert_eq!(
+            empty.entries(b"bundled:///libs").unwrap().files,
+            Some(Vec::new())
+        );
+    }
+
+    #[test]
+    fn explicit_snapshots_reject_ambiguous_names_and_keep_host_cache_identity() {
+        let inner: Arc<dyn FileSystem> = Arc::new(MemoryBuilder::new(b"/", true).finish());
+        let builtin = BundledFs::new(inner.clone());
+        assert_eq!(builtin.snapshot_id(), inner.snapshot_id());
+        let first = BundledFs::with_libraries(inner.clone(), vec![]).unwrap();
+        let second = BundledFs::with_libraries(
+            inner.clone(),
+            vec![(
+                JsString::from_bytes(b"x.d.ts".as_slice()),
+                Arc::from(b"x".as_slice()),
+            )],
+        )
+        .unwrap();
+        assert_ne!(first.snapshot_id(), second.snapshot_id());
+        assert_eq!(first.snapshot_id(), first.snapshot_id());
+        let live: Arc<dyn FileSystem> = Arc::new(tsr_vfs::wrapped::WrappedFs::new(
+            inner.clone(),
+            tsr_vfs::wrapped::Replacements::default(),
+        ));
+        assert!(BundledFs::with_libraries(live, vec![])
+            .unwrap()
+            .snapshot_id()
+            .is_none());
+        for name in [b"".as_slice(), b".", b"..", b"a/b", b"a\\b"] {
+            assert!(matches!(
+                BundledFs::with_libraries(
+                    inner.clone(),
+                    vec![(JsString::from_bytes(name), Arc::from([]))]
+                ),
+                Err(Error::InvalidPath)
+            ));
+        }
+        assert!(matches!(
+            BundledFs::with_libraries(
+                inner,
+                vec![
+                    (JsString::from_bytes(b"x.d.ts".as_slice()), Arc::from([])),
+                    (JsString::from_bytes(b"x.d.ts".as_slice()), Arc::from([])),
+                ]
+            ),
+            Err(Error::InvalidPath)
+        ));
     }
 
     #[test]

@@ -16,7 +16,7 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 crate-type = ["cdylib", "rlib"]
 
 [features]
-checker = ["tsr_embed/checker", "dep:tsr_compiler", "dep:tsr_checker", "dep:tsr_vfs", "dep:tsr_bundled", "dep:tsr_tsoptions", "dep:tsr_astnav", "dep:serde_json"]
+checker = ["tsr_embed/checker", "dep:tsr_compiler", "dep:tsr_checker", "dep:tsr_vfs", "dep:tsr_bundled", "dep:tsr_tsoptions", "dep:tsr_astnav", "dep:tsr_json", "dep:tsr_diagnostics", "dep:serde", "dep:serde_json"]
 
 [dependencies]
 wasm-bindgen = "=0.2.126"
@@ -33,6 +33,9 @@ tsr_vfs = { version = "0.4.0", path = "../tsr_vfs", optional = true }
 tsr_bundled = { version = "0.4.0", path = "../tsr_bundled", optional = true }
 tsr_tsoptions = { version = "0.4.0", path = "../tsr_tsoptions", optional = true }
 tsr_astnav = { version = "0.4.0", path = "../tsr_astnav", optional = true }
+tsr_json = { version = "0.4.0", path = "../tsr_json", optional = true }
+tsr_diagnostics = { version = "0.4.0", path = "../tsr_diagnostics", optional = true }
+serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", features = ["preserve_order"], optional = true }
 
 [dev-dependencies]
@@ -40,6 +43,10 @@ serde_json = { version = "1", features = ["preserve_order"] }
 
 [[test]]
 name = "emit"
+required-features = ["checker"]
+
+[[test]]
+name = "transpile"
 required-features = ["checker"]
 
 [lints]

@@ -99,14 +99,17 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
 
 
 def build_consumer():
+    # Historical S10-only adapter. Phase 7 public-API acceptance uses
+    # parity.py run transpile-embed and the separate rust-consumer manifest.
     before = sources()
-    command = ['cargo', 'build', '--locked', '--release', '--manifest-path',
-               'tools/s10/rust-consumer/Cargo.toml', '--target-dir', 'target']
+    command = ['cargo', 'build', '--locked', '--release', '-p', 's10_corpus',
+               '--bin', 'legacy-rust-consumer', '--target-dir', 'target']
     subprocess.run(command, cwd=ROOT, env=build_environment(), check=True)
     if sources() != before:
         raise ValueError('source changed while building the external consumer')
-    binary = ROOT / 'target/release/s10_rust_consumer'
+    binary = ROOT / 'target/release/legacy-rust-consumer'
     record = {'sources': before, 'command': command, 'binary_sha256': digest(binary),
+              'boundary': 'legacy-internal-S10',
               'rustc': subprocess.check_output(['rustc', '--version'], env=build_environment(), text=True).strip()}
     output = ROOT / 'target/s10/rust-consumer-build.json'
     output.parent.mkdir(parents=True, exist_ok=True)

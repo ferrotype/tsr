@@ -22,6 +22,8 @@ use tsr_testrunner::{compiler_runner, transpile_runner, Mode, Stop, TestData};
 struct Arguments {
     suite: String,
     mode: Mode,
+    backend: String,
+    consumer: Option<PathBuf>,
     root: PathBuf,
     command: Command,
 }
@@ -40,6 +42,8 @@ fn usage(message: &str) -> ! {
 fn parse_arguments() -> Arguments {
     let mut suite = None;
     let mut mode = Mode::Single;
+    let mut backend = "native".to_owned();
+    let mut consumer = None;
     let mut root = std::env::current_dir()
         .unwrap_or_else(|error| usage(&format!("current directory: {error}")));
     let mut command = None;
@@ -61,6 +65,8 @@ fn parse_arguments() -> Arguments {
                     other => usage(&format!("unknown mode {other}")),
                 }
             }
+            "--backend" => backend = value("--backend"),
+            "--consumer" => consumer = Some(PathBuf::from(value("--consumer"))),
             "--root" => root = PathBuf::from(value("--root")),
             "--id" => id = Some(value("--id")),
             "--local" => local = Some(PathBuf::from(value("--local"))),
@@ -81,9 +87,20 @@ fn parse_arguments() -> Arguments {
         },
         _ => usage("list or run is required"),
     };
+    if !matches!(backend.as_str(), "native" | "embed") {
+        usage("--backend must be native or embed");
+    }
+    if backend == "native" && consumer.is_some() {
+        usage("--consumer requires --backend embed");
+    }
+    if backend == "embed" && matches!(command, Command::Run { .. }) && consumer.is_none() {
+        usage("embed run requires --consumer (no native fallback)");
+    }
     Arguments {
         suite,
         mode,
+        backend,
+        consumer,
         root,
         command,
     }
@@ -138,19 +155,40 @@ fn prepare(variant: Variant, content: &[u8]) -> Result<compiler_runner::Prepared
 fn run(arguments: &Arguments, id: &str, local: &Path, testdata: &TestData) -> Result<Report, Stop> {
     let variant = enumerate::find_variant(testdata, id)?
         .ok_or_else(|| Stop::fatal(format!("no variant {id} in suite {}", arguments.suite)))?;
+    if (arguments.suite == "transpile") != (variant.suite == "transpile") {
+        return Err(Stop::fatal(format!(
+            "variant {id} is outside suite {}",
+            arguments.suite
+        )));
+    }
     let content = read(&variant.file)?;
     let roots = Roots::new(testdata.reference(), local.to_path_buf());
     let mut report = Report::default();
     if variant.suite == "transpile" {
-        transpile_runner::run_transpile_test(&variant, &content, &roots, &mut report);
+        if let Some(consumer) = &arguments.consumer {
+            transpile_runner::run_transpile_test_with(
+                &variant,
+                &content,
+                &roots,
+                &mut report,
+                &mut |unit, options, declaration| {
+                    tsr_testrunner::portable::transpile(consumer, unit, options, declaration)
+                },
+            );
+        } else if arguments.backend == "native" {
+            transpile_runner::run_transpile_test(&variant, &content, &roots, &mut report);
+        } else {
+            return Err(Stop::fatal("embed run requires --consumer"));
+        }
         return Ok(report);
     }
     match prepare(variant.clone(), &content) {
-        Ok(prepared) => compiler_runner::run_single_config_test(
+        Ok(prepared) => compiler_runner::run_single_config_test_with_backend(
             prepared,
             testdata,
             &roots,
             arguments.mode,
+            arguments.consumer.as_deref(),
             &mut report,
         ),
         Err(Stop::Skip(reason)) => report.subtest(&variant.id(), "test", Outcome::skip(reason)),

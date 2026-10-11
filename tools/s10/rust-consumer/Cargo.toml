@@ -11,16 +11,20 @@ publish = false
 
 [dependencies]
 tsr_embed = { version = "0.4.0", path = "../../../crates/tsr_embed" }
-s10_corpus = { version = "0.1.0", path = "../corpus-adapter" }
 serde_json = { version = "1", features = ["preserve_order"] }
 
-[dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+tsr_ast = { version = "0.4.0", path = "../../../crates/tsr_ast" }
+tsr_diagnostics = { version = "0.4.0", path = "../../../crates/tsr_diagnostics" }
+tsr_json = { version = "0.4.0", path = "../../../crates/tsr_json" }
 tsr_arena = { version = "0.4.0", path = "../../../crates/tsr_arena" }
-tsr_checker = { version = "0.4.0", path = "../../../crates/tsr_checker" }
 tsr_core = { version = "0.4.0", path = "../../../crates/tsr_core" }
 tsr_jsstring = { version = "0.4.0", path = "../../../crates/tsr_jsstring" }
 tsr_tsoptions = { version = "0.4.0", path = "../../../crates/tsr_tsoptions" }
 tsr_vfs = { version = "0.4.0", path = "../../../crates/tsr_vfs" }
+tsr_tspath = { version = "0.4.0", path = "../../../crates/tsr_tspath" }
+tsr_printer = { version = "0.4.0", path = "../../../crates/tsr_printer" }
+tsr_scanner = { version = "0.4.0", path = "../../../crates/tsr_scanner" }
 
 [profile.release]
 lto = "fat"

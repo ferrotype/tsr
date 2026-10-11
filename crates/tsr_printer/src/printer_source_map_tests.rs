@@ -85,6 +85,10 @@ fn new_generator() -> tsr_sourcemap::Generator {
 }
 
 fn run(case: &Value) -> (Vec<u8>, Vec<u8>) {
+    run_with_expression_driver(case, false)
+}
+
+fn run_with_expression_driver(case: &Value, iterative: bool) -> (Vec<u8>, Vec<u8>) {
     let file_name = case["file_name"].as_str().expect("file name").to_owned();
     let text = bytes(&case["source"]);
     let parsed = parse(&file_name, text.clone());
@@ -97,6 +101,7 @@ fn run(case: &Value) -> (Vec<u8>, Vec<u8>) {
     let emit_context = crate::EmitContext::new();
     let mut printer = Printer::new(
         PrinterOptions {
+            iterative_expressions: iterative,
             new_line,
             remove_comments: flag("remove_comments"),
             source_map: true,
@@ -256,6 +261,13 @@ fn panic_text(payload: &(dyn std::any::Any + Send)) -> String {
 /// The producer's `a1RunWrites`: each write's text, then each generator's
 /// map.
 fn run_writes(case: &Value) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
+    run_writes_with_expression_driver(case, false)
+}
+
+fn run_writes_with_expression_driver(
+    case: &Value,
+    iterative: bool,
+) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
     let flag = |name: &str| case[name].as_bool() == Some(true);
     let mut ec = EmitContext::new();
     let mut factory = AstBuilder::with_hooks(
@@ -318,6 +330,7 @@ fn run_writes(case: &Value) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
             inline_sources: flag("inline_sources"),
             omit_brace_source_map_positions: flag("omit_braces"),
             preserve_source_newlines: flag("preserve_source_newlines"),
+            iterative_expressions: iterative,
             ..PrinterOptions::default()
         },
         &ec,
@@ -353,6 +366,66 @@ fn run_writes(case: &Value) -> (Vec<Vec<u8>>, Vec<Vec<u8>>) {
 
 fn expected_list(case: &Value, key: &str) -> Vec<Vec<u8>> {
     case[key].as_array().expect(key).iter().map(bytes).collect()
+}
+
+#[test]
+fn wasm_expression_driver_preserves_printed_bytes_and_source_maps() {
+    let document: Value = serde_json::from_str(FIXTURE).expect("fixture");
+    for case in document["cases"].as_array().unwrap() {
+        if case["writes"].is_null() {
+            let actual = run_with_expression_driver(case, true);
+            assert_eq!(actual, run(case), "recursive comparison: {}", case["id"]);
+            assert_eq!(
+                actual,
+                (
+                    bytes(&case["expected_output"]),
+                    bytes(&case["expected_map"])
+                ),
+                "pinned comparison: {}",
+                case["id"]
+            );
+        } else {
+            let actual = run_writes_with_expression_driver(case, true);
+            assert_eq!(
+                actual,
+                run_writes(case),
+                "recursive comparison: {}",
+                case["id"]
+            );
+            assert_eq!(
+                actual,
+                (
+                    expected_list(case, "expected_outputs"),
+                    expected_list(case, "expected_maps")
+                ),
+                "pinned comparison: {}",
+                case["id"]
+            );
+        }
+    }
+    for source in [
+        "const x = a /*left*/ +\n b * c - d / e;",
+        "const x = a = b = c; a ?? (b || c); (a ?? b) && c;",
+        "const x = a ** b ** c; (a ** b) ** c; a << b + c;",
+        "const f = () => ({ a: 1 } + x); (function() {} + x);",
+        "const x = (a, b, c); const y = a + (b + c);",
+    ] {
+        let case = serde_json::json!({"file_name": "/main.ts", "source": {"text": source}, "inline_sources": true});
+        assert_eq!(
+            run_with_expression_driver(&case, true),
+            run(&case),
+            "{source}"
+        );
+    }
+}
+
+#[test]
+fn wasm_expression_driver_prints_the_entire_deep_binary_chain() {
+    let source = format!("const result = {};", vec!["a"; 5001].join(" + "));
+    let case = serde_json::json!({"file_name": "/main.ts", "source": {"text": source}});
+    let iterative = run_with_expression_driver(&case, true);
+    assert_eq!(iterative, run(&case));
+    assert_eq!(iterative.0, format!("{source}\n").as_bytes());
 }
 
 #[test]

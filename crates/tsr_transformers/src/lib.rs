@@ -13,6 +13,8 @@
 pub mod declarations;
 pub mod destructuring;
 pub mod estransforms;
+#[cfg(any(target_arch = "wasm32", test))]
+mod expression_spine;
 pub mod inliners;
 pub mod jsxtransforms;
 pub mod modifier_visitor;

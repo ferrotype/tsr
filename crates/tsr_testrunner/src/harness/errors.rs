@@ -4,7 +4,9 @@ use super::paths::remove_prefixes;
 use serde_json::{json, Value};
 use tsr_ast::Diagnostic;
 use tsr_compiler::{
-    diagnostic_writer::{category, flattened, DiagnosticWriter, FormattingOptions},
+    diagnostic_writer::{
+        category, flattened, DiagnosticSources, DiagnosticWriter, FormattingOptions,
+    },
     Program,
 };
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -166,7 +168,7 @@ impl Annotation<'_, '_> {
 /// diagnostic with code -1, is an error here.
 /// Harness port: tsc/internal/testutil/tsbaseline/error_baseline.go:GetErrorBaseline.
 pub fn render(
-    program: &Program,
+    program: &dyn DiagnosticSources,
     inputs: &[InputFile<'_>],
     diagnostics: &[Diagnostic],
     pretty: bool,
@@ -199,13 +201,13 @@ pub struct ErrorBaseline {
 // port: tsc/internal/testutil/tsbaseline/error_baseline.go:GetErrorBaseline
 // port: tsc/internal/testutil/tsbaseline/error_baseline.go:iterateErrorBaseline
 pub fn error_baseline(
-    program: &Program,
+    program: &dyn DiagnosticSources,
     inputs: &[InputFile<'_>],
     diagnostics: &[Diagnostic],
     pretty: bool,
 ) -> Result<ErrorBaseline> {
     let mut failed_checks = Vec::new();
-    let mut writer = DiagnosticWriter::new(
+    let mut writer = DiagnosticWriter::from_sources(
         program,
         FormattingOptions {
             new_line: NL.to_vec(),
@@ -346,19 +348,36 @@ pub fn error_baseline(
 /// text, then their diagnostics through the pretty writer with its colors
 /// removed, which renders each against the text its span maps to. `None`
 /// when the program has no content-mapped files.
+pub trait ContentMapperSources: DiagnosticSources {
+    /// Program order and the extensions of the mapper selected for each file.
+    fn mapped_files(&self) -> Result<Vec<(tsr_ast::NodeId, Vec<tsr_jsstring::JsString>)>>;
+}
+
+impl ContentMapperSources for Program {
+    fn mapped_files(&self) -> Result<Vec<(tsr_ast::NodeId, Vec<tsr_jsstring::JsString>)>> {
+        let mut mapped = Vec::new();
+        for file in self.files() {
+            let source = file.bound().view().source_file()?;
+            if let Some(mapper) = self.content_mapper(&source) {
+                mapped.push((file.source(), mapper.extensions.clone()));
+            }
+        }
+        Ok(mapped)
+    }
+}
+
 /// Harness port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline.
 // port: tsc/internal/testutil/tsbaseline/contentmapper_baseline.go:getContentMapperBaseline
-pub fn content_mapper(program: &Program, diagnostics: &[Diagnostic]) -> Result<Option<Vec<u8>>> {
+pub fn content_mapper(
+    program: &dyn ContentMapperSources,
+    diagnostics: &[Diagnostic],
+) -> Result<Option<Vec<u8>>> {
     let mut mapped = Vec::new();
     let mut out = Vec::new();
-    for file in program.files() {
-        let source = file.bound().view().source_file()?;
-        let Some(mapper) = program.content_mapper(&source) else {
-            continue;
-        };
-        mapped.push(file.source());
-        let extensions: Vec<&[u8]> = mapper
-            .extensions
+    for (file, extensions) in program.mapped_files()? {
+        let source = program.diagnostic_source(file)?;
+        mapped.push(file);
+        let extensions: Vec<&[u8]> = extensions
             .iter()
             .map(tsr_jsstring::JsString::as_bytes)
             .collect();
@@ -386,7 +405,7 @@ pub fn content_mapper(program: &Program, diagnostics: &[Diagnostic]) -> Result<O
         out.extend_from_slice(b"<no content>\n");
         return Ok(Some(out));
     }
-    let mut writer = DiagnosticWriter::new(program, FormattingOptions::default());
+    let mut writer = DiagnosticWriter::from_sources(program, FormattingOptions::default());
     let rendered = writer.format(&file_diagnostics, true)?;
     out.extend_from_slice(&remove_prefixes(&without_ansi_escapes(&rendered)));
     Ok(Some(out))

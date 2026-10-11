@@ -26,6 +26,7 @@ impl CheckerState {
         self.check_grammar_import_call_expression(node)?;
         let args = self.source_list(node, self.node(node)?.argument_list())?;
         let Some(&specifier) = args.first() else {
+            // checkchildren-allow: absent first argument means no import arguments or excess arguments to check
             return self.create_promise_return_type(node, self.builtins.any_type);
         };
         let specifier_type = self.check_expression_cached(specifier)?;

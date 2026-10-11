@@ -66,6 +66,31 @@ jobs:
       - name: Packaged assets and publication policy
         run: python3 scripts/package_assets.py --check
 
+  checkchildren:
+    name: checker child-traversal lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned compiler-private tooling
+        run: |
+          nightly=$(python3 -c "import tomllib; print(tomllib.load(open('data/s04/toolchains.toml','rb'))['nightly'])")
+          rustup toolchain install "$nightly" --profile minimal --component rustc-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: checkchildren
+          workspaces: . -> target/phase7/checkchildren-cargo
+      - name: Omission controls and checker analysis
+        run: python3 tools/phase7/checkchildren/run.py check --output "$RUNNER_TEMP/checkchildren.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkchildren
+          path: ${{ runner.temp }}/checkchildren.log
+          if-no-files-found: warn
+
   rust-tests:
     name: rust tests ${{ matrix.shard }}
     strategy:
@@ -193,6 +218,105 @@ jobs:
           name: tsr-testrunner
           path: target/release/tsr-testrunner
           retention-days: 1
+          if-no-files-found: error
+
+  portable-parity:
+    name: portable parity through ${{ matrix.runtime }}
+    needs: runner
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [embed, wasm]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: portable-${{ matrix.runtime }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: tsr-testrunner
+          path: runner
+      - run: chmod +x runner/tsr-testrunner
+      - name: Build and test the independent consumer
+        id: public_native_consumer
+        if: matrix.runtime == 'embed'
+        run: |
+          cargo test --release --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target
+          cargo build --release --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target
+      - name: Read the wasm and Node pins
+        if: matrix.runtime == 'wasm'
+        id: portable-pins
+        run: |
+          echo "node=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+          echo "bindgen=$(python3 -c "import json;print(json.load(open('tools/s10/toolchains.json'))['wasm_bindgen'])")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: matrix.runtime == 'wasm'
+        with:
+          node-version: ${{ steps.portable-pins.outputs.node }}
+      - name: Provision the pinned wasm tools
+        if: matrix.runtime == 'wasm'
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-bindgen-cli --version '${{ steps.portable-pins.outputs.bindgen }}' --locked
+      - name: Build the production wasm artifact
+        id: production_wasm
+        if: matrix.runtime == 'wasm'
+        run: |
+          python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
+          node --test tools/phase7/portable/test-wasm.mjs
+      - name: Build the independent test-only wasm compiler consumer
+        id: test_wasm_compiler
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        run: |
+          cargo test --locked --manifest-path tools/phase7/portable/wasm-compiler/Cargo.toml --target-dir target --lib
+          cargo clippy --locked --manifest-path tools/phase7/portable/wasm-compiler/Cargo.toml --target-dir target --all-targets -- -D warnings
+          node --test tools/phase7/portable/test-compiler-wasm.mjs
+          python3 tools/phase7/portable/wasm-compiler/build.py --wasm-bindgen "$(command -v wasm-bindgen)" --output results/wasm-compiler-artifact
+      - name: Run the complete transpile roster
+        if: ${{ !cancelled() && (steps.public_native_consumer.outcome == 'success' || steps.production_wasm.outcome == 'success') }}
+        env:
+          TSR_WASM_ARTIFACT_DIR: ${{ github.workspace }}/target/s10/checker
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          if [ "$RUNTIME" = embed ]; then consumer=target/release/s10_rust_consumer; else consumer=tools/phase7/portable/wasm-consumer; fi
+          python3 scripts/parity.py run "transpile-$RUNTIME" --runner runner/tsr-testrunner --consumer "$consumer" --output "results/transpile-$RUNTIME/1-1"
+      - name: Run the complete compiler roster
+        if: ${{ !cancelled() && (steps.public_native_consumer.outcome == 'success' || steps.test_wasm_compiler.outcome == 'success') }}
+        env:
+          TSR_WASM_COMPILER_ARTIFACT_DIR: ${{ github.workspace }}/results/wasm-compiler-artifact
+          RUNTIME: ${{ matrix.runtime }}
+        run: |
+          if [ "$RUNTIME" = embed ]; then
+            consumer=target/release/s10_rust_consumer
+            jobs=4
+            test -x "$consumer"
+          else
+            consumer=tools/phase7/portable/wasm-consumer
+            jobs=2
+            test -f "$TSR_WASM_COMPILER_ARTIFACT_DIR/build.json"
+          fi
+          python3 scripts/parity.py run "compiler-$RUNTIME" --runner runner/tsr-testrunner --consumer "$consumer" --jobs "$jobs" --output "results/compiler-$RUNTIME/1-1"
+      - name: Run the three-engine browser smoke
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/phase7-browsers
+        run: |
+          version=$(python3 -c "import json;print(json.load(open('tools/phase7/portable/browser/toolchains.json'))['playwright'])")
+          npm install --prefix "$RUNNER_TEMP/phase7-browser" --ignore-scripts --no-audit --no-fund "playwright@$version"
+          node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install --with-deps chromium firefox webkit
+          node --test tools/phase7/portable/browser/test-runner.mjs
+          node tools/phase7/portable/browser/run.mjs --artifacts target/s10/checker --output results/browser-smoke --playwright-module "$RUNNER_TEMP/phase7-browser/node_modules/playwright"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-portable-${{ matrix.runtime }}
+          path: results
+          retention-days: 7
           if-no-files-found: error
 
   phase5-runner:
@@ -382,7 +506,7 @@ jobs:
 
   parity-check:
     name: parity check
-    needs: [parity, phase5-parity, jsapi]
+    needs: [parity, portable-parity, phase5-parity, jsapi]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -395,7 +519,7 @@ jobs:
       - name: Compare with the expectation files
         run: |
           status=0
-          for suite in compiler compiler-concurrent transpile fourslash lsp jsapi; do
+          for suite in compiler compiler-concurrent compiler-embed compiler-wasm transpile transpile-embed transpile-wasm fourslash lsp jsapi; do
             python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
           done
           exit "$status"

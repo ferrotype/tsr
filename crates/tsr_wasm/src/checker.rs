@@ -116,6 +116,31 @@ impl WasmSession {
         serde_json::to_vec(&rows?).map_err(error)
     }
 
+    /// Return the loaded program's module-resolution trace in recorded order.
+    /// Each row has a byte-array `message_key` and `args`, tagged `text` byte
+    /// arrays or `bool` values. Rendering belongs to the caller; no queries or
+    /// diagnostic scheduling are performed by this snapshot operation.
+    pub fn resolution_trace(&self) -> Result<Vec<u8>, JsValue> {
+        let rows: Vec<_> = self
+            .session
+            .program()
+            .trace()
+            .iter()
+            .map(|entry| ResolutionTrace {
+                message_key: entry.message.key.as_bytes(),
+                args: entry
+                    .args
+                    .iter()
+                    .map(|arg| match arg {
+                        tsr_embed::TraceArg::Text(text) => TraceArgument::Text(text.as_bytes()),
+                        tsr_embed::TraceArg::Bool(value) => TraceArgument::Bool(*value),
+                    })
+                    .collect(),
+            })
+            .collect();
+        serde_json::to_vec(&rows).map_err(error)
+    }
+
     /// Emit through `tsr_embed::Session::emit`, whose write callback keeps
     /// every output in memory: nothing reaches a file system. `request` is a
     /// JSON object whose keys are all optional: `files`, byte-array file
@@ -216,6 +241,19 @@ impl WasmSession {
     }
 }
 
+#[derive(serde::Serialize)]
+struct ResolutionTrace<'a> {
+    message_key: &'a [u8],
+    args: Vec<TraceArgument<'a>>,
+}
+
+#[derive(serde::Serialize)]
+#[serde(tag = "kind", content = "value", rename_all = "snake_case")]
+enum TraceArgument<'a> {
+    Text(&'a [u8]),
+    Bool(bool),
+}
+
 /// A decoded `WasmSession::emit` request.
 struct EmitRequest {
     files: Option<Vec<Vec<u8>>>,
@@ -298,4 +336,20 @@ fn diagnostic(
         "reports_unnecessary": value.reports_unnecessary,
         "reports_deprecated": value.reports_deprecated,
     }))
+}
+
+#[cfg(test)]
+mod trace_tests {
+    use super::TraceArgument;
+
+    #[test]
+    fn resolution_trace_arguments_preserve_arbitrary_bytes_and_boolean_values() {
+        let text = serde_json::to_value(TraceArgument::Text(&[0, 0xff, 0xed, 0xa0, 0x80])).unwrap();
+        assert_eq!(
+            text,
+            serde_json::json!({"kind":"text","value":[0,255,237,160,128]})
+        );
+        let boolean = serde_json::to_value(TraceArgument::Bool(false)).unwrap();
+        assert_eq!(boolean, serde_json::json!({"kind":"bool","value":false}));
+    }
 }

@@ -217,9 +217,11 @@ impl CheckerState {
                         .ok_or(Error::MissingLink("keyof operand"))?;
                     // checkTypeOperator checks the operand only; the `keyof`
                     // type itself is created when something reads it.
+                    // checkchildren-allow: returned check_source_element checks keyof operand; later check is readonly-only
                     return self.check_source_element(operand);
                 }
                 if data.operator() == K::UniqueKeyword {
+                    // checkchildren-allow: check_unique_type_operator checks unique operand; later check is readonly-only
                     return self.check_unique_type_operator(node);
                 }
                 if data.operator() != K::ReadonlyKeyword {

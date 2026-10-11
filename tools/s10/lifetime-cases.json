@@ -2,14 +2,27 @@
   "version": 1,
   "consumer": "tools/s10/rust-consumer/Cargo.toml",
   "test": "lifetime",
-  "modes": ["debug", "release", "miri", "address_sanitizer"],
-  "cases": [
-    "lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline",
-    "lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions",
-    "lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results",
-    "lifetime::retire_before_initialization_cannot_create_a_checker",
-    "lifetime::native_unwind_retires_the_session_and_preserves_the_payload",
-    "lifetime::concurrent_first_queries_share_one_checker_identity"
+  "modes": [
+    "debug",
+    "release",
+    "miri",
+    "address_sanitizer"
   ],
-  "applicability": "E3 owner, generation, operation and retained-result contracts at the public embedding boundary, including repeated disposal counters, panic retirement, reentry and contention. Storage-internal fault injection, socket queue publication, formatting scratch and project-service replacement remain their existing E3 suites; this consumer exposes none of those services. Native unwind and contention are not claimed for wasm instances."
+  "cases": [
+    "callback_order_and_inline_maps_are_observed_independently_of_output_files",
+    "compiler_diagnostics_and_queries_share_the_emit_pool",
+    "compiler_request_cancellation_preserves_native_emit_and_checker_contracts",
+    "compiler_scope_panic_retires_both_checker_roots",
+    "concurrent_first_queries_share_a_checker_identity",
+    "emit_refuses_a_target_file_from_another_program",
+    "emitter_records_and_write_metadata_retain_their_source_owners",
+    "malformed_source_keeps_original_bytes_and_resolvable_diagnostics",
+    "native_query_unwind_preserves_payload_and_invalidates_the_session",
+    "reentry_fails_and_retirement_invalidates_retained_queries_and_emit",
+    "repeated_load_check_query_emit_drop_releases_tracked_storage",
+    "retained_type_survives_session_drop_and_rejects_a_foreign_session",
+    "retirement_before_initialization_refuses_a_query",
+    "transpile_results_retain_sources_and_follow_pinned_cancellation"
+  ],
+  "applicability": "Current public embedding-boundary witnesses for load/check/query/emit ownership, retained types/results, foreign-owner rejection, malformed-source diagnostics, source-map/write metadata, callback order, retirement, unwind, cancellation, reentry, contention and transpile results. The source roster and exact executed names must agree in every mode. Storage-internal fault injection, socket queue publication, formatting scratch and project-service replacement remain their existing E3 suites. Native unwind and contention are not claimed for wasm instances. Historical six-case receipts are preserved and do not certify this current fourteen-case roster."
 }

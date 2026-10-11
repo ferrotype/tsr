@@ -32,6 +32,8 @@ struct ESModuleTransformer<'a> {
     failure: Failure,
     current_source_file: Cell<Option<NodeId>>,
     import_require_statements: RefCell<Option<ImportRequireStatements>>,
+    #[cfg(test)]
+    iterative_spines: bool,
 }
 
 /// `importRequireStatements`.
@@ -50,6 +52,8 @@ pub fn new_es_module_transformer<'a>(opts: &TransformOptions<'a>) -> Option<Tran
         failure: opts.failure.clone(),
         current_source_file: Cell::new(None),
         import_require_statements: RefCell::new(None),
+        #[cfg(test)]
+        iterative_spines: false,
     });
     Some(Transformer::new(
         move |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| tx.visit(visitor, node),
@@ -71,6 +75,19 @@ impl ESModuleTransformer<'_> {
         }
         let id = node.expect(NIL);
         let kind = visitor.factory().node(id).kind();
+        #[cfg(any(target_arch = "wasm32", test))]
+        if self.use_iterative_spines()
+            && matches!(
+                kind.known(),
+                Some(
+                    K::BinaryExpression
+                        | K::ParenthesizedExpression
+                        | K::PartiallyEmittedExpression
+                )
+            )
+        {
+            return crate::expression_spine::visit_expression_spine(&self.failure, visitor, id);
+        }
         match kind.known() {
             Some(K::SourceFile) => Some(self.visit_source_file(visitor, id)),
             Some(K::ImportDeclaration) => Some(self.visit_import_declaration(visitor, id)),
@@ -733,3 +750,21 @@ fn update_statements(
     let statement_list = factory.alloc_list(loc, nodes);
     factory.update_source(file, Some(statement_list), end_of_file_token)
 }
+
+#[cfg(any(target_arch = "wasm32", test))]
+impl ESModuleTransformer<'_> {
+    fn use_iterative_spines(&self) -> bool {
+        #[cfg(test)]
+        {
+            cfg!(target_arch = "wasm32") || self.iterative_spines
+        }
+        #[cfg(not(test))]
+        {
+            true
+        }
+    }
+}
+
+#[cfg(test)]
+#[path = "esmodule_stack_tests.rs"]
+mod stack_tests;

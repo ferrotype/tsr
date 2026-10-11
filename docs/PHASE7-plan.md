@@ -1,10 +1,11 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **R1 and R2 in progress** (2026-10-11,
-[docs/PHASE7-R1.md](PHASE7-R1.md), [docs/PHASE7-R2.md](PHASE7-R2.md));
+Status: **R1–R5 in progress** (2026-10-11,
+[R1](PHASE7-R1.md), [R2](PHASE7-R2.md), [R3](PHASE7-R3.md),
+[R4](PHASE7-R4.md), [R5](PHASE7-R5.md));
 R0 recorded (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md)).
 Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
-7, 9 and 11 accepted, the others open. The detailed plan for
+2, 3, 7, 9 and 11 accepted, the others open. The detailed plan for
 [PLAN Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over),
 the last phase: it turns PLAN section 5's exit criteria and the
 [acceptance matrix](S12-acceptance.md) of ADR 0020 into checkpoints with
@@ -39,7 +40,7 @@ can say so from committed files. At the end of Phase 7:
   through the bare WebAssembly instance and through an external Rust
   consumer of `tsr_embed`, graded by the same runner and the same baselines
   as the native suite. A browser smoke covers parse, check, emit and deep
-  input in each supported engine.
+  input in Chromium, Firefox and WebKit (owner decision 3).
 - **Performance.** The five TypeScript-benchmarking scenarios (vscode,
   self-compiler, mui-docs, xstate, bluesky) are frozen and recorded under
   `status/perf/` for full checking and checking plus emit at 2, 4 and 8
@@ -51,8 +52,9 @@ can say so from committed files. At the end of Phase 7:
 - **Hardening.** Differential fuzzing against the pinned Go binary runs in
   the repository with its findings as fixtures; crash reports replay; the
   deep-input stress covers native and WebAssembly stacks; the sanitizer and
-  Miri lanes run on the ownership contracts; profiling is either available
-  or explicitly out of scope by decision.
+  Miri lanes run on the ownership contracts; pprof compatibility is explicitly
+  out of scope by [ADR 0024](adr/0024-profiling-compatibility-out-of-scope.md),
+  with native profiling documented.
 - **Release.** The four native targets of ADR 0002 are built and tested in
   CI, the Linux binaries honour the glibc 2.28 floor, the release layout is
   what the pinned `packages/typescript` client and the VS Code extension
@@ -117,8 +119,6 @@ can say so from committed files. At the end of Phase 7:
   not a browser result), the four pending technical decisions of PLAN
   section 13 (storage layout, interning, trampolines, the `checkchildren`
   replacement).
-- Profiling: `--pprofDir` and the three API profiling methods answer "not
-  available"; `internal/pprof` is the one file the ledger assigns to Phase 7.
 - Ledger closure: Phase 5 shows 74 planned and 41 in-progress files (its L8
   bookkeeping: ledger homes, the 93 direct-test assignments, port
   completion), Phase 1 shows 38 planned and 60 in progress, `project/dirty`
@@ -200,9 +200,13 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
 4. **Acceptance through the existing runner.** The WebAssembly instance and
    the consumer do not get their own comparators: `tsr_testrunner` expands
    the cases and composes and compares the baselines as it does for the
-   native suites, and a compile backend compiles through the in-memory host
-   of `tsr_wasm` (in Node) or through `tsr_embed`'s public API (in the
-   external consumer process). Use `compiler-wasm`, `transpile-wasm`,
+   native suites. Owner decision 2026-10-11 permits `compiler-wasm` to use
+   a test-only wasm consumer of public `tsr_embed`, sharing the native external
+   consumer's exact executor, walker and query order. The production `tsr_wasm`
+   artifact remains the boundary for `transpile-wasm` and browser smoke;
+   native embedding acceptance uses the external `tsr_embed` consumer process.
+   The test-only compiler artifact cannot certify production wasm performance
+   or artifact-size budgets. Use `compiler-wasm`, `transpile-wasm`,
    `compiler-embed` and `transpile-embed`, each with its expectation file and
    native suite's applicable case/subtest roster. An `Unsupported` result
    is a failing entry, never a skip. The two `tsc` trace-order approvals do
@@ -243,11 +247,13 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
    each reproducer's inputs, options, operation sequence and failing boundary.
    Running a native compiler fixture alone cannot certify a wasm or public
    lifetime fix. Use the existing suite and unit-test machinery for each route.
-7. **Profiling.** Two admissible answers, the owner's choice (owner decision 2):
-   write pprof-format CPU and heap profiles from a sampling profiler behind
-   the existing flags and API methods (a dependency, recorded under
-   ADR 0017), or declare `internal/pprof` out of scope in the ledger and
-   keep the explicit "not available" answers, which the pin's clients accept.
+7. **Profiling.** Owner decision 2, accepted 2026-10-11: pprof compatibility
+   is out of scope ([ADR 0024](adr/0024-profiling-compatibility-out-of-scope.md)).
+   The ledger marks `internal/pprof` out of scope; keep the existing explicit
+   unavailable/refusal responses for the CLI and API/LSP operations. Native
+   profiling uses the documented `samply`/`sample` recipes in
+   [the profiling guide](PERF-profiling-2026-10.md#method). No profiler
+   dependency or pprof-format compatibility is required.
 8. **Release layout.** The release artifact mirrors upstream's platform
    package (`lib/tsc` beside the lib files), verified by pointing the pinned
    `packages/typescript` client's `getExePath` and the extension at a local
@@ -427,12 +433,16 @@ attribution. A measured residual alone does not close acceptance.
 Work items:
 
 1. The `compiler-wasm` and `transpile-wasm` suites (architecture item 4):
-   runner backends that compile each variant in a Node-hosted `tsr_wasm`
-   instance through the in-memory host (files, libraries, symlinks, directory enumeration and package
-   metadata supplied in memory, as `MemorySnapshot` and `BundledFs` do
-   natively), with emit (`.js`, `.map`, `.d.ts`) through the session's write
-   callback, and expose both transpile-module and transpile-declaration
-   operations through the wasm API. Start with the native single-checker
+   per owner decision 2026-10-11, `compiler-wasm` compiles each variant in a
+   Node-hosted test-only wasm consumer of public `tsr_embed`. It imports the
+   exact native external executor, walker and query order; the host supplies
+   files, libraries, symlinks, directory enumeration and package metadata in
+   memory, including `MemorySnapshot` and `BundledFs` behavior. Owned writes
+   cover `.js`, `.map` and `.d.ts`; synchronous callbacks supply native test
+   mapper behavior. `transpile-wasm` continues to use production `tsr_wasm`
+   transpile-module and transpile-declaration exports. Browser smoke also
+   continues to test production `tsr_wasm`. This test-only compiler artifact
+   is excluded from performance and artifact-size acceptance. Start with the native single-checker
    rosters (13,432 compiler variants and 28 transpile variants at the planning
    pin), including every applicable subtest. Test-case expansion and baseline
    rendering stay on the host; compilation and queries stay in the instance.
@@ -445,9 +455,10 @@ Work items:
 2. Deep input on wasm32: the stress fixtures of ADR 0011 through the
    instance with the stack configuration recorded (Node's `--stack-size`,
    the instance's own stack), failures declared rather than inferred.
-3. The browser smoke (owner decision 3): parse, check, emit and deep input
-   in each supported engine, driven by a committed page and the engines'
-   automation; results recorded with the engine versions.
+3. The browser smoke (owner decision 3, accepted 2026-10-11): parse, check,
+   emit and deep input in Chromium, Firefox and WebKit, driven by a committed
+   page and the engines' repository-only automation; results recorded with
+   each engine version and stack/worker configuration.
 4. Budgets: the full artifact against an equivalent Go `GOOS=js` build of the pin
    (uncompressed, glue declared separately, corpus adapters excluded from
    both); checking and checking plus emit on each scenario at one checker in
@@ -542,8 +553,9 @@ Work items:
    that automated check with review alone requires a separate owner amendment
    to PLAN, not a completion claim. Record the storage layout and interning
    decisions from R1 here too (items 6 and 8).
-5. Profiling (owner decision 2) implemented or declared, with the ledger entry for
-   `internal/pprof` moved accordingly.
+5. Profiling scope (owner decision 2) is declared by ADR 0024:
+   `internal/pprof` is out of scope in the ledger, native profiling is documented,
+   and the existing unavailable/refusal responses remain explicit.
 6. The `Unsupported` and "not available" paths enumerated (`rg` over the
    crates), each either implemented, out of scope by decision, or a
    documented limit.
@@ -647,7 +659,7 @@ as release acceptance. Trace approvals stay scoped to their named `tsc` rows.
 | The dogfood finds crashes late | R5 starts before R7; minimize and replay each crash through the affected entry point |
 | Blind mutations stop reaching new behavior | Differential comparison can be combined with coverage-guided mutation; use coverage and minimized failures to decide, not an assumption that the methods conflict |
 | The ledger closure uncovers unported behaviour behind passing suites | Port and test the behavior, or obtain a scoped owner exclusion; an uncovered path is not automatically out of scope |
-| Profiling as a dependency against ADR 0017 | Owner decision 2 chooses; the "not available" answers are already accepted by the pin's clients |
+| Profiling compatibility | Owner decision 2 and ADR 0024 declare pprof out of scope; existing refusals remain and native profiling is documented |
 
 ## 8. Decisions
 
@@ -660,14 +672,16 @@ again.
    targets; a change is an ADR after R1's or R2's attribution, not before.
    Already accepted by PLAN, ADR 0020 and the Phase 5 performance transfer;
    no threshold change is proposed here.
-2. **Profiling.** Implement pprof-format profiles behind `--pprofDir` and the
-   three API methods with a sampling-profiler dependency, or declare
-   `internal/pprof` out of scope and keep the explicit "not available"
-   answers. Recommended: out of scope; the pin's clients accept the answer
-   and the owner profiles with native tools.
-3. **Browser engines for the smoke.** Chromium, Firefox and WebKit through
-   their automation, as repository-only tooling. Recommended: all three,
-   results recorded per engine version.
+2. **Profiling.** **Decided by the owner 2026-10-11:** pprof compatibility
+   is out of scope, as [ADR 0024](adr/0024-profiling-compatibility-out-of-scope.md)
+   records. Keep the CLI/API/LSP unavailable/refusal responses and document
+   native profiling. The `internal/pprof` ledger status is `out-of-scope`;
+   no profiler dependency or pprof-format producer is required.
+3. **Browser engines for the smoke.** **Decided by the owner 2026-10-11:**
+   Chromium, Firefox and WebKit are all required, through repository-only
+   automation. Record results per engine version, with stack/worker
+   configuration and declared failure behavior; Node results do not certify
+   browser defaults.
 4. **Weekly runs.** A scheduled `perf.yml` on a dedicated measurement runner
    or four weekly manual dispatches. Recommended: scheduled if an exclusive
    measurement host is available. The existing `runs-on` input can select it;

@@ -212,3 +212,40 @@ fn emit_encodes_emit_diagnostics() {
         );
     }
 }
+
+#[test]
+fn resolution_trace_preserves_loaded_program_order_and_typed_arguments() {
+    let (wasm, control) = sessions(
+        &[(b"/src/main.ts", MAIN), (b"/src/util.ts", UTIL)],
+        &json!({"noLib":true,"module":99,"target":9,"traceResolution":true}),
+    );
+    let encoded = wasm
+        .resolution_trace()
+        .unwrap_or_else(|_| panic!("trace snapshot"));
+    let rows: Value = serde_json::from_slice(&encoded).expect("trace JSON");
+    let expected: Vec<_> = control
+        .program()
+        .trace()
+        .iter()
+        .map(|entry| {
+            let args: Vec<_> = entry
+                .args
+                .iter()
+                .map(|argument| match argument {
+                    tsr_embed::TraceArg::Text(text) => {
+                        json!({"kind":"text","value":text.as_bytes()})
+                    }
+                    tsr_embed::TraceArg::Bool(value) => json!({"kind":"bool","value":value}),
+                })
+                .collect();
+            json!({"message_key":entry.message.key.as_bytes(),"args":args})
+        })
+        .collect();
+    assert!(!expected.is_empty());
+    assert_eq!(rows, json!(expected));
+    assert!(rows.as_array().unwrap().iter().any(|row| row["args"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|arg| arg["kind"] == "text" && bytes(&arg["value"]) == b"/src/util.ts")));
+}
