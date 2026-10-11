@@ -37,7 +37,12 @@ Pending technical decisions from the plan's section 13 become records when the o
 
 - Storage layout for nodes and types (item 6): decided on the benchmarking scenarios' census in Phase 7 R1.
 - Interning (item 8): decided on measured string duplication in R1.
-- Trampolines at the four left-operand recursion sites (item 11): decided by the stress tests in R5.
-- Replacement for the `checkchildren` analyzer (item 14): a `dylint` or `rustc_driver` lint with a regression for a skipped child check, decided in R5. Substituting review alone would require an owner amendment to PLAN.
+
+Recorded in Phase 7: the four recursion-site strategies (item 11,
+[ADR 0011](0011-deep-recursion--reserved-stacks-and-growth-guards.md)), with
+the observed wasm nesting limits still open in R5; and the `rustc_driver`
+replacement for `checkchildren` (item 14,
+[ADR 0016](0016-toolchain-and-lints.md)), including planted-omission controls
+and explicit analysis limitations.
 
 Settled since this list was written: the spike subset (item 16, Phase 0) and the fourslash transport (open question 5: a carried patch on the pinned harness, ADR 0019).

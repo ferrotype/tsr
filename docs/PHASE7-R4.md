@@ -135,7 +135,7 @@ locally (four tests). The external lifetime tests independently exercise
 create/check/query/emit/drop, retained query roots, retirement/reentry, native
 query unwind invalidation and fresh-session recovery, foreign emit targets,
 concurrent initialization, malformed bytes, and transpile results. These are
-named witnesses for a subset of the lifetime obligations, not full E3 closure.
+named witnesses whose public applicability is mapped below.
 All 14 external public lifetime tests passed locally, including source-map
 metadata/inline maps, differing callback and emitted-file order, shared compiler
 state, positive suggestion/declaration diagnostics, and compiler-scope
@@ -154,9 +154,9 @@ actual child descendants. The dependency guard has injected manifest/import
 failure cases. These checks validate the producer and public boundary; they
 are not full upstream corpus captures or performance measurements.
 
-R4 still requires complete applicable public lifetime/E3 coverage with
-release/Miri/ASan execution, final CI lanes, facade/host
-documentation closure, and the specified elapsed/RSS/retained-byte/executable-size budgets
+R4 still requires final CI lanes, facade/host documentation closure, and the
+specified
+elapsed/RSS/retained-byte/executable-size budgets
 or an owner-approved ADR amendment. R3's wasm/browser/trap and budget criteria
 also remain independent; native tests cannot certify them.
 
@@ -243,6 +243,84 @@ capture is
 `/Users/cristian/git/ts-rust-benchmarks/2026-10-11/r4-lifetime-final`, with capture
 SHA-256 `ed48d8ef6a2d98a76b181710cd74114fdcea36f95654e9af11d2fcb3d51400fc`.
 These are the enumerated public lifetime, failure and release routes described
-above; they do not establish every applicable E3 obligation or wasm trap
-behavior. The complete native compiler expectation now records 13,432 variants
+above. This historical receipt covers its fourteen-case source roster; the
+additional public categories and their focused followup are mapped below.
+Native ownership receipts do not certify wasm trap behavior. The complete native compiler expectation now records 13,432 variants
 with an empty failure set; the actual capture remains the correctness witness.
+
+
+## Public ownership applicability
+
+The applicability audit compares [S06](../data/s06/ownership-cases.json),
+[S07](../data/s07/ownership-cases.json) and
+[S09](../data/s09/ownership-cases.json) with the public `Session`, `ProgramFile`,
+query-result and emit contracts. Applicability concerns an exposed ownership
+transition; it does not require a second facade test for each private mechanism
+that implements that transition. The original suites still test those mechanisms.
+
+| Public transition | Inventory obligation | External witness |
+| --- | --- | --- |
+| Source bytes, node/list/text backing and checked imports survive their owners | S06 retained node/text/imported metadata; S07 completed nodes/symbols | malformed-source, transpile-result and emitter-record tests; generated syntax below |
+| Canonical and supplemental mapped sources stay alive together | S06 `storage_retained_mapped_node_keeps_both_files_auxiliary_data_and_metadata`; S07 mapped-member retention | `services::caller_owned_mapper_project_loads_and_emits_canonical_and_supplemental_sources` retains both source texts through output, then checks final disposal |
+| Identical snapshots share bound-file identity; an edited snapshot cannot reinterpret old IDs | Both S07 `groups` (`shared_bound_file`, `retained_snapshot_edit`) | `public_ownership_shared_file_survives_concurrent_snapshot_edit` checks shared `Arc`, concurrent retained reads, old/new node and symbol rejection, and final release |
+| Every escaped result imports only into its exact checker and keeps its dependencies | S09 `results`, `ast` | `public_ownership_retained_results_and_generated_syntax_keep_exact_owners` covers symbol/signature/type-list/node, typed AST parent/return links, transferred builder syntax and clone; existing retained-type test covers type |
+| Retained access reacquires a permit; retirement closes access without freeing live roots prematurely | S09 `results`, exposed `generation`/`pool` effects | retained-type, retirement/reentry, unwind and compiler-pool tests below |
+| Compiler operations and emit share the correct pool and release its owners | S09 `compiler_pool` release, wrong-owner and panic effects | shared compiler diagnostics/query test, compiler-scope panic test, emit metadata/final-drop tests |
+| Concurrent first requests share initialization; reentry fails before waiting; native panic preserves payload and retires both pools | Exposed S09 `generation`/`pool` effects | concurrent-first-query, reentry, native-unwind and compiler-scope-panic tests |
+
+The original fourteen-case receipt maps completely as follows. Names refer to
+[the external test target](../tools/s10/rust-consumer/tests/lifetime.rs).
+
+| Case | Public obligation |
+| --- | --- |
+| `callback_order_and_inline_maps_are_observed_independently_of_output_files` | Output ordering, callback index identity and source-owner retention |
+| `compiler_diagnostics_and_queries_share_the_emit_pool` | Compiler-pool identity, retained query access, foreign files and reentry |
+| `compiler_request_cancellation_preserves_native_emit_and_checker_contracts` | Cancellation remains distinct from retirement; unaffected routes stay usable |
+| `compiler_scope_panic_retires_both_checker_roots` | Native panic invalidation across both public pools |
+| `concurrent_first_queries_share_a_checker_identity` | First-use contention publishes one checker identity |
+| `emit_refuses_a_target_file_from_another_program` | Foreign source-owner rejection |
+| `emitter_records_and_write_metadata_retain_their_source_owners` | Source-map/write metadata and final output-root disposal |
+| `malformed_source_keeps_original_bytes_and_resolvable_diagnostics` | Original byte backing and diagnostic node resolution while its Program is retained |
+| `native_query_unwind_preserves_payload_and_invalidates_the_session` | Initiating panic payload, retirement and fresh-session recovery |
+| `reentry_fails_and_retirement_invalidates_retained_queries_and_emit` | Reentry, query/emit retirement and retained-root disposal |
+| `repeated_load_check_query_emit_drop_releases_tracked_storage` | Repeated request lifecycle, escaped output and final Program/checker release |
+| `retained_type_survives_session_drop_and_rejects_a_foreign_session` | Exact-owner type retention and post-session access |
+| `retirement_before_initialization_refuses_a_query` | Retired generation cannot initialize a checker |
+| `transpile_results_retain_sources_and_follow_pinned_cancellation` | Transpile result backing, diagnostics and pinned cancellation asymmetry |
+
+The two new `public_ownership_*` cases close the public snapshot-edit and
+non-type result/AST categories missing from that roster. The mapped/supplemental
+service case is included separately in the focused instrumentation followup.
+The [manifest](../tools/s10/lifetime-cases.json) inventories sixteen lifetime
+cases and identifies this supporting service case. Evidence is composed from the
+historical fourteen-case receipt and focused new-case/service executions; it is
+not described as a new full sixteen-case capture.
+
+The complementary capture passed those two new lifetime cases and the supporting
+service case in each of debug, release, strict-provenance Miri and
+AddressSanitizer: twelve successful focused executions, with the compiled-source
+fingerprint unchanged. It is retained at
+`/Users/cristian/git/ts-rust-benchmarks/2026-10-11/r4-lifetime-public-followup-01`,
+with capture SHA-256
+`24db8b12f740dcdc41ac91721e4cdcc24e8ffbd6b2a6f0fda23cf0521ccea338`.
+The receipt records exact test names, commands, toolchain, source revision hashes
+and log hashes; `run.py` preserves the focused runner. Focused external lifetime
+and services clippy also passed with warnings denied. Together with the original
+four-mode receipt, this accounts for all public ownership categories identified
+by the audit; the fourteen historical cases were not rerun. The two receipts
+retain their distinct source fingerprints and do not certify unrelated later
+implementation changes.
+
+The following inventory mechanisms have no corresponding facade operation:
+S06 exclusive construction, arbitrary storage/header replacement, validation
+fault hooks, burned staged identities and injected foreign cache publication;
+S07 local binding backend selection, exclusive mutating binder callbacks and
+invalid staged flow/symbol graphs; S09 generation commit gates, forced retirement
+between compiler files, initializer fault injection, pool idle eviction/project
+replacement, API socket registry/queue commitment, decoded printer scratch and
+formatting insertion scratch. Their original E3 suites remain authoritative.
+Ordinary public generated syntax and mapped-source retention are included above;
+these exclusions do not exclude those results merely because private factories
+implement them. This audit identifies no additional public ownership category
+requiring a synthetic hook or a new facade capability. Native unwind/contention
+and sanitizer execution remain separate from wasm instance/trap evidence.

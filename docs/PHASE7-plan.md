@@ -470,8 +470,9 @@ Work items:
    GC/disposal and post-operation checkpoints for retained process RSS.
    Each of artifact bytes, operation elapsed, peak process RSS and retained
    process RSS has the ADR 0020 limit 1.0; wasm linear memory is not the RSS
-   denominator. Workloads `wasm-size` and `wasm-<scenario>` under
-   `status/perf` report the two operation modes separately.
+   denominator. Workloads `wasm-size`, `wasm-check-<scenario>` and
+   `wasm-emit-<scenario>` under `status/perf` report the two operation modes
+   separately.
 
 Witnesses: the suite in CI; the smoke's recorded results; the records.
 
@@ -514,8 +515,8 @@ Work items:
    results (1.0), the linked consumer executable against a Go consumer built
    for the same work (1.0). Fixed positive comparable live roots, GC/disposal
    and a declared post-operation checkpoint make retained bytes comparable;
-   report allocation traffic separately. Workloads `embed-<scenario>` (check
-   and check+emit separately) and `embed-size`.
+   report allocation traffic separately. Workloads `embed-check-<scenario>`,
+   `embed-emit-<scenario>` and `embed-size` keep the two modes separate.
 
 Witnesses: the suite in CI; the lanes; the records; the doctests.
 

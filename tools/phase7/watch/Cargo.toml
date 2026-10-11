@@ -1,0 +1,41 @@
+[package]
+name = "phase7-live-watch"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.96"
+publish = false
+
+# A separate tooling workspace: neither the production roster nor its lock changes.
+[workspace]
+
+[features]
+system-allocator = []
+
+[dependencies]
+tsr_arena = { path = "../../../crates/tsr_arena" }
+tsr_bundled = { path = "../../../crates/tsr_bundled" }
+tsr_compiler = { path = "../../../crates/tsr_compiler" }
+tsr_contentmapper = { path = "../../../crates/tsr_contentmapper" }
+tsr_core = { path = "../../../crates/tsr_core" }
+tsr_execute = { path = "../../../crates/tsr_execute" }
+tsr_ipc = { path = "../../../crates/tsr_ipc" }
+tsr_jsstring = { path = "../../../crates/tsr_jsstring" }
+tsr_locale = { path = "../../../crates/tsr_locale" }
+tsr_tsc = { path = "../../../crates/tsr_tsc" }
+tsr_tspath = { path = "../../../crates/tsr_tspath" }
+tsr_vfs = { path = "../../../crates/tsr_vfs" }
+tsr_incremental = { path = "../../../crates/tsr_incremental" }
+serde_json = "1"
+sha2 = "0.10"
+mimalloc = "=0.1.48"
+rustix = { version = "1.1", features = ["fs", "event", "pipe", "process", "termios"] }
+libc = "0.2"
+
+[profile.release]
+panic = "unwind"
+lto = "fat"
+codegen-units = 1
+
+[lints.rust]
+unsafe_code = "deny"
+unsafe_op_in_unsafe_fn = "deny"

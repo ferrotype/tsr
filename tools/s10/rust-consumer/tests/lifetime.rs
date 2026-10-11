@@ -1,11 +1,12 @@
 //! External public-entry-point witnesses. These cover the named session and
-//! transpile contracts below; they do not certify every E3 ownership workload.
+//! transpile contracts below. PHASE7-R4.md maps the public E3 applicability.
 use std::sync::Arc;
 use tsr_arena::{Counters, Counts, Error as ArenaError};
 use tsr_core::{CancellationToken, CompilerOptions, ModuleKind, ScriptTarget, Tristate};
 use tsr_embed::{
-    DiagnosticKind, EmitOptions, FileCache, ProgramOptions, QueryError, Session, SessionError,
-    SessionRequest, TranspileOptions, TranspileRequest, transpile_declaration, transpile_module,
+    transpile_declaration, transpile_module, DiagnosticKind, EmitOptions, FileCache,
+    ProgramOptions, QueryError, Session, SessionError, SessionRequest, TranspileOptions,
+    TranspileRequest,
 };
 use tsr_jsstring::JsString;
 
@@ -364,13 +365,11 @@ fn emitter_records_and_write_metadata_retain_their_source_owners() {
     );
     assert!(!map.source_map.mappings.is_empty());
     assert_eq!(map.source_map.file.as_bytes(), b"main.js");
-    assert!(
-        output
-            .program()
-            .unwrap()
-            .source_file(map.input_source_file_names[0].as_bytes())
-            .is_some()
-    );
+    assert!(output
+        .program()
+        .unwrap()
+        .source_file(map.input_source_file_names[0].as_bytes())
+        .is_some());
     drop(output);
     assert!(weak.upgrade().is_none());
     assert_eq!(counters.snapshot(), Counts::default());
@@ -433,12 +432,10 @@ fn callback_order_and_inline_maps_are_observed_independently_of_output_files() {
             .collect::<Vec<_>>(),
         [b"/a.js".as_slice(), b"/b.js".as_slice()]
     );
-    assert!(
-        output
-            .files
-            .iter()
-            .all(|file| !file.name.as_bytes().ends_with(b".map"))
-    );
+    assert!(output
+        .files
+        .iter()
+        .all(|file| !file.name.as_bytes().ends_with(b".map")));
     assert_eq!(output.source_maps.len(), 2);
     assert_eq!(
         output
@@ -549,19 +546,15 @@ fn compiler_diagnostics_and_queries_share_the_emit_pool() {
         &mut FileCache::new(),
         &counters,
     );
-    assert!(
-        suggestions
-            .diagnostics(&request, DiagnosticKind::Semantic, None)
-            .unwrap()
-            .is_empty()
-    );
-    assert!(
-        suggestions
-            .diagnostics(&request, DiagnosticKind::Suggestion, None)
-            .unwrap()
-            .iter()
-            .any(|diagnostic| diagnostic.code == 6133)
-    );
+    assert!(suggestions
+        .diagnostics(&request, DiagnosticKind::Semantic, None)
+        .unwrap()
+        .is_empty());
+    assert!(suggestions
+        .diagnostics(&request, DiagnosticKind::Suggestion, None)
+        .unwrap()
+        .iter()
+        .any(|diagnostic| diagnostic.code == 6133));
     drop(suggestions);
     let declarations = load_with_options(
         b"export const Hidden = class { private secret = 1; };",
@@ -573,13 +566,11 @@ fn compiler_diagnostics_and_queries_share_the_emit_pool() {
             ..Default::default()
         },
     );
-    assert!(
-        declarations
-            .diagnostics(&request, DiagnosticKind::Declaration, None)
-            .unwrap()
-            .iter()
-            .any(|diagnostic| diagnostic.code == 4094)
-    );
+    assert!(declarations
+        .diagnostics(&request, DiagnosticKind::Declaration, None)
+        .unwrap()
+        .iter()
+        .any(|diagnostic| diagnostic.code == 4094));
     drop(declarations);
     assert_eq!(counters.snapshot(), Counts::default());
 }
@@ -647,27 +638,21 @@ fn compiler_request_cancellation_preserves_native_emit_and_checker_contracts() {
         cancellation: Some(token),
         ..Default::default()
     };
-    assert!(
-        session
-            .emit_with_request(&request, &EmitOptions::default())
-            .unwrap()
-            .is_none()
-    );
-    assert!(
-        !session
-            .emit(&EmitOptions::default())
-            .unwrap()
-            .files
-            .is_empty()
-    );
+    assert!(session
+        .emit_with_request(&request, &EmitOptions::default())
+        .unwrap()
+        .is_none());
+    assert!(!session
+        .emit(&EmitOptions::default())
+        .unwrap()
+        .files
+        .is_empty());
     let fresh = self::session(&counters);
     let file = fresh.program().file(b"/main.ts").unwrap();
-    assert!(
-        fresh
-            .diagnostics(&request, DiagnosticKind::Semantic, Some(file))
-            .unwrap()
-            .is_empty()
-    );
+    assert!(fresh
+        .diagnostics(&request, DiagnosticKind::Semantic, Some(file))
+        .unwrap()
+        .is_empty());
     assert!(matches!(
         fresh.diagnostics(
             &SessionRequest::default(),
@@ -748,4 +733,227 @@ fn transpile_results_retain_sources_and_follow_pinned_cancellation() {
         file.bound().view().source_file().unwrap().text().as_bytes(),
         b"export const a string = 1;\n"
     );
+}
+
+fn bound_local(file: &tsr_ast::CompletedFile, name: &[u8]) -> tsr_arena::SymbolId {
+    let view = file.view();
+    let locals = view
+        .node_binding(file.source())
+        .unwrap()
+        .unwrap()
+        .locals
+        .unwrap();
+    view.result()
+        .tables()
+        .get(locals)
+        .unwrap()
+        .get(name)
+        .unwrap()
+        .unwrap()
+}
+
+#[test]
+fn public_ownership_shared_file_survives_concurrent_snapshot_edit() {
+    let counters = Counters::new();
+    let mut cache = FileCache::new();
+    let old = load(b"const before = 1;", &mut cache, &counters);
+    let source = old.program().file(b"/main.ts").unwrap().source();
+    let file = old
+        .program()
+        .files()
+        .iter()
+        .find(|file| file.source() == source)
+        .unwrap()
+        .clone();
+    let symbol = bound_local(file.bound(), b"before");
+    let response = file.bound().retain_symbol(symbol).unwrap();
+    let unchanged = load(b"const before = 1;", &mut cache, &counters);
+    let shared = unchanged
+        .program()
+        .files()
+        .iter()
+        .find(|file| file.source() == source)
+        .unwrap();
+    assert!(Arc::ptr_eq(&file, shared));
+    assert_eq!(bound_local(shared.bound(), b"before"), symbol);
+    drop(old);
+    drop(unchanged);
+    cache.prune();
+
+    let ready = std::sync::Barrier::new(2);
+    let edited = std::sync::Barrier::new(2);
+    std::thread::scope(|scope| {
+        let reader = scope.spawn(|| {
+            ready.wait();
+            assert_eq!(bound_local(response.file(), b"before"), symbol);
+            assert_eq!(
+                response
+                    .file()
+                    .view()
+                    .source_file()
+                    .unwrap()
+                    .text()
+                    .as_bytes(),
+                b"const before = 1;"
+            );
+            edited.wait();
+            assert_eq!(response.symbol().name_bytes(), b"before");
+            assert!(response
+                .file()
+                .view()
+                .node(response.symbol().value_declaration().unwrap())
+                .is_ok());
+        });
+        ready.wait();
+        let new = load(b"const after = 2;", &mut cache, &counters);
+        let new_file = new.program().file(b"/main.ts").unwrap();
+        let new_symbol = bound_local(new_file.bound(), b"after");
+        assert_ne!(source, new_file.source());
+        assert_ne!(symbol, new_symbol);
+        assert!(matches!(
+            new_file.bound().view().node(source),
+            Err(ArenaError::WrongOwner)
+        ));
+        assert!(matches!(
+            file.bound().view().node(new_file.source()),
+            Err(ArenaError::WrongOwner)
+        ));
+        assert!(matches!(
+            new_file.bound().view().symbol(symbol),
+            Err(ArenaError::WrongOwner)
+        ));
+        assert!(matches!(
+            file.bound().view().symbol(new_symbol),
+            Err(ArenaError::WrongOwner)
+        ));
+        drop(new);
+        cache.prune();
+        edited.wait();
+        reader.join().unwrap();
+    });
+    drop(file);
+    cache.prune();
+    assert_eq!(bound_local(response.file(), b"before"), symbol);
+    drop(response);
+    cache.prune();
+    assert_eq!(counters.snapshot(), Counts::default());
+}
+
+#[test]
+fn public_ownership_retained_results_and_generated_syntax_keep_exact_owners() {
+    let counters = Counters::new();
+    let session = load(
+        b"interface Shared { field: string }",
+        &mut FileCache::new(),
+        &counters,
+    );
+    let weak_program = Arc::downgrade(session.program());
+    let file = session.program().file(b"/main.ts").unwrap();
+    let view = file.bound().view().ast();
+    let declaration = view
+        .node_slice(view.node(file.source()).unwrap().statements(view).unwrap())
+        .unwrap()
+        .iter()
+        .flatten()
+        .next()
+        .unwrap();
+    let name = view.node(declaration).unwrap().name().unwrap();
+    let (ty, symbol, signature, list, node, mut syntax, generated) = {
+        let mut operation = session.operation().unwrap();
+        let symbol = operation.get_symbol_at_location(name).unwrap().unwrap();
+        let ty = operation.get_declared_type_of_symbol(symbol).unwrap();
+        let string = operation.builtin_type("stringType").unwrap();
+        let signature = operation.call_signature(&[], ty).unwrap();
+        let node = operation
+            .synthetic_expression_at(declaration, ty, false)
+            .unwrap();
+        let retained = (
+            operation.retain_type(ty).unwrap(),
+            operation.retain_symbol_ref(symbol).unwrap(),
+            operation.retain_signature(signature).unwrap(),
+            operation.retain_type_list(&[ty, string]).unwrap(),
+            operation.retain_node(node).unwrap(),
+        );
+        let mut builder = operation.node_builder();
+        builder.retain_source_node(file.source()).unwrap();
+        let generated = builder
+            .type_to_type_node(ty, Some(file.source()), 0, 0)
+            .unwrap()
+            .unwrap();
+        let syntax = builder.into_syntax();
+        (
+            retained.0, retained.1, retained.2, retained.3, retained.4, syntax, generated,
+        )
+    };
+    // A different checker over the identical Program must reject every family.
+    let foreign = Session::from_program(session.program().clone(), &counters);
+    {
+        let operation = foreign.operation().unwrap();
+        let wrong = Some(QueryError::Arena(ArenaError::WrongOwner));
+        assert_eq!(operation.import_symbol_ref(&symbol).err(), wrong);
+        assert_eq!(operation.import_signature(&signature).err(), wrong);
+        assert_eq!(operation.import_type_list(&list).err(), wrong);
+        assert_eq!(operation.import_node(&node).err(), wrong);
+    }
+    drop(foreign);
+    drop(session);
+    assert!(weak_program.upgrade().is_some());
+    {
+        let mut operation = node.owner().operation().unwrap();
+        let typ = operation.import_type(&ty).unwrap();
+        let imported_symbol = operation.import_symbol_ref(&symbol).unwrap();
+        assert_eq!(
+            operation
+                .get_declared_type_of_symbol(imported_symbol)
+                .unwrap(),
+            typ
+        );
+        assert_eq!(operation.import_type_list(&list).unwrap()[0], typ);
+        let imported_node = operation.import_node(&node).unwrap();
+        assert_eq!(
+            operation.synthetic_expression_type(imported_node).unwrap(),
+            typ
+        );
+        assert_eq!(
+            operation.node_parent(imported_node).unwrap().unwrap().0,
+            declaration
+        );
+        let imported_signature = operation.import_signature(&signature).unwrap();
+        assert_eq!(
+            operation.signature_return_type(imported_signature).unwrap(),
+            Some(typ)
+        );
+        let signature_node = operation
+            .signature_declaration(imported_signature)
+            .unwrap()
+            .unwrap();
+        assert_eq!(
+            operation.node_kind(signature_node).unwrap().known(),
+            Some(tsr_ast::SyntaxKind::FunctionType)
+        );
+    }
+    // Transferred syntax owns its AST independently of checker permits.
+    assert!(syntax.ast.view().node(generated).is_ok());
+    let cloned = syntax.clone_node(Some(generated)).unwrap();
+    assert!(syntax.ast.view().node(cloned).is_ok());
+    assert_eq!(
+        syntax.ast.view().node(declaration).unwrap().kind().known(),
+        Some(tsr_ast::SyntaxKind::InterfaceDeclaration)
+    );
+    drop(ty);
+    drop(symbol);
+    drop(list);
+    drop(node);
+    assert!(
+        weak_program.upgrade().is_some(),
+        "the signature is still a checker root"
+    );
+    drop(signature);
+    assert!(weak_program.upgrade().is_none());
+    assert!(
+        syntax.ast.view().node(cloned).is_ok(),
+        "the transferred AST still owns its source graph"
+    );
+    drop(syntax);
+    assert_eq!(counters.snapshot(), Counts::default());
 }

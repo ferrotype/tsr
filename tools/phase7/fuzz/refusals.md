@@ -4,10 +4,15 @@ Status: **reviewed inventory; open functionality remains**, 2026-10-11.
 
 This is a source review of the lexical inventory produced by [audit.py](audit.py),
 not an approved-exclusion list or a passing metric. The original inventory had
-216 matching lines. A fresh inventory has 217: the added line injects
+216 matching lines. The initial refreshed inventory had 217: the added line injected
 `Unsupported("test visit failure")` in `esmodule_stack_tests.rs`. The fresh
 review input is preserved outside `target` at
 `../ts-rust-benchmarks/2026-10-11/r5-refusal-semantic-input-20261011.json`.
+After the four narrow implementations below, the refreshed lexical inventory has
+212 matching lines, saved as `r5-refusal-after-four-narrow-fixes.json` beside that
+review input. The subsequent project-reference importer fix leaves 210 matching
+lines, saved as `r5-refusal-after-projectref.json`. These counts are not acceptance
+metrics.
 Function identities below, rather than frozen line numbers, locate behavior.
 All paths are relative to the repository root.
 
@@ -27,26 +32,18 @@ The review distinguishes:
   caller. Its presence does not mean that the feature is unsupported.
 - **Approved scope**: only a decision already recorded by the owner qualifies.
 
-No compiler batches, Cargo commands, performance measurements or new semantic
-regressions were run for this review. It covers the searched wording only:
+The original inventory review ran no compiler batches or performance measurements.
+The focused native/Rust regressions below were added afterward. The review
+covers the searched wording only:
 other errors, panics, unimplemented macros and source outside `crates/**/*.rs`
 need their own review. New source can change the lexical inventory without
 changing any functionality.
 
-## Consequential work
+## Remaining review scope
 
-These paths visibly replace pinned behavior, and need implementation or an
-owner decision. None has an approved exclusion in the ADR index.
-
-| Rust function | Refused behavior and pinned authority | Next useful witness |
-| --- | --- | --- |
-| `tsr_compiler/src/loader.rs::Loader::load_worker` (`unsupported root/reference extension diagnostics`) | A root/reference with an unsupported extension and `allowNonTsExtensions` disabled returns a compiler error instead of the pin's extension diagnostics. See `upstream/tsc/internal/compiler/fileloader.go` extension handling and `program.go` unsupported-extension processing. | A physical existing unsupported-extension root and a referenced file; compare complete CLI diagnostics and exit status, including the option-enabled case. |
-| `tsr_compiler/src/checker_module_specifiers.rs::module_specifier_paths` | Refuses an importer renamed from project-reference output to source. The comment identifies the missing importer-name/proximity-sort handling. The target redirect is implemented separately. See pinned `compiler/program.go::GetSourceOfProjectReferenceIfOutputIncluded` and module-specifier processing. | Public module-specifier query from a declaration output importer belonging to a referenced project; compare names and ordering. |
-| `tsr_checker/src/external_resolution.rs::resolve_external_module_reference` | A nonempty `alternate_result` refuses the diagnostic chain. Pinned `checker.go::resolveExternalModule` consumes `ResolvedModule.AlternateResult`; `module/resolver.go` produces it. | Package whose declarations exist but cannot resolve under the selected module-resolution settings; compare the complete diagnostic chain. |
-| `tsr_checker/src/node_builder_names.rs::access_from_symbol_chain_worker` | A computed property whose expression is an entity name is refused. Pinned `checker/nodebuilderimpl.go::createAccessFromSymbolChain` recursively builds a type query and indexed access, or returns the left expression. | Type/declaration display of an otherwise inaccessible computed entity-name member; compare emitted syntax and symbol tracking. |
-| `tsr_checker/src/node_builder_extra.rs::array_or_tuple_node` | A tuple's `labeled_declaration` with a binding-pattern name is refused. The pin calls `getTupleElementLabel` while emitting tuple labels; `checker/relater.go::getTupleElementLabelFromBindingElement` handles destructured/rest parameter names. | Inferred tuple or rest-parameter display retaining a destructured parameter label. Establish the exact producer of `labeled_declaration`, then compare both type display and declaration output. |
-| `tsr_printer/src/emit_context/factory_helpers.rs::get_name` | `node == None` without an assigned name refuses `NewGeneratedNameForNode(nil)`. Pinned `printer/factory.go::getName` calls `NewGeneratedNameForNode` in that case. | Direct public factory/name-helper witness with nil, plus the emitted generated identifier; do not infer ordinary source reachability from this helper case alone. |
-| `tsr_checker/src/class_properties.rs::type_of_accessors` | Circular annotated auto-accessor resolution is refused. The pin's `getTypeOfAccessors` takes its diagnostic path using `setter`, even in the auto-accessor arm. | First establish the pin's exact nil/setter diagnostic behavior with a circular auto-accessor. Preserve a pin panic if it occurs; do not choose a more convenient diagnostic location. |
+The five narrow branches described below now have pinned behavior and focused
+Rust regressions. The tuple-label refusal is a constructor guard, as established
+below; it was previously misclassified as missing destructuring display.
 
 `typeToTypeNode: unsupported type family`, recursive export-map refusal, and
 deferred-property refusal remain open invariants below. They need targeted
@@ -54,6 +51,118 @@ construction/reachability work before either implementation closure or an
 unreachability claim. The old C1 plan already requires a witness or reviewed
 constructor invariant for its representation guards; see
 [C1.4](../../../docs/PHASE2-C1-plan.md#c14-arrays-tuples-enums-and-literals).
+
+## Five implemented narrow branches
+
+`tsr_printer/src/emit_context/factory_helpers.rs::get_name(None)` now constructs
+exactly the pin's node-generated identifier with a nil source. The pinned
+`nil_name_native_test.go` directly executes local, export and declaration name
+helpers: all succeed with kind 4, nil source and no emit flags. Printing each
+result separately panics on the nil original node; the Rust regression preserves
+that invalid-input panic boundary. This closes factory construction only, without
+claiming an ordinary source-transformer caller passes nil. Frozen native rows are
+`crates/tsr_printer/src/emit_context/nil_name_native.json`.
+
+`tsr_checker/src/external_resolution.rs::resolve_external_module_reference`
+now emits the pin's alternate-resolution diagnostic chain, including the
+repopulate marker. The caller's module reference and the implicit-any caller's
+package ID remain distinct inputs to chain construction. The native
+`alternate_resolution_native_test.go` executes `Checker.GetDiagnostics` over a
+real parsed/bound program with an explicitly supplied unresolved module result
+and nonempty alternate result. Primary and `@types` declaration locations match
+Rust's complete TS2307/TS6278 chain, positions, arguments and repopulate fields;
+rows are `crates/tsr_compiler/src/alternate_resolution_native.json`.
+
+This supplied-host-state witness proves the removed refusal branch's behavior,
+not ordinary resolver reachability. The native resolver currently creates
+`AlternateResult` for resolved JavaScript packages; the checker normally consumes
+that result earlier via implicit-any handling. Four ordinary package fixtures did
+not trigger the former refusal. No reachability claim or parity waiver follows.
+Both native witnesses execute pin `1f70213d4922b434345f639b441681e470c7cfc1`
+with Go 1.27.1 in temporary exports of its production source.
+
+`tsr_checker/src/node_builder_names.rs::access_from_symbol_chain_worker`
+now builds the pin's indexed type query for an entity-name computed property.
+A normal parsed/bound source witnesses the branch:
+`declare const key: unique symbol; class Symbols { static readonly [key]: unique symbol; } const value = Symbols[key];`.
+Querying the initializer's type and printing with default or fully qualified
+flags produces `(typeof Symbols)[typeof key]` in both implementations. Querying
+the variable instead widens to `symbol`, so that would miss this branch. The
+Rust regression also transfers generated syntax, drops its checker/program, and
+prints it again to verify retention of the original computed-name expression.
+Frozen source and native rows are
+`crates/tsr_compiler/tests/fixtures/computed_entity_native.json`; its adjacent Go
+producer executes the public checker display API at the pin.
+
+`tsr_checker/src/class_properties.rs::type_of_accessors` now preserves the
+pin's circular auto-accessor fallback: type `any`, no file semantic diagnostic,
+and a fileless TS2502 at `(0, 0)` with argument `x`. Native direct controls cover
+`typeof this.x`, `A["x"]` and `typeof A.prototype.x` annotations. The pin calls
+`error(setter, ...)` with a nil setter; `NewDiagnosticForNode(nil)` creates a
+fileless diagnostic and `addDiagnostic` stores it globally. It is not a no-op.
+The controls compare globals both before and after semantic checking, as well
+as the type and file diagnostics. The earlier budget schedule reads globals
+before semantic checking, so its zero-diagnostic observation alone did not prove
+that no TS2502 exists. Frozen rows and the native producer are
+`crates/tsr_compiler/tests/fixtures/circular_accessor_native.json` and its
+adjacent `circular_accessor_native_test.go` producer.
+
+`tsr_compiler/src/checker_module_specifiers.rs::module_specifier_paths` now
+orders candidate paths relative to a referenced output importer's source.
+Specifier computation still uses the actual output's imports, options and
+resolution mode. The native project contains source/output `a` and `b` files,
+with competing `./a` and `../out/a` imports. Querying the output `b.d.ts` variable
+produces `() => import("./a").Foo`; the root importer produces
+`() => import("./ref/src/a").Foo`. Both match the focused Rust regression
+`an_importer_that_is_a_referenced_output_orders_paths_from_its_source`.
+Exact input files, queries and outputs are frozen in
+`crates/tsr_compiler/tests/fixtures/project_reference_native.json`; its adjacent
+Go producer executes public checker APIs over the parsed project-reference
+configuration at the pin.
+
+## Tuple-label constructor guard
+
+`array_or_tuple_node`'s nonidentifier `labeled_declaration` refusal does not
+replace pinned binding-pattern label generation. The pin's `getTupleElementLabel`
+calls `labeledDeclaration.Name().Text()` immediately when a label is supplied.
+`getTupleElementLabelFromBindingElement` is used only without that label, for a
+rest parameter. Supplied object/array binding-pattern labels both panic in the
+pin with `Unhandled case in Node.Text: *ast.BindingPattern`; the frozen direct
+helper witness is `tuple_label_guard_native.json` and its adjacent Go producer
+under `crates/tsr_compiler/tests/fixtures`.
+
+Ordinary source tuple labels originate from named tuple members. Signature
+inference's `getNameableDeclarationAtPosition` accepts named tuple members or
+identifier-named parameters, matching Rust's `parameter_label_at`. Synthetic
+spread arguments and tuple normalization copy existing labels. Three native
+source controls cover destructured fixed parameters, destructured rest
+parameters and ordinary identifier parameters: inferred tuple display omits
+the destructuring names and preserves ordinary labels. Rows and producer are
+`tuple_label_native.json` and its adjacent Go file. The focused Rust display
+control in `checker_semantics.rs` matches all three frozen displays. The shared
+[native reproduction command](README.md#reproduce-the-narrow-native-refusal-controls)
+reruns all seven producers and checks every frozen JSON byte.
+
+This establishes the constructor contract for the reviewed producers and
+rejects the proposed destructuring port; it does not equate Rust's refusal
+result with the pin's panic or prove arbitrary constructed ASTs valid. A new
+producer that supplies a nonidentifier label remains a bug requiring a witness.
+
+## Root/reference extension guard classification
+
+`tsr_compiler/src/loader.rs::Loader::load_worker` retains an **open invariant**
+for an unsupported extension that reaches its task queue. It is not an ordinary
+root/path-reference diagnostic implementation gap: `run_inner` passes each root
+through `file_reference` before calling `load`, and
+`resolve_tripleslash_path_reference` calls the same function before a successful
+reference is queued. With `allowNonTsExtensions` disabled, `file_reference`
+already returns the pinned unsupported-extension or enable-`allowJs` diagnostic.
+With that option enabled, the later `load_worker` guard is disabled as well.
+Thus these two ordinary routes do not enter the refusal. Other task producers
+(resolver results, library replacement, project-reference redirects and mapped
+sources) still require their own constructor/dispatch proof; no global
+unreachability or approved exclusion is claimed. This classification comes from
+the caller/guard control flow, not a new extension differential capture.
 
 ## Entries that are not new production refusals
 
@@ -114,9 +223,9 @@ does not introduce an additional production path.
 | --- | --- |
 | `tsr_compiler/src/loader.rs` casing-variant selection | **Contract guard**: a casing-selected file must still exist and have identical source bytes before prior source IDs/ranges are replaced. Missing text or changed bytes is refused. This prevents mixed snapshots; it does not prove that a mutable host cannot trigger it. |
 | `tsr_compiler/src/loader.rs::parse_content_mapped_file` | **Contract guard**: a source classified as mapped must resolve to its configured mapper. Missing mapper is inconsistent configuration; failed initialization has its own explicit diagnostic/empty-file behavior. |
-| `tsr_compiler/src/loader.rs` root/reference extension branch | **Open implementation**, described above. The Error variant declaration is separate. |
+| `tsr_compiler/src/loader.rs` root/reference extension branch | **Open invariant** for other task producers; ordinary roots and path references already pass through the diagnostic-producing extension check, as described above. The Error variant declaration is separate. |
 | `tsr_compiler/src/checker_module_specifiers.rs::compute_known_symlinks` | Error propagation; mutable-host/package-parser errors are defensive adapter failures. The retained resolver uses a snapshot and keeps malformed JSON as contents, as the call-site comment states. This is not a blanket package JSON refusal. |
-| `tsr_compiler/src/checker_module_specifiers.rs::module_specifier_paths` | **Open implementation** for a project-reference-output importer, described above. |
+| `tsr_compiler/src/checker_module_specifiers.rs::module_specifier_paths` | The project-reference-output importer refusal is removed; exact native/Rust display witness described above. Remaining lexical matches propagate resolver/host failures. |
 | `tsr_compiler/src/checker_host.rs::{get_mode_for_usage_location,get_jsx_runtime_import_specifier}` | Error propagation from metadata. AST errors retain their class; unexpected metadata failures become named Unsupported. No substituted mode or JSX path is returned. Review any new metadata error variant at this adapter. |
 | `tsr_compiler/src/metadata.rs::usage_mode` | **Contract guard**: module specifier AST must have its parent for context-sensitive mode selection. Parentless constructed syntax is refused. |
 | `tsr_compiler/src/project_references.rs::module_error`, `tsr_testrunner/src/harness/config_host.rs::module_error` | Propagate module errors into host errors. Immutable resolver requirement and malformed-package failure remain explicit; these adapters are not evidence of missing project-reference support. |
@@ -145,13 +254,11 @@ valid instance is handled.
 | `check_bodies.rs::check_function_expression_context` | **Contract guard**: accepts function/arrow/method kinds; other node kinds refuse. The stale “object literal method” label does not mean all methods are missing. |
 | `check_bodies.rs::assign_contextual_body_parameters` | **Open invariant**: synthetic rest parameter without value declaration refuses. Requires a constructor/scheduling witness for the contextual-rest representation. |
 | `check_type_syntax.rs::check_array_tuple_syntax` | **Contract guard**: type operators keyof/unique/readonly are dispatched; unknown operator refuses, corresponding to pinned type-operator dispatch. |
-| `class_properties.rs::type_of_accessors` | **Open pinned-behavior investigation**, circular annotated auto-accessor branch described above. |
 | `construct.rs::new_object_type` | **Contract guard plus open constructor boundary**: unknown object flags have no payload. Generic EVOLVING_ARRAY construction refuses although Go has a payload arm. Normal Rust `flow_arrays.rs::evolving_array_type` directly allocates `Payload::EvolvingArray`; this refusal is not evidence of missing evolving-array flow support. Future generic callers must use/extend the correct constructor. |
 | `diagnostics.rs::file_name`, `program.rs::program`, `symbols.rs::split_symbol`, `merge.rs::{clone_symbol_table,merge_global_symbol,append_merged_declarations}` | **Contract guards**: foreign syntax/symbol/table/declaration access requires a retained checker program. Local identities are handled without it. Missing owner/program cannot become empty data. |
 | `emit_resolver.rs::DeclarationEmitResolver::unsupported` | Error adapter for the printer trait's unsupported hook. The trait default methods must be audited separately by name; the single lexical match cannot certify that all declaration-resolver callbacks are implemented. |
 | `expression_errors.rs::entity_name_text` | **Contract guard**: only identifier/qualified/property entity syntax is accepted. Other AST kinds refuse. |
 | `expressions.rs::check_binary_operands` | **Contract guard**: unrecognized operator reaches refusal; pinned `checkBinaryLikeExpression` also panics on its default. Malformed constructed operators remain observable. |
-| `external_resolution.rs::resolve_external_module_reference` | **Open implementation**: alternate package-resolution diagnostic chain, described above. |
 | `external_resolution.rs::suggested_import_extension` | Host-error adapter: file-existence failure is refused, not converted to “file absent.” Requires a functioning checker host; not missing ordinary extension suggestions. |
 | `flow_assignments.rs::ensure_assignments_marked` (two paths) | **Open invariants**: reentrant root scan or already-visiting ancestor scan is refused; failed states are retained. Need a valid-flow/cycle witness before claiming unreachable. |
 | `grammar_modifiers.rs::first_illegal_modifier` | **Open invariant**: unrecognized source family in first-modifier selection refuses. Grammar errors are ordinary source inputs; do not waive this solely because a modifier is illegal. |
@@ -169,8 +276,7 @@ valid instance is handled.
 | `node_builder.rs::type_node_worker` computed enum arm | **Representation guard**: ENUM_LIKE is handled by `enum_type_node` before literal dispatch; `computed_enum_type` constructs flags ENUM, not ordinary LITERAL. Do not count this stale arm as missing all computed-enum display. C1 still requires an exact constructor/dispatch witness for closure. |
 | `node_builder.rs::structured_type_node` | **Open invariant**: final unsupported type family. Union-origin substitution, conditional/template/string mapping/index/indexed access and anonymous/mapped dispatch precede it. Need a concrete remaining valid type/flag producer before identifying an implementation slice. |
 | `node_builder_enum.rs::enum_type_node` | **Open invariant**: enum parent serialization must produce ImportType or TypeReference in this branch. Other generated nodes refuse; no proof of exhaustiveness added here. |
-| `node_builder_extra.rs::array_or_tuple_node` | **Open implementation/reachability witness**: nonidentifier tuple-label binding pattern described above. |
-| `node_builder_names.rs::access_from_symbol_chain_worker` | **Open implementation**: computed entity-name member, described above. |
+| `node_builder_extra.rs::array_or_tuple_node` | **Constructor guard**: reviewed source/signature/synthetic label producers preserve identifier names. Supplied binding-pattern labels panic at the pin; ordinary destructured-parameter inference omits these labels. See the native controls above. |
 | `object_grammar.rs::check_object_literal_grammar` | **Contract guard**: invalid constructed object member kind refuses; source property/shorthand/spread/method/accessors are handled. |
 | `object_members.rs::resolve_type_members` | **Contract guard**: unsupported structured-type payload family, matching pinned default panic; evolving arrays must first be finalized. |
 | `object_members.rs::resolve_anonymous_type_members` | **Open invariant**: class, enum and value module branches are handled before the old class/enum/module refusal label. Remaining symbol flags outside type-literal/function/method refuse. Do not classify ordinary classes/enums/modules as missing from the label alone. |
@@ -194,7 +300,6 @@ valid instance is handled.
 | `tsr_printer/src/printer.rs::emit_external_helper_access` | **Contract guard**: a helpers-module identifier itself flagged HELPER_NAME would repeatedly substitute itself at the pin. Rust refuses instead of entering unbounded substitution. No ordinary source unreachability proof or approved divergence is inferred; retain a constructed public-printer witness if this behavior becomes part of a supported contract. |
 | `tsr_printer/src/printer.rs::emit_jsdoc_node` | **Pinned absence**: upstream `printer.go::emitJSDocNode` panics “not implemented.” Rust returns Unsupported. Not missing a working pin feature; exact panic/error-class equivalence still belongs to the printer boundary expectations. |
 | `tsr_printer/src/printer.rs::{get_opening_bracket,get_closing_bracket}` | **Contract guards**: only brace/parenthesis/angle/square masks are valid. Other list-format bracket masks refuse. |
-| `tsr_printer/src/emit_context/factory_helpers.rs::get_name` and its comment | **Open direct helper functionality**, nil generated-name case described above. The comment and refusal are one path, not two independent gaps. |
 
 ## Historical example/probe adapters
 
@@ -218,9 +323,9 @@ fixes or explicit owner scope decisions; open invariants need producer/dispatch
 proofs and targeted witnesses. In particular, an error enum, a test expecting a
 refusal, or a function listed in the port ledger supplies no such proof.
 
-The minimal next correctness work is a pinned unsupported-extension CLI
-regression and implementation, followed by the computed entity-name display
-branch. The package diagnostic-chain and project-reference importer branches
-need route-specific multi-file fixtures. The circular auto-accessor case needs
-an oracle observation before selecting an error/diagnostic outcome. Keep all
+The reviewed project-reference importer branch is implemented and witnessed;
+tuple-label classification is corrected above. The extension task-queue guard remains an open
+invariant for routes other than the two prevalidated callers above. The
+implemented package diagnostic-chain branch retains its ordinary-reachability
+limitation. Keep all
 failures visible in the relevant suite; no approval is created by this review.

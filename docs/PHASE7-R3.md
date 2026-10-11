@@ -1,8 +1,8 @@
 # Phase 7 R3: WebAssembly correctness progress
 
 Status: **in progress**, 2026-10-11. Single-file transpile now crosses the
-production wasm boundary. Full compiler-harness acceptance, comprehensive
-deep-input stress and the ADR 0020 budgets remain incomplete.
+production wasm boundary. The full compiler-harness correctness run passes. Comprehensive deep-input
+stress and the ADR 0020 budgets remain incomplete.
 
 ## Implemented boundary
 
@@ -241,70 +241,199 @@ artifact. Native crate tests pass (9), native all-target clippy passes with
 warnings denied, transport tests pass (6), and the shared public-dependency
 boundary guard passes (5). Wasm compilation retains six existing compiler
 preload dead-code warnings; these are not test failures or hidden warnings.
-This bounded roster is not the full 13,432-variant compiler suite.
+The subsequent full `compiler-wasm` run exits zero: **13,432 variants,
+119,615 passes, zero failures and eight existing output skips**. Its results
+match the full native embedding counts. The durable capture is
+`/Users/cristian/git/ts-rust-benchmarks/2026-10-11/r3-compiler-wasm-full`;
+its test-only artifact is distinct from production wasm. The exact
+`status/parity/compiler-wasm.json` expectation was accepted and checked by the
+parent integration task; both commands exit zero.
 
-Remaining R3 obligations include full `compiler-wasm` execution and exact
-expectations (including pre/post schedule, resolution traces, mapped outputs
-and additional assertions), broader deep input and trap replay, and the
-separate production artifact-size, elapsed and memory budgets. Implementing
-the adapter alone does not establish these results.
+Remaining R3 obligations include broader deep input and trap replay and the
+separate production artifact-size, elapsed and memory budgets.
 
-## Budget route assessment (implementation pending)
+## Production budget foundation (correctness only)
 
 The existing S10 measurement is not a full compiler budget route:
 `scripts/s10_go.py` builds a parser-only `GOOS=js` authority, and
 `scripts/s10_measure.py --kind portable` runs correctness checks rather than
-compiler elapsed/RSS measurements. The existing Phase 7 CLI benchmark uses
-ordinary executables at 2/4/8 checkers and has no retained-memory checkpoint;
-its measurements do not certify one-checker wasm or embedding budgets.
+compiler elapsed/RSS measurements. The Phase 7 CLI benchmark uses ordinary
+executables at 2/4/8 checkers and has no retained-memory checkpoint. Those
+measurements do not certify one-checker wasm or embedding budgets.
 
-Reuse the five committed scenario descriptors, provisioned dependency closure
-and frozen input/options/diagnostic/emit obligations. Reuse the serial
-alternating warmup/pair/stability rules, host eligibility checks, omitted-work
-and changed-output controls, and the child `wait4` peak-RSS reader. S10 can
-supply pinned Rust/Go/Node/bindgen provisioning, exported instance factories,
-Go's `wasm_exec` loader and artifact archival. These are shared mechanisms;
-new compiler authorities and readers remain necessary.
+The new foundation under `tools/phase7/budget` calls real config parsing,
+loading, checking and optional in-memory emit from frozen physical file,
+directory and symlink metadata. Native Rust uses public `tsr_embed`; native
+and wasm Go share one production program operation. Production wasm uses
+`tsr_wasm::MemoryHost/PreparedHost/WasmSession`. The acceptance pre/post
+schedule, baseline walker and test-only compiler wasm artifact are excluded.
 
-The smallest equivalent operation is a fresh session from an explicit frozen
-physical file/directory/symlink snapshot and identical resolved options/roots,
-at one checker: load and check, optionally emit in memory, retain the same
-positive session/diagnostic/output roots through a declared post-operation
-checkpoint, then dispose. A separate native consumer must call public
-`tsr_embed`; a thin pinned Go consumer must call the real compiler program,
-diagnostic and emit methods. Its native and `GOOS=js` front ends can share
-that operation. Production wasm must call `tsr_wasm::MemoryHost/WasmSession`.
-The acceptance pre/post schedule, baseline walker and test-only compiler wasm
-artifact are excluded from this route.
+Production wasm now exposes composable snapshot preparation, real configured
+program loading, retained checking, retained emit and owned observations.
+Checking uses the same compiler pool as emit: config, program, syntactic,
+global and per-file semantic diagnostics, plus declarations when enabled,
+followed by production sort/deduplication. Tests verify checker identity across
+check/emit, owned result lifetime and error behavior. All 17 `tsr_wasm` tests
+and all-target clippy with warnings denied pass. Its original convenience
+methods retain their output representation. MemoryHost also forwards explicit
+unavailable-file metadata; a requested missing payload fails instead of
+pretending that the file does not exist.
 
-Concrete gaps to resolve before measurement:
+A source-guarded production release build completed successfully. The exact
+runtime module (26,268,600 bytes, SHA-256
+`ee3e8b242e67d1e2d4def674aeccd9908f097d9df045cedbd0fc2137ab5a1afb`),
+bindings (`242fd7e31deaead398dbb53ab356e361d9597fb64bb08a27081e9ee063e57d05`)
+and original build record are retained once under
+`/Users/cristian/git/ts-rust-benchmarks/2026-10-11/r3-budget-production-wasm-tiny-01/production-assets`.
+The build includes the VFS parent index and the previously checked narrow
+printer/checker refusals. Later source edits are not represented by these
+immutable bytes.
 
-- `WasmSession::diagnostics` currently checks through `Session::operation`,
-  while emit uses a separate retained compiler pool. The public native
-  `Session::diagnostics` phase API now uses the pool retained by emit. Review
-  moving production wasm diagnostics to that route while preserving output;
-  comparing two initialized Rust checker states with Go's one program pool
-  would measure different work.
-- Production wasm needs owned loaded-file/source identities and checked
-  type-count facts to reject omitted work. Empty diagnostics alone do not
-  prove the expected closure was checked. Preparing resolved options and
-  roots must also preserve configuration/project-reference behavior; the
-  current host takes only raw compiler options and roots. Verify equivalence
-  for every scenario or extend production values explicitly.
-- Arena `Counters` count owners/storage objects, not requested/live bytes.
-  Separate allocator observation from ordinary timing. The existing native
-  `cap::Cap` stats wrapper is a possible observation mechanism, validated
-  against ordinary-consumer work. Go needs explicit `ReadMemStats`, GC and
-  `KeepAlive` checkpoints with the same positive live roots. Allocation
-  traffic is separate from retained bytes.
-- Declare Rust, Go and V8 result retention/disposal/GC checkpoints. Add live
-  process RSS sampling: `wait4` supplies peak at exit, not retained RSS while
-  the session/results remain alive. Report wasm linear memory and allocator
-  counters beside process RSS; linear memory is not its substitute.
-- Build size authorities with equivalent full production parse/check/emit
-  capabilities, without CLI/watch or corpus adapters, and declare glue/runtime
-  bytes separately. The test-only compiler artifact must be rejected by
-  budget readers. Its passing correctness rows cannot satisfy any size,
-  elapsed or memory gate.
+Actual Go wasm versus production Rust wasm tiny comparisons pass for both v1
+and streamed v2 preparation. Both load exactly 83 sources, use one checker,
+produce zero diagnostics and one identical emitted write. Source identities,
+loaded texts, diagnostic values, options and outputs match; type creation
+counts remain separate (Go 30,928; Rust 30,942). The checkpoint occurs before
+owned observation serialization. Version failure is terminal, and the real
+Node child transport also passes. Captures are
+`r3-budget-production-wasm-tiny-01` and
+`r3-budget-production-wasm-streamed-tiny-02` beneath the durable dated record
+root; the second reuses the verified retained production assets rather than
+copying another module. Focused simulated-export controls separately test
+stage ordering, content hashes/offsets/duplicates and terminal traps. They do
+not claim a newly observed production panic.
 
-No new budget builds or measurements were started during this assessment.
+Version 2 streams complete metadata and bounded base64 content frames,
+verifies canonical identities, counts, contiguous offsets and per-file raw
+SHA-256, and drops decoded transport/assembly roots before execution. Known
+physical files without supplied content remain explicit unavailable
+placeholders. Native discovery is an untimed acquisition route over frozen
+metadata and logs actual production reads, repeats and misses; only that route
+may acquire canonical raw files from the recorded OS scope. Its controls reject
+stale size, disappeared physical files, overwritten captures and target paths.
+The Go prototype passes twelve focused body tests and native/wasm builds. The
+controller verifies both read closures before freezing their union.
+
+The retained Node checkpoint labels its own authority and reports wasm linear
+memory, process RSS, V8 heap, external bytes and array buffers separately. Go
+reports GC/ReadMemStats with retained roots kept alive. Native Rust allocator
+instrumentation remains a separate artifact. Arena storage counters are not a
+byte denominator, and none of these distinct observations is relabeled as an
+equivalent retained allocation measurement.
+
+The actual streamed production wasm Xstate check comparison also passes:
+1,536 loaded sources, zero diagnostics and equal roots/options/texts/counts;
+type counts remain separate. Capture: `r3-budget-production-wasm-xstate-check-01`.
+All nine remaining Go native discovery routes complete, with their ordered
+read events retained in `r3-budget-go-discovery-scenarios-01`.
+
+Production wasm depth probes compare actual complete Go/Rust check-and-emit
+observations. Left addition and right exponentiation at 5,000 operators,
+JSX at 600 levels, conditional types at 600 and nested statements at 1,600
+all pass. **5,000 parentheses fail during Rust parsing** with
+`RangeError: Maximum call stack size exceeded`; Go completes. Verified wasm
+name mapping locates repeated `parse_primary_expression` → left-hand-side →
+update/unary → assignment → `parse_expression` frames. Runtime noncustom
+sections match the named mapping artifact exactly. A separate 500-parenthesis
+control passes with equal observations. These are bounded results, not a
+claim of unlimited recursion. Captures `r3-production-wasm-depth-01`,
+`r3-production-wasm-depth-remaining-02` and
+`r3-production-wasm-parentheses-500-control-01` preserve successes, the initial
+stalled failed child, terminal-I/O correction and the symbolicated failure.
+
+A subsequent guarded production build adds bounded owned row APIs. Its exact
+runtime is 26,276,385 bytes, SHA-256
+`849ca393f51a4b063f9566aa055abb17f2fe3945b196b814909d1bdc14f2bf78`,
+retained with bindings/build metadata under
+`r3-budget-production-paged-wasm-assets-02`. A subsequent `cargo fmt -p tsr_wasm`
+changed only test assertion formatting in `checker.rs`; these retained bytes
+were not rebuilt solely for formatting. The header caches source identities
+and diagnostic metadata; each source/write request copies only that row's bytes.
+Native equivalence verifies assembled rows match the complete snapshot and
+checks invalidation after another check/emit. Actual Go/production-wasm paged
+tiny replay passes with unchanged helper hashes at
+`r3-budget-production-paged-wasm-tiny-03`; the subsequent paged Xstate check
+also passes at `r3-budget-production-paged-wasm-xstate-check-02`. Both Node
+adapters now collect V8
+after successful preparation and at checkpoint, outside execute; Go also
+collects its runtime after prepare and at checkpoint. Modern checkpoints report
+a distinct pre-observation process peak with its metric authority. These
+foundation controls are not performance acceptance.
+
+The final production browser rerun uses those exact retained assets and passes
+all six required smoke cases in Chromium 151.0.7922.34, Firefox 153.0 and
+WebKit 26.5. This rerun covers the current compiler-pool diagnostics path,
+parse/check/emit, both transpile modes, bounded deep input and the real
+invalid-filename trap followed by invalidation and fresh-instance recovery.
+Receipt `r3-browser-production-paged-final-01/browser-smoke.json` retains the
+served asset bytes and manifest outside target. No rebuild was needed.
+
+The production Go wasm VSCode check reaches a capacity failure during
+`execute`, after successful preparation. Its runtime reports:
+`out of memory: cannot allocate 524288-byte block (4203118592 in use)`.
+The host rejects the preserved non-JSON fatal line; no checkpoint, observation
+or ratio is produced. Capture: `r3-budget-production-paged-wasm-vscode-check-01`.
+Independent Rust wasm VSCode check also fails during execute. Verified name
+mapping identifies `rust_oom` → allocation error handler → `RawVec::handle_error`
+→ `TypeStore::new_type` → object-type instantiation, rather than a compiler
+assertion. Its stderr, matching wasm hashes and symbolicated frames are retained
+under `r3-budget-production-paged-wasm-scenarios-01/vscode-check`. Neither
+VSCode check authority reaches checkpoint; no ratio is available.
+
+All ten production wasm scenario/mode replays are complete. The exact paired
+observations pass for Xstate, self-compiler and Bluesky in both check and emit
+modes. Rust wasm independently passes MUI docs check and emit; Go wasm fails
+during execute with explicit runtime out-of-memory lines at roughly 4.2 GB in
+use. VSCode emit also fails during execute on both authorities: Go reports
+out of memory and Rust terminates with `RuntimeError: unreachable`. The Rust
+check failure above is symbolicated; the emit failure is retained without
+claiming an independently mapped cause. Both VSCode modes have no checkpoint
+or complete observations on either authority.
+
+| Scenario | Check | Emit |
+| --- | --- | --- |
+| Xstate | Paired exact pass | Paired exact pass |
+| Self-compiler | Paired exact pass | Paired exact pass |
+| Bluesky | Paired exact pass | Paired exact pass |
+| MUI docs | Rust pass; Go OOM | Rust pass; Go OOM |
+| VSCode | Go OOM; Rust allocator failure | Go OOM; Rust unreachable |
+
+The completed queue receipt is
+`r3-budget-production-paged-wasm-scenarios-01`, with unchanged helper hashes
+and per-authority raw responses/stderr. Its exit status is 1 because required
+cases fail. One authority's failure cannot become a paired pass or silently
+remove a required scenario. No memory limit or input was retuned to avoid
+these failures. The Go Node launcher now validates the reviewed build record
+combination `phase7-budget`, measurement contract 2, source guard true,
+build exit 0 and performance eligibility true. Historical prototype records
+remain readable only with performance eligibility false. Three focused Node
+controls cover the two accepted modes, missing/malformed gates, GC/accounting
+stages and terminal failure; accepting build metadata alone does not establish
+performance acceptance.
+
+Remaining work before production budget acceptance:
+
+- Complete native production comparisons and resolve or explicitly report the
+  failed production wasm capacity cases. All ten wasm modes have concrete
+  outcomes above; only six have paired complete work. The full compiler-wasm
+  acceptance run never supplies budget measurements.
+- Verify scenario options, references, diagnostics and emit gates. Unsupported
+  incremental/watch/external mapper execution must fail explicitly.
+- Validate bounded observation transport on large scenarios. The tiny
+  observation is about 10.5 MB because it includes loaded builtin texts;
+  VSCode's raw read closure is about 125 MB. Version-2 row commands and
+  production source/write APIs now avoid whole-observation JSON; an
+  exceptionally large individual source/write still has its own frame bound.
+- Validate ordinary versus instrumented work, allocation authorities and
+  retained roots. Attribute filesystem layout and transport costs; do not
+  present a whole-operation comparison as isolated compiler CPU.
+- Reuse the serial alternating warmup/pair/stability rules and negative
+  controls only after equal work is established. `wait4` peak RSS and live
+  checkpoint RSS are different quantities. Keep serialization, preparation,
+  process overhead, wasm linear memory and allocator facts separate.
+- Measure artifact size from equivalent full production capabilities, with
+  glue/runtime bytes separately declared. The test-only compiler acceptance
+  artifact is ineligible for size, elapsed or memory acceptance.
+
+No production performance budget has been measured or accepted by this
+foundation. Current captures are correctness evidence only.

@@ -34,6 +34,10 @@ pub use tsr_checker::{symbol_format_flags, type_flags, type_format_flags, TypeRe
 /// The request used by compiler-pool diagnostic and emit operations.
 #[cfg(feature = "checker")]
 pub use tsr_checker::{CheckerRequest as SessionRequest, Operation as QueryOperation};
+/// Configuration parsing host using the production package resolver over an
+/// explicit filesystem. Use it with `tsr_tsoptions` before session loading.
+#[cfg(feature = "checker")]
+pub use tsr_compiler::CompilerConfigHost;
 /// Failures from loading or emitting a session, including host, ownership
 /// and query errors.
 #[cfg(feature = "checker")]

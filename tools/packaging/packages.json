@@ -8,6 +8,18 @@
       "reason": "Repository-only Phase 4 command-line test harness"
     },
     {
+      "name": "phase7-live-watch",
+      "manifest": "tools/phase7/watch/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only native watcher resource probe"
+    },
+    {
+      "name": "phase7_rust_budget",
+      "manifest": "tools/phase7/budget/rust/Cargo.toml",
+      "publish": false,
+      "reason": "Repository-only public embedding budget consumer"
+    },
+    {
       "name": "phase7_wasm_compiler",
       "manifest": "tools/phase7/portable/wasm-compiler/Cargo.toml",
       "publish": false,

@@ -49,5 +49,9 @@ required-features = ["checker"]
 name = "transpile"
 required-features = ["checker"]
 
+[[test]]
+name = "configured"
+required-features = ["checker"]
+
 [lints]
 workspace = true

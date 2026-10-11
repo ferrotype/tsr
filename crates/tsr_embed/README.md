@@ -119,6 +119,13 @@ both pools, and a panic in a compiler callback retires the session.
 
 ## Configured incremental and mapped programs
 
+`CompilerConfigHost` connects an explicit filesystem and current directory to
+the production configuration resolver. Pass it to
+`tsr_tsoptions::get_parsed_command_line_of_config_file`, then supply the resulting
+`ParsedCommandLine` to `Session::load`. This preserves config inheritance,
+package resolution and include/exclude expansion without an operating-system
+filesystem fallback.
+
 `Session::load` now honors `incremental: true`: diagnostics and emission use the
 production incremental program, read previous build info through the supplied
 filesystem and may emit `.tsbuildinfo`, including with `noEmit`. The in-memory

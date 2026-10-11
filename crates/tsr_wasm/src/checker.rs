@@ -3,7 +3,10 @@ use std::sync::Arc;
 use tsr_arena::Counters;
 use tsr_ast::Diagnostic;
 use tsr_compiler::diagnostic_writer::DiagnosticWriter;
-use tsr_embed::{EmitOnly, EmitOptions, FileCache, ProgramOptions, Session};
+use tsr_embed::{
+    DiagnosticKind, EmitOnly, EmitOptions, EmitOutput, FileCache, ProgramOptions, Session,
+    SessionRequest,
+};
 use tsr_jsstring::JsString;
 use wasm_bindgen::prelude::*;
 
@@ -19,8 +22,10 @@ pub struct MemoryHost {
 impl MemoryHost {
     #[wasm_bindgen(constructor)]
     pub fn new(cwd: &[u8], case_sensitive: bool) -> Self {
+        let mut builder = tsr_vfs::MemoryBuilder::new(cwd, case_sensitive);
+        builder.insert_directory(cwd);
         Self {
-            builder: tsr_vfs::MemoryBuilder::new(cwd, case_sensitive),
+            builder,
             cwd: JsString::from_bytes(cwd),
             roots: Vec::new(),
         }
@@ -38,8 +43,23 @@ impl MemoryHost {
         self.builder.insert_directory(path);
     }
 
+    /// Declare an existing physical file whose content has not been supplied.
+    /// Metadata and directory enumeration see it; a read fails explicitly.
+    pub fn add_unavailable_file(&mut self, path: &[u8], raw_size: u64) {
+        self.builder.insert_unavailable_file(path, raw_size);
+    }
+
     pub fn add_symlink(&mut self, path: &[u8], target: &[u8]) {
         self.builder.insert_symlink(path, target);
+    }
+
+    /// Freeze the input snapshot without parsing configuration or loading a
+    /// program. The returned host has no native filesystem fallback.
+    pub fn prepare(self) -> PreparedHost {
+        PreparedHost {
+            fs: Arc::new(tsr_bundled::BundledFs::new(Arc::new(self.builder.finish()))),
+            cwd: self.cwd,
+        }
     }
 
     /// Consume this snapshot. `options` uses the compiler's numeric-enum JSON
@@ -56,13 +76,82 @@ impl MemoryHost {
                 current_directory: self.cwd,
                 default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
                 skip_module_resolution: false,
-                single_threaded: tsr_core::Tristate::UNKNOWN,
+                single_threaded: tsr_core::Tristate::TRUE,
             },
             &mut FileCache::new(),
             &counters,
         )
         .map_err(error)?;
-        Ok(WasmSession { session })
+        Ok(WasmSession::new(session))
+    }
+}
+
+/// Frozen production host, suitable for loading a configured program in a
+/// separately delimited operation. Builtin libraries use the production
+/// bundled host; every other read stays in the supplied snapshot.
+#[wasm_bindgen]
+pub struct PreparedHost {
+    fs: Arc<dyn tsr_vfs::FileSystem>,
+    cwd: JsString,
+}
+
+#[wasm_bindgen]
+impl PreparedHost {
+    /// Parse a real tsconfig and its dependencies, then load one checker
+    /// program. `arguments` is JSON byte arrays of ordered compiler override
+    /// arguments, not pre-resolved options. A missing main config is an API
+    /// error; recoverable config diagnostics stay with the loaded program.
+    /// This narrow route rejects incremental/watch/external mapper execution.
+    pub fn compile_config(self, path: &[u8], arguments: &str) -> Result<WasmSession, JsValue> {
+        let arguments: Vec<Vec<u8>> = serde_json::from_str(arguments).map_err(error)?;
+        let arguments: Vec<_> = arguments.into_iter().map(JsString::from_bytes).collect();
+        let host = tsr_embed::CompilerConfigHost::new(self.fs.clone(), self.cwd.clone());
+        let cli = tsr_tsoptions::parse_command_line(&arguments, &host);
+        if !cli.root_file_names.is_empty()
+            || !cli.options.project.is_empty()
+            || cli.options.watch.is_true()
+        {
+            return Err(error("arguments must contain compiler overrides only"));
+        }
+        let parsed = tsr_tsoptions::get_parsed_command_line_of_config_file(
+            path,
+            &cli.options,
+            &cli.raw,
+            &host,
+        )
+        .map_err(error)?;
+        let Some(mut config) = parsed.command_line else {
+            return Err(error("main configuration could not be read"));
+        };
+        let mut diagnostics = cli.errors;
+        diagnostics.append(&mut config.errors);
+        config.errors = diagnostics;
+        if config.options.incremental.is_true()
+            || config.options.watch.is_true()
+            || config.options.run_external_code.is_true()
+            || config
+                .content_mappers
+                .as_ref()
+                .is_some_and(|mappers| !mappers.is_empty())
+        {
+            return Err(error(
+                "incremental/watch/external mapper execution unsupported",
+            ));
+        }
+        let session = Session::load(
+            ProgramOptions {
+                config,
+                host: self.fs,
+                current_directory: self.cwd,
+                default_library_path: JsString::from_bytes(tsr_bundled::LIB_PATH),
+                skip_module_resolution: false,
+                single_threaded: tsr_core::Tristate::TRUE,
+            },
+            &mut FileCache::new(),
+            &Counters::new(),
+        )
+        .map_err(error)?;
+        Ok(WasmSession::new(session))
     }
 }
 
@@ -71,6 +160,64 @@ impl MemoryHost {
 #[wasm_bindgen]
 pub struct WasmSession {
     session: Session,
+    retained_diagnostics: Option<Vec<Diagnostic>>,
+    retained_emit: Option<EmitOutput>,
+    retained_observation: Option<crate::snapshot::Snapshot>,
+}
+
+impl WasmSession {
+    fn new(session: Session) -> Self {
+        Self {
+            session,
+            retained_diagnostics: None,
+            retained_emit: None,
+            retained_observation: None,
+        }
+    }
+    fn freeze_observation(&mut self) -> Result<&crate::snapshot::Snapshot, JsValue> {
+        if self.retained_observation.is_none() {
+            let diagnostics = self
+                .retained_diagnostics
+                .as_ref()
+                .ok_or_else(|| error("check has not completed"))?;
+            self.retained_observation = Some(
+                crate::snapshot::collect(&self.session, diagnostics, self.retained_emit.as_ref())
+                    .map_err(error)?,
+            );
+        }
+        Ok(self
+            .retained_observation
+            .as_ref()
+            .expect("observation was initialized"))
+    }
+    fn collect_diagnostics(&self) -> Result<Vec<Diagnostic>, tsr_embed::SessionError> {
+        let program = self.session.program();
+        let request = SessionRequest::default();
+        let mut diagnostics = Vec::new();
+        for kind in [
+            DiagnosticKind::Config,
+            DiagnosticKind::Program,
+            DiagnosticKind::Syntactic,
+            DiagnosticKind::Global,
+        ] {
+            diagnostics.extend(self.session.diagnostics(&request, kind, None)?);
+        }
+        for file in program.files() {
+            diagnostics.extend(self.session.diagnostics(
+                &request,
+                DiagnosticKind::Semantic,
+                Some(file),
+            )?);
+            if program.options().declaration.is_true() || program.options().composite.is_true() {
+                diagnostics.extend(self.session.diagnostics(
+                    &request,
+                    DiagnosticKind::Declaration,
+                    Some(file),
+                )?);
+            }
+        }
+        program.sort_and_deduplicate_diagnostics(&diagnostics)
+    }
 }
 
 #[wasm_bindgen]
@@ -83,28 +230,7 @@ impl WasmSession {
     /// ranges. This preserves malformed source bytes and nested message chains.
     pub fn diagnostics(&self) -> Result<Vec<u8>, JsValue> {
         let program = self.session.program();
-        let mut operation = self.session.operation().map_err(error)?;
-        let mut diagnostics = program.config().config_file_parsing_diagnostics();
-        diagnostics.extend_from_slice(program.program_diagnostics().map_err(error)?);
-        diagnostics.extend(program.syntactic_diagnostics(None).map_err(error)?);
-        diagnostics.extend(operation.global_diagnostics().map_err(error)?);
-        for file in program.files() {
-            diagnostics.extend(
-                program
-                    .semantic_diagnostics_with_checker(&mut operation, file)
-                    .map_err(error)?,
-            );
-            if program.options().declaration.is_true() || program.options().composite.is_true() {
-                diagnostics.extend(
-                    program
-                        .declaration_diagnostics_with_checker(&mut operation, file)
-                        .map_err(error)?,
-                );
-            }
-        }
-        let values = program
-            .sort_and_deduplicate_diagnostics(&diagnostics)
-            .map_err(error)?;
+        let values = self.collect_diagnostics().map_err(error)?;
         let sources = DiagnosticWriter::new(
             program,
             tsr_compiler::diagnostic_writer::FormattingOptions::default(),
@@ -114,6 +240,69 @@ impl WasmSession {
             .map(|value| diagnostic(&sources, value))
             .collect();
         serde_json::to_vec(&rows?).map_err(error)
+    }
+
+    /// Check all loaded files and retain the sorted diagnostic objects. No
+    /// diagnostic JSON or output digest is constructed during this operation.
+    /// Checks and emit share the same compiler pool and checker identities.
+    pub fn check(&mut self) -> Result<(), JsValue> {
+        self.retained_diagnostics = Some(self.collect_diagnostics().map_err(error)?);
+        self.retained_observation = None;
+        Ok(())
+    }
+
+    /// Retain a production emit and its callback writes without serialization.
+    /// `request` has the same format as `emit`. A later call replaces the prior
+    /// retained emit; `.free()` drops all retained source and output owners.
+    pub fn emit_retained(&mut self, request: &str) -> Result<(), JsValue> {
+        self.retained_emit = Some(self.emit_output(request)?);
+        self.retained_observation = None;
+        Ok(())
+    }
+
+    /// Snapshot owned sources, work counts, retained diagnostics and callback
+    /// writes after checking. This method runs no diagnostic or emit phases.
+    pub fn retained_snapshot(&self) -> Result<Vec<u8>, JsValue> {
+        let diagnostics = self
+            .retained_diagnostics
+            .as_ref()
+            .ok_or_else(|| error("check has not completed"))?;
+        crate::snapshot::encode(&self.session, diagnostics, self.retained_emit.as_ref())
+            .map_err(error)
+    }
+
+    /// Freeze retained metadata and diagnostic source indices without copying
+    /// all source texts or serializing output rows. Counts are decimal strings.
+    /// Subsequent row methods share this snapshot until another check or emit.
+    pub fn retained_snapshot_header(&mut self) -> Result<Vec<u8>, JsValue> {
+        crate::snapshot::header(self.freeze_observation()?).map_err(error)
+    }
+
+    /// Serialize one retained source, including its exact name, path and text.
+    /// The zero-based index uses the order frozen by retained_snapshot_header.
+    pub fn retained_source(&mut self, index: u32) -> Result<Vec<u8>, JsValue> {
+        self.freeze_observation()?;
+        crate::snapshot::source_row(
+            self.retained_observation
+                .as_ref()
+                .expect("observation was initialized"),
+            self.session.program(),
+            index as usize,
+        )
+        .map_err(error)
+    }
+
+    /// Serialize one retained callback write in callback order.
+    pub fn retained_write(&mut self, index: u32) -> Result<Vec<u8>, JsValue> {
+        self.freeze_observation()?;
+        crate::snapshot::write_row(
+            self.retained_observation
+                .as_ref()
+                .expect("observation was initialized"),
+            self.retained_emit.as_ref(),
+            index as usize,
+        )
+        .map_err(error)
     }
 
     /// Return the loaded program's module-resolution trace in recorded order.
@@ -152,58 +341,9 @@ impl WasmSession {
     /// `text` a byte array, in `EmittedFiles` order. No acceptance claim:
     /// Phase 7 grades this entry point.
     pub fn emit(&self, request: &str) -> Result<Vec<u8>, JsValue> {
-        let request = EmitRequest::parse(request).map_err(error)?;
+        let output = self.emit_output(request)?;
         let program = self.session.program();
-        let files = request
-            .files
-            .as_ref()
-            .map(|names| {
-                names
-                    .iter()
-                    .map(|name| {
-                        program
-                            .source_file(name)
-                            .ok_or_else(|| error("file not in program"))
-                    })
-                    .collect::<Result<Vec<_>, _>>()
-            })
-            .transpose()?;
-        let output = self
-            .session
-            .emit(&EmitOptions {
-                target_source_files: files.as_deref(),
-                emit_only: request.emit_only,
-                force_emit: request.force_emit,
-            })
-            .map_err(error)?;
-        let sources = DiagnosticWriter::new(
-            program,
-            tsr_compiler::diagnostic_writer::FormattingOptions::default(),
-        );
-        let rows: Result<Vec<_>, _> = output
-            .diagnostics
-            .iter()
-            .map(|value| diagnostic(&sources, value))
-            .collect();
-        // Written field by field so output bytes go straight to the response
-        // instead of through one JSON value per byte.
-        let mut response = br#"{"emit_skipped":"#.to_vec();
-        serde_json::to_writer(&mut response, &output.emit_skipped).map_err(error)?;
-        response.extend_from_slice(br#","diagnostics":"#);
-        serde_json::to_writer(&mut response, &rows?).map_err(error)?;
-        response.extend_from_slice(br#","files":["#);
-        for (index, file) in output.files.iter().enumerate() {
-            if index > 0 {
-                response.push(b',');
-            }
-            response.extend_from_slice(br#"{"name":"#);
-            serde_json::to_writer(&mut response, file.name.as_bytes()).map_err(error)?;
-            response.extend_from_slice(br#","text":"#);
-            serde_json::to_writer(&mut response, file.text.as_slice()).map_err(error)?;
-            response.push(b'}');
-        }
-        response.extend_from_slice(b"]}");
-        Ok(response)
+        encode_emit(program, &output)
     }
 
     /// Query at a UTF-16 source offset, matching JavaScript-facing positions.
@@ -239,6 +379,65 @@ impl WasmSession {
             .map(|text| text.as_bytes().to_vec())
             .map_err(error)
     }
+}
+
+impl WasmSession {
+    fn emit_output(&self, request: &str) -> Result<EmitOutput, JsValue> {
+        let request = EmitRequest::parse(request).map_err(error)?;
+        let program = self.session.program();
+        let files = request
+            .files
+            .as_ref()
+            .map(|names| {
+                names
+                    .iter()
+                    .map(|name| {
+                        program
+                            .source_file(name)
+                            .ok_or_else(|| error("file not in program"))
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+            })
+            .transpose()?;
+        self.session
+            .emit(&EmitOptions {
+                target_source_files: files.as_deref(),
+                emit_only: request.emit_only,
+                force_emit: request.force_emit,
+            })
+            .map_err(error)
+    }
+}
+
+fn encode_emit(program: &tsr_embed::Program, output: &EmitOutput) -> Result<Vec<u8>, JsValue> {
+    let sources = DiagnosticWriter::new(
+        program,
+        tsr_compiler::diagnostic_writer::FormattingOptions::default(),
+    );
+    let rows: Result<Vec<_>, _> = output
+        .diagnostics
+        .iter()
+        .map(|value| diagnostic(&sources, value))
+        .collect();
+    // Written field by field so output bytes go straight to the response
+    // instead of through one JSON value per byte.
+    let mut response = br#"{"emit_skipped":"#.to_vec();
+    serde_json::to_writer(&mut response, &output.emit_skipped).map_err(error)?;
+    response.extend_from_slice(br#","diagnostics":"#);
+    serde_json::to_writer(&mut response, &rows?).map_err(error)?;
+    response.extend_from_slice(br#","files":["#);
+    for (index, file) in output.files.iter().enumerate() {
+        if index > 0 {
+            response.push(b',');
+        }
+        response.extend_from_slice(br#"{"name":"#);
+        serde_json::to_writer(&mut response, file.name.as_bytes()).map_err(error)?;
+        response.extend_from_slice(br#","text":"#);
+        serde_json::to_writer(&mut response, file.text.as_slice()).map_err(error)?;
+        response.push(b'}');
+    }
+    response.extend_from_slice(b"]}");
+    Ok(response)
 }
 
 #[derive(serde::Serialize)]
@@ -351,5 +550,94 @@ mod trace_tests {
         );
         let boolean = serde_json::to_value(TraceArgument::Bool(false)).unwrap();
         assert_eq!(boolean, serde_json::json!({"kind":"bool","value":false}));
+    }
+}
+
+#[cfg(test)]
+mod retained_tests {
+    use super::MemoryHost;
+    use std::sync::Arc;
+
+    #[test]
+    fn check_and_emit_share_checker_identity_and_retirement_gate() {
+        let mut host = MemoryHost::new(b"/p", true);
+        host.add_file(b"/p/main.ts", b"export const answer = 42;", true);
+        let mut session = host.compile(r#"{"noLib":true}"#).unwrap();
+        session.check().unwrap();
+        let identity = |session: &super::WasmSession| {
+            session
+                .session
+                .with_compiler_operations(|operations| {
+                    assert_eq!(operations.len(), 1);
+                    Ok(Arc::as_ptr(operations.iter().next().unwrap().owner().identity()) as usize)
+                })
+                .unwrap()
+        };
+        let before = identity(&session);
+        session.emit_retained("{}").unwrap();
+        assert_eq!(before, identity(&session));
+        let owned = session.retained_snapshot().unwrap();
+        session.retire();
+        assert!(session.collect_diagnostics().is_err());
+        drop(session);
+        assert!(!owned.is_empty());
+    }
+    #[test]
+    fn retained_rows_equal_complete_snapshot_and_invalidate_after_emit() {
+        let mut host = MemoryHost::new(b"/p", true);
+        host.add_file(b"/p/main.ts", b"export const answer: string = 42;", true);
+        let mut session = host.compile(r#"{"noLib":true,"sourceMap":true}"#).unwrap();
+        session.check().unwrap();
+        session.emit_retained("{}").unwrap();
+        let whole: serde_json::Value =
+            serde_json::from_slice(&session.retained_snapshot().unwrap()).unwrap();
+        let mut assembled: serde_json::Value =
+            serde_json::from_slice(&session.retained_snapshot_header().unwrap()).unwrap();
+        let sources = assembled["source_count"]
+            .as_str()
+            .unwrap()
+            .parse::<u32>()
+            .unwrap();
+        let writes = assembled["write_count"]
+            .as_str()
+            .unwrap()
+            .parse::<u32>()
+            .unwrap();
+        assembled.as_object_mut().unwrap().remove("source_count");
+        assembled.as_object_mut().unwrap().remove("write_count");
+        assembled["sources"] = serde_json::Value::Array(
+            (0..sources)
+                .map(|index| {
+                    serde_json::from_slice(&session.retained_source(index).unwrap()).unwrap()
+                })
+                .collect(),
+        );
+        assembled["writes"] = serde_json::Value::Array(
+            (0..writes)
+                .map(|index| {
+                    serde_json::from_slice(&session.retained_write(index).unwrap()).unwrap()
+                })
+                .collect(),
+        );
+        assert_eq!(assembled, whole);
+        assert!(crate::snapshot::source_row(
+            session.retained_observation.as_ref().unwrap(),
+            session.session.program(),
+            sources as usize
+        )
+        .is_err());
+        assert!(crate::snapshot::write_row(
+            session.retained_observation.as_ref().unwrap(),
+            session.retained_emit.as_ref(),
+            writes as usize
+        )
+        .is_err());
+        let first = session.retained_snapshot_header().unwrap();
+        assert_eq!(first, session.retained_snapshot_header().unwrap());
+        session.emit_retained("{}").unwrap();
+        assert!(session.retained_observation.is_none());
+        session.retained_snapshot_header().unwrap();
+        session.check().unwrap();
+        assert!(session.retained_observation.is_none());
     }
 }

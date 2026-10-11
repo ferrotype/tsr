@@ -186,7 +186,14 @@ The external lifetime tests cover their named public routes: program creation,
 checking, scoped queries, in-memory emit, retained results after session drop,
 retirement, reentry, native unwind invalidation and recovery, foreign emit
 targets, concurrent initialization, malformed source bytes, and transpile
-ownership/cancellation. They are a subset of the R4/E3 obligations. They do
-not independently establish compiler corpus acceptance, browser behavior,
-sanitizers, Miri coverage or performance/retained-memory/size budgets. The full
-native corpus capture above supplies the separate compiler correctness witness.
+ownership/cancellation. The [R4 ownership applicability map](../../../docs/PHASE7-R4.md#public-ownership-applicability)
+relates every original fourteen-case witness and the two additional snapshot-edit
+and retained-result/AST cases to S06/S07/S09. A separate public service witness
+covers canonical/supplemental content-mapper retention. The original fourteen
+cases have debug/release/Miri/ASan evidence. The two new lifetime cases and the
+supporting service case also pass all four modes, with a separate twelve-execution
+receipt recorded in the applicability map. This is complementary evidence, not
+a new full-roster capture.
+These ownership tests do not establish compiler corpus acceptance, browser/trap
+behavior or performance/retained-memory/size budgets. The full native corpus
+capture above supplies the separate compiler correctness witness.

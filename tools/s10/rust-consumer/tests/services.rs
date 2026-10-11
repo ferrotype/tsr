@@ -249,6 +249,7 @@ fn mapped_options() -> ProgramOptions {
 
 #[test]
 fn caller_owned_mapper_project_loads_and_emits_canonical_and_supplemental_sources() {
+    let counters = Counters::new();
     let project = Arc::new(MappedProject {
         transforms: AtomicUsize::new(0),
         closes: AtomicUsize::new(0),
@@ -261,9 +262,10 @@ fn caller_owned_mapper_project_loads_and_emits_canonical_and_supplemental_source
         mapped_options(),
         &services,
         &mut FileCache::new(),
-        &Counters::new(),
+        &counters,
     )
     .unwrap();
+    let weak_program = Arc::downgrade(session.program());
     assert_eq!(project.transforms.load(Ordering::SeqCst), 1);
     assert!(session.program().file(b"/main.box.0.ts").is_some());
     let diagnostics = session
@@ -283,9 +285,31 @@ fn caller_owned_mapper_project_loads_and_emits_canonical_and_supplemental_source
         .windows(b"supplemental = 2".len())
         .any(|text| text == b"supplemental = 2")));
     drop(session);
-    assert!(output.program().unwrap().file(b"/main.box.0.ts").is_some());
+    assert!(weak_program.upgrade().is_some());
+    let retained_program = output.program().unwrap();
+    for (path, text) in [
+        (
+            b"/main.box".as_slice(),
+            b"export const canonical: string = 1;\n".as_slice(),
+        ),
+        (
+            b"/main.box.0.ts".as_slice(),
+            b"export const supplemental = 2;\n".as_slice(),
+        ),
+    ] {
+        let source = retained_program
+            .file(path)
+            .unwrap()
+            .bound()
+            .view()
+            .source_file()
+            .unwrap();
+        assert_eq!(source.text().as_bytes(), text);
+    }
     assert_eq!(project.closes.load(Ordering::SeqCst), 0);
     drop(output);
+    assert!(weak_program.upgrade().is_none());
+    assert_eq!(counters.snapshot(), tsr_arena::Counts::default());
     project.close().unwrap();
     assert_eq!(project.closes.load(Ordering::SeqCst), 1);
 }
@@ -389,4 +413,95 @@ fn incremental_session_cancellation_foreign_files_and_retained_queries_keep_thei
             ArenaError::Retired
         )))
     ));
+}
+
+#[test]
+fn public_config_host_resolves_extends_and_include_before_session_load() {
+    let mut fs = tsr_vfs::MemoryBuilder::new(b"/project", true);
+    fs.insert_physical(
+        b"/project/base.json",
+        br#"{"compilerOptions":{"noLib":true,"strict":true}}"#.as_slice(),
+    );
+    fs.insert_physical(
+        b"/project/tsconfig.json",
+        br#"{"extends":"./base.json","include":["src/*.ts"]}"#.as_slice(),
+    );
+    fs.insert_physical(b"/project/src/main.ts", b"export {};".as_slice());
+    fs.insert_physical(b"/project/other.ts", b"export {};".as_slice());
+    let fs: Arc<dyn tsr_vfs::FileSystem> = Arc::new(fs.finish());
+    let host = tsr_embed::CompilerConfigHost::new(fs.clone(), js(b"/project"));
+    let parsed = tsr_tsoptions::get_parsed_command_line_of_config_file(
+        b"/project/tsconfig.json",
+        &CompilerOptions::default(),
+        &Default::default(),
+        &host,
+    )
+    .unwrap();
+    let config = parsed.command_line.unwrap();
+    assert_eq!(config.root_file_names, [js(b"/project/src/main.ts")]);
+    assert!(config.options.strict.is_true());
+    let session = Session::load(
+        ProgramOptions {
+            config,
+            host: fs,
+            current_directory: js(b"/project"),
+            default_library_path: js(b"/lib"),
+            skip_module_resolution: false,
+            single_threaded: Tristate::TRUE,
+        },
+        &mut FileCache::new(),
+        &Counters::new(),
+    )
+    .unwrap();
+    assert_eq!(session.program().files().len(), 1);
+}
+
+#[test]
+fn unavailable_snapshot_content_is_fatal_through_public_config_and_load() {
+    let mut builder = tsr_vfs::MemoryBuilder::new(b"/project", true);
+    builder.insert_unavailable_file(b"/project/tsconfig.json", 2);
+    let host = tsr_embed::CompilerConfigHost::new(Arc::new(builder.finish()), js(b"/project"));
+    let error = tsr_tsoptions::get_parsed_command_line_of_config_file(
+        b"/project/tsconfig.json",
+        &CompilerOptions::default(),
+        &Default::default(),
+        &host,
+    )
+    .err()
+    .unwrap();
+    assert!(error
+        .to_string()
+        .contains("snapshot file content is unavailable"));
+    assert!(error.to_string().contains("/project/tsconfig.json"));
+
+    let mut builder = tsr_vfs::MemoryBuilder::new(b"/project", true);
+    builder.insert_unavailable_file(b"/project/main.ts", 7);
+    let error = Session::load(
+        ProgramOptions {
+            config: tsr_tsoptions::ParsedCommandLine::new(
+                CompilerOptions {
+                    no_lib: Tristate::TRUE,
+                    ..Default::default()
+                },
+                vec![js(b"/project/main.ts")],
+            ),
+            host: Arc::new(builder.finish()),
+            current_directory: js(b"/project"),
+            default_library_path: js(b"/lib"),
+            skip_module_resolution: false,
+            single_threaded: Tristate::TRUE,
+        },
+        &mut FileCache::new(),
+        &Counters::new(),
+    )
+    .err()
+    .unwrap();
+    assert!(error
+        .to_string()
+        .contains("snapshot file content is unavailable"));
+    let SessionError::Host(tsr_vfs::Error::Detailed(error)) = error else {
+        panic!("loader must preserve the structured host error");
+    };
+    assert!(!error.is_not_exist());
+    assert!(error.to_string().contains("/project/main.ts"));
 }

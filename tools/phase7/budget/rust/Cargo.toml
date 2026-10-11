@@ -1,0 +1,36 @@
+[package]
+name = "phase7_rust_budget"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.96"
+publish = false
+
+[workspace]
+
+[features]
+allocation-metrics = []
+
+[dependencies]
+tsr_embed = { path = "../../../../crates/tsr_embed", version = "0.4.0" }
+tsr_arena = { path = "../../../../crates/tsr_arena", version = "0.4.0" }
+tsr_ast = { path = "../../../../crates/tsr_ast", version = "0.4.0" }
+tsr_core = { path = "../../../../crates/tsr_core", version = "0.4.0" }
+tsr_jsstring = { path = "../../../../crates/tsr_jsstring", version = "0.4.0" }
+tsr_tsoptions = { path = "../../../../crates/tsr_tsoptions", version = "0.4.0" }
+tsr_tspath = { path = "../../../../crates/tsr_tspath", version = "0.4.0" }
+tsr_vfs = { path = "../../../../crates/tsr_vfs", version = "0.4.0" }
+mimalloc = "=0.1.48"
+base64 = "0.22.1"
+sha2 = "0.10"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "raw_value"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+rustix = { version = "1.1", features = ["fs"] }
+
+[profile.release]
+# Match ADR 0012/0016 and the native production executable.
+panic = "unwind"
+lto = "fat"
+codegen-units = 1

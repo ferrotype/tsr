@@ -168,6 +168,8 @@ before one of them. `tsr` depends on every library it re-exports and goes last:
 | Package | crates.io | Reason |
 | --- | --- | --- |
 | `phase4_tsctests` | Private | Repository-only Phase 4 command-line test harness |
+| `phase7-live-watch` | Private | Repository-only native watcher resource probe |
+| `phase7_rust_budget` | Private | Repository-only public embedding budget consumer |
 | `phase7_wasm_compiler` | Private | Repository-only WebAssembly compiler consumer of the public embedding API |
 | `s08_relater_prototype` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s09_format_harness` | Private | Repository-only benchmark, experiment, test or capture tool |

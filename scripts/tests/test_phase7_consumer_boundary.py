@@ -74,6 +74,22 @@ def source_errors(consumer):
 
 
 class ConsumerBoundaryTests(unittest.TestCase):
+    def test_budget_consumer_uses_public_session_without_acceptance_helpers(self):
+        manifest = ROOT / "tools/phase7/budget/rust/Cargo.toml"
+        self.assertEqual(dependency_errors(manifest), [])
+        errors, visited = source_errors(manifest.parent)
+        self.assertEqual(errors, [])
+        for name in ("main.rs", "engine.rs", "protocol.rs", "allocator.rs"):
+            self.assertIn(manifest.parent / "src" / name, visited)
+        # Its protocol and observations are independent of the S10 acceptance
+        # schema/walkers. Following an include must not quietly import them.
+        self.assertTrue(all(path.is_relative_to(manifest.parent) for path in visited))
+        document = tomllib.loads(manifest.read_text())
+        for alias, dependency in document["dependencies"].items():
+            if isinstance(dependency, dict) and "path" in dependency:
+                package_root = (manifest.parent / dependency["path"]).resolve()
+                self.assertTrue(package_root.is_relative_to(ROOT / "crates"), alias)
+
     def test_wasm_compiler_uses_the_same_public_executor_and_walker(self):
         manifest = ROOT / "tools/phase7/portable/wasm-compiler/Cargo.toml"
         self.assertEqual(dependency_errors(manifest), [])
