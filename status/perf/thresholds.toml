@@ -145,3 +145,113 @@ elapsed_async_getsymbolatlocation_identifiers = 1.25
 elapsed_async_getsymbolatlocation_identifiers_batched = 1.25
 peak_rss_sync = 0.85
 peak_rss_async = 0.85
+
+# ADR 0020 / Phase 7 R3–R4: one-checker public embedding and production wasm.
+# Preparation is outside elapsed; process peak ends before owned observation.
+# Native retained heap is an independent instrumented row (not retained RSS).
+
+[embed-check-vscode]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-emit-vscode]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-check-self-compiler]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-emit-self-compiler]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-check-mui-docs]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-emit-mui-docs]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-check-xstate]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-emit-xstate]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-check-bluesky]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[embed-emit-bluesky]
+elapsed = 1.0
+peak_rss = 0.70
+retained_bytes = 1.0
+
+[wasm-check-vscode]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-emit-vscode]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-check-self-compiler]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-emit-self-compiler]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-check-mui-docs]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-emit-mui-docs]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-check-xstate]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-emit-xstate]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-check-bluesky]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[wasm-emit-bluesky]
+elapsed = 1.0
+peak_rss = 1.0
+retained_rss = 1.0
+
+[embed-size]
+artifact_bytes = 1.0
+
+[wasm-size]
+artifact_bytes = 1.0

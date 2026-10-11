@@ -445,6 +445,12 @@ class CommittedFiles(unittest.TestCase):
             "api": {**{f"elapsed_{mode}_{task}": 1.25 for mode in ("sync", "async") for task in API_TASKS
                         if (mode, task) != ("async", "spawn_api")},
                     "peak_rss_sync": 0.85, "peak_rss_async": 0.85},
+            **{f"embed-{mode}-{scenario}": {"elapsed": 1.0, "peak_rss": 0.70, "retained_bytes": 1.0}
+               for scenario in perf.SCENARIOS for mode in perf.SCENARIO_MODES},
+            **{f"wasm-{mode}-{scenario}": {"elapsed": 1.0, "peak_rss": 1.0, "retained_rss": 1.0}
+               for scenario in perf.SCENARIOS for mode in perf.SCENARIO_MODES},
+            "embed-size": {"artifact_bytes": 1.0},
+            "wasm-size": {"artifact_bytes": 1.0},
         })
         self.assertEqual(tomllib.loads(perf.THRESHOLDS.read_text()), tables)
         for workload in tables:
@@ -459,7 +465,11 @@ class CommittedFiles(unittest.TestCase):
             for run, path in perf.runs(workload):
                 found += 1
                 with self.subTest(path=path.name):
-                    detailed = workload == "lsp" or workload == "api" or workload in SCENARIO_WORKLOADS
+                    budget = workload in {f"{prefix}-{mode}-{scenario}"
+                                          for prefix in ("embed", "wasm") for mode in perf.SCENARIO_MODES
+                                          for scenario in perf.SCENARIOS}
+                    size = workload in ("embed-size", "wasm-size")
+                    detailed = workload == "lsp" or workload == "api" or workload in SCENARIO_WORKLOADS or budget or size
                     self.assertEqual(set(run), RUN_KEYS | ({"summaries", "metadata"} & set(run) if detailed else set()))
                     self.assertEqual(run["workload"], workload)
                     self.assertEqual(perf.run_path(perf.PERF, run), path)
@@ -472,8 +482,8 @@ class CommittedFiles(unittest.TestCase):
                     for runtime, lists in run["samples"].items():
                         self.assertIn(runtime, ("rust", "go"))
                         self.assertEqual(set(lists), set(run["samples"]["rust"]))
-                        counts = ((20, 40) if workload == "lsp" else (7, 14) if workload in SCENARIO_WORKLOADS
-                                  else None if workload == "api" else (7,))
+                        counts = ((20, 40) if workload == "lsp" else (7, 14) if workload in SCENARIO_WORKLOADS or budget
+                                  else None if workload == "api" else (1,) if size else (7,))
                         self.assertTrue(all(len(values) in counts if counts else values for values in lists.values()))
                     rows = perf.compare(run, thresholds.get(workload, {}))
                     # Recorded misses remain evidence; perf.check reports failure.

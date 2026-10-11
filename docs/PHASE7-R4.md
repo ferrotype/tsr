@@ -1,6 +1,7 @@
 # R4 — embedding acceptance progress
 
-Status: single-file and native compiler embedding correctness captured; R4 remains incomplete.
+Status: full native compiler/transpile correctness and public ownership checks
+captured; R4 remains incomplete because its resource budgets are not met.
 This record tracks [R4 and architecture item 4](PHASE7-plan.md), rather than
 changing their exit criteria. Benchmark and retained-memory results remain
 separate obligations and are not inferred from API tests.
@@ -324,3 +325,49 @@ these exclusions do not exclude those results merely because private factories
 implement them. This audit identifies no additional public ownership category
 requiring a synthetic hook or a new facade capability. Native unwind/contention
 and sanitizer execution remain separate from wasm instance/trap evidence.
+
+## First serial resource comparison
+
+`r34-native-xstate-check-pairs-01`, under the durable
+`../ts-rust-benchmarks/2026-10-11/` capture root, compares the ordinary public
+embedding consumer with the pinned Go consumer at one checker. One discarded
+warmup pair precedes seven fresh, serial, alternating pairs; complete owned
+observations match throughout.
+
+| Metric | Go median | Rust median | Rust / Go | Limit |
+| --- | ---: | ---: | ---: | ---: |
+| Execute request through acknowledgement | 0.888 s | 1.769 s | 1.9913 | 1.0 |
+| Process peak before observation | 668,450,816 B | 702,726,144 B | 1.0513 | 0.70 |
+| Linked consumer bytes | 20,017,170 B | 28,896,848 B | 1.4436 | 1.0 |
+
+Elapsed excludes preparation, checkpoint GC and later observation. The 95%
+ratio interval is 1.9236–2.0390; Go/Rust relative MAD is 1.61%/1.54%. Every pair
+was under background host load, so this timing/RSS capture is diagnostic and
+is not entered as a qualified performance run. It establishes matching work
+and gives a starting measurement, not a quiet-host acceptance claim.
+
+The size row is separately recorded under `status/perf/embed-size`. Go is
+stripped (`-s -w`); Rust is the ordinary unstripped release consumer with fat
+LTO, one codegen unit and mimalloc. The recorded result describes these actual
+artifacts, without claiming that Rust's size has been minimized. There is no
+allocator instrumentation in the elapsed/RSS/size executable.
+
+The separate native allocation path uses the same Rust sources, release
+profile and allocator, with allocation instrumentation added. It authenticates
+the ordinary reference and checks each sample's complete work. Go's collected
+`HeapAlloc`, Rust's live requested layout bytes, allocation traffic and process
+RSS retain distinct names and accounting authorities. The production budget
+commands and readonly `perf.py` recording route are documented in
+[the budget README](../tools/phase7/budget/README.md). All captures are outside
+`target`; cleaning Cargo outputs does not remove them.
+
+The seven-pair instrumented follow-up
+`r34-native-xstate-check-allocation-01` completes with identical observed work.
+Retained Go `HeapAlloc` has median 559,392,448 bytes; Rust live requested bytes
+have median 573,931,160 bytes: **1.0260×**, against the 1.0 retained-byte limit.
+Cumulative allocation traffic is 1,588,245,328 versus 2,858,454,476 bytes
+(**1.7998×**). Traffic includes preparation and is not presented as compiler-only
+allocation or a retained-byte substitute. Instrumented elapsed/RSS numbers are
+not used. This allocation result can accompany a future ordinary qualified
+comparison only under the tool's exact source/artifact/work binding; the busy
+ordinary run is not made timing-qualified by the allocation result.

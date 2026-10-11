@@ -413,27 +413,68 @@ performance acceptance.
 
 Remaining work before production budget acceptance:
 
-- Complete native production comparisons and resolve or explicitly report the
-  failed production wasm capacity cases. All ten wasm modes have concrete
-  outcomes above; only six have paired complete work. The full compiler-wasm
-  acceptance run never supplies budget measurements.
-- Verify scenario options, references, diagnostics and emit gates. Unsupported
-  incremental/watch/external mapper execution must fail explicitly.
-- Validate bounded observation transport on large scenarios. The tiny
-  observation is about 10.5 MB because it includes loaded builtin texts;
-  VSCode's raw read closure is about 125 MB. Version-2 row commands and
-  production source/write APIs now avoid whole-observation JSON; an
-  exceptionally large individual source/write still has its own frame bound.
-- Validate ordinary versus instrumented work, allocation authorities and
-  retained roots. Attribute filesystem layout and transport costs; do not
-  present a whole-operation comparison as isolated compiler CPU.
-- Reuse the serial alternating warmup/pair/stability rules and negative
-  controls only after equal work is established. `wait4` peak RSS and live
-  checkpoint RSS are different quantities. Keep serialization, preparation,
-  process overhead, wasm linear memory and allocator facts separate.
-- Measure artifact size from equivalent full production capabilities, with
-  glue/runtime bytes separately declared. The test-only compiler acceptance
-  artifact is ineligible for size, elapsed or memory acceptance.
+- Resolve the failed production wasm capacity cases, or obtain an explicit
+  scope decision. All ten modes have concrete outcomes above; only six have
+  paired complete work. Native production comparisons already cover all ten
+  modes, with only the descriptor's existing Go emit-omission policy on MUI.
+- Capture the qualified per-scenario resource matrix on a quiet host, using
+  the serial runner below. Keep preparation, operation, observation, process
+  RSS, wasm linear memory and allocator facts separate. A whole-operation
+  interval does not establish isolated compiler CPU.
+- Resolve the 5,000-parenthesis production parser stack limit, or document an
+  owner-approved tested bound. The passing 500-parenthesis control does not
+  replace the failed input. The browser's required expression-chain case
+  already passes in all three engines.
 
-No production performance budget has been measured or accepted by this
-foundation. Current captures are correctness evidence only.
+Production artifact size receipts now bind the ordinary public consumers,
+archived build manifests and actual body/glue hashes. Native bodies are
+28,896,848 Rust bytes versus 20,017,170 stripped Go bytes (ratio 1.443603);
+wasm bodies are 26,276,385 Rust bytes versus 34,213,731 Go bytes (ratio 0.768007).
+Wasm glue is separate: Rust bindings 27,301 bytes; Go runtime shim 16,992 bytes.
+Receipts are `r34-budget-native-size-02` and `r34-budget-wasm-size-01`.
+The readonly reader validates archived metadata and immutable body/glue bytes
+without spawning Node or depending on later helper/source contents. The first
+native attempt is retained as incomplete after sandboxed host metadata access
+failed. Both production surfaces provide parse/config/load/check/emit; Rust
+wasm additionally exports transpile and public AST/value operations. These
+sizes therefore compare the declared production surfaces, not identical export
+sets. The test-only compiler acceptance wasm is excluded.
+
+## First serial resource comparison
+
+`r34-wasm-xstate-check-pairs-01` completes the real XState check operation
+with one discarded warmup pair and seven serial, alternating measured pairs.
+Every owned source, diagnostic and result observation matches. The frozen
+input, exact executable/wasm identities and raw responses remain in the capture.
+
+| Metric | Go median | Rust median | Rust / Go |
+| --- | ---: | ---: | ---: |
+| Execute request through acknowledgement | 6.360 s | 4.775 s | 0.7508 |
+| Process peak before observation | 1,065,091,072 B | 920,748,032 B | 0.8645 |
+| Retained process RSS after checkpoint | 1,065,156,608 B | 920,748,032 B | 0.8644 |
+
+Elapsed excludes preparation, checkpoint collection and observation. The 95%
+elapsed ratio interval is 0.7356–0.7676; relative MAD is 1.23% for Go and 0.55%
+for Rust. All seven pairs have busy-host observations from macOS storage and
+background services. They are retained without filtering and **do not qualify
+as a quiet-host acceptance run**. The earlier R0 load waiver does not cover
+this capture. No threshold changed.
+
+The [serial runner](../tools/phase7/budget/README.md) now captures/replays each
+scenario and operation separately, and `scripts/perf.py` has the corresponding
+readers and existing ADR limits. Artifact size is recorded; the full qualified
+resource matrix remains pending. A threshold miss is different from an invalid
+measurement, and a native or wasm failure never supplies a ratio.
+
+A separate startup-only capture, `r34-wasm-startup-pairs-01`, runs fresh pinned
+Node processes over the same production artifacts, with one warmup pair and
+seven alternating pairs. No project is prepared or checked. Median
+launch-to-ready is 86.790 ms for Go and 52.109 ms for Rust (0.6004×). Within it,
+`loadProcessor` takes 56.273 ms versus 23.540 ms (0.4183×). That inner interval
+includes artifact reads/hash checks, bindings, module compilation/instantiation
+and runtime initialization; it excludes the frontend ES-module import. It is
+not labeled pure module compilation time. The parent interval includes Node
+startup, that import, the loader and ready-response transport. These diagnostic
+numbers have no new threshold and do not qualify the separate operation runs.
+The committed `startup.py` / `startup-child.mjs` commands and seven focused
+failure/order/timeout controls are described in the budget README.

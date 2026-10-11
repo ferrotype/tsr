@@ -1,7 +1,7 @@
 # Production embedding budget foundation
 
-These tools currently establish comparable compiler work on bounded inputs.
-They do not establish timing, retained-memory, allocation, or size budgets.
+These tools capture comparable compiler work and resource measurements over
+frozen inputs. A capture records evidence; it does not change budget thresholds.
 The native authorities are the pinned Go compiler and public `tsr_embed`.
 The wasm authorities are the same Go operation and production `tsr_wasm`.
 The test-only compiler-wasm acceptance artifact is rejected by this route.
@@ -118,3 +118,117 @@ observation remains a tiny-fixture compatibility route.
 
 All new captures and retained artifacts must be outside every `target`
 ancestor and must use a new directory. Build intermediates may use `target`.
+
+## Separate native allocation accounting
+
+`allocation.py` runs seven fresh, alternating native pairs against an explicit
+ordinary capture. That reference must have complete, equivalent compiler work
+and authenticated artifacts; busy-host or timing-MAD failures do not prevent
+allocation accounting. The Go executable must be the same as the reference.
+The separate Rust artifact must use `--allocation-metrics`, the same source
+closure, and the ordinary release profile and mimalloc allocator.
+
+```sh
+python3 tools/phase7/budget/rust/build.py --allocation-metrics \
+  --output /absolute/new/instrumented-rust
+python3 tools/phase7/budget/allocation.py \
+  --reference /absolute/ordinary-native-capture \
+  --go /absolute/budget-go --go-build /absolute/go/build.json \
+  --rust /absolute/instrumented-rust/phase7_rust_budget \
+  --rust-build /absolute/instrumented-rust/build.json \
+  --output /absolute/new/allocation-capture
+```
+
+The retained ratio compares Go `runtime.MemStats.HeapAlloc` after collection
+with Rust live requested allocation layout bytes. These are different heap
+accounting authorities; allocator overhead and Rust RSS are not inferred from
+requested bytes. Cumulative allocation traffic has its own samples and ratio.
+Every sample retains complete owned observations after the checkpoint and must
+match the ordinary reference, including a same-runtime checking-work floor.
+The reader rechecks raw responses and artifact identities without starting a
+child. `scripts/perf.py record` accepts this capture only through explicit
+`--allocation-capture`; it never substitutes RSS for retained allocation bytes.
+The instrumented run supplies no elapsed, RSS, or executable-size acceptance.
+
+## Separate wasm startup diagnostics
+
+`startup.py` launches fresh processes with the same pinned Node executable and
+`--expose-gc --stack-size=4096` flags. It calls each existing frontend's exported
+`loadProcessor` once, without preparing a project or checking or emitting code.
+One discarded warmup pair precedes seven serial pairs with alternating order.
+
+```sh
+python3 tools/phase7/budget/startup.py \
+  --go-artifacts /absolute/retained-go-artifacts \
+  --rust-artifacts /absolute/retained-production-checker \
+  --output /absolute/new/startup-capture
+```
+
+`load_processor_ns` includes the loader's artifact reads and hash checks,
+bindings loading, wasm compilation and instantiation, and runtime initialization.
+It excludes importing the frontend JavaScript module. The separate parent
+`launch_to_ready_ns` includes Node startup, that frontend import, the loader,
+and delivery of the ready response. Neither number isolates pure module
+compilation. The live processor remains retained until the ready response is
+flushed; the process then exits. These are warm-cache startup diagnostics with
+no project work, budget threshold, or performance acceptance. Raw stdout/stderr,
+commands, copied manifests/helpers, and immutable artifact identities remain
+in the new capture outside `target`; the referenced artifacts must also be
+retained outside `target`. No existing compiler measurement is changed.
+
+## Serial resource capture and readonly recording
+
+Select the committed scenario and operation before discovery/freezing, using
+the provisioned workload directory (never a modified project):
+
+```sh
+python3 tools/phase7/budget/scenario_input.py xstate check \
+  --directory /absolute/provisioned/xstate-checkout \
+  --output /absolute/new/selection
+```
+
+After the inventory, discovery and freeze commands above, measure the immutable
+pair with explicit build manifests. Substitute `--runtime wasm` and artifact
+directories for a Node/wasm pair; native arguments are executable paths.
+
+```sh
+python3 tools/phase7/budget/measure.py --runtime native \
+  --go /absolute/go-artifacts/budget-go \
+  --rust /absolute/rust-artifacts/phase7_rust_budget \
+  --go-build /absolute/go-artifacts/build.json \
+  --rust-build /absolute/rust-artifacts/build.json \
+  --inventory /absolute/inventory --contents /absolute/frozen \
+  --input /absolute/selection/input.json \
+  --selection /absolute/selection/selection.json \
+  --output /absolute/new/native-xstate-check
+python3 scripts/perf.py record embed-check-xstate \
+  --capture /absolute/new/native-xstate-check
+```
+
+The controller discards one warmup pair, then captures seven serial alternating
+pairs, extending once to fourteen under the S07 elapsed uncertainty rule. It
+retains busy and failed rows; quietness and uncertainty determine measurement
+eligibility independently of threshold misses. Prototype manifests remain
+diagnostic. Production budget consumers require contract 2 with source-guarded
+release provenance; ordinary production checker wasm uses its checker manifest
+and bound Node transport. The selected descriptor binds config/options and
+frozen file/diagnostic counts. Checking-work reduction is compared with each
+runtime's own one-checker warmup; the older four-checker CLI type aggregate is
+not a one-checker authority. Only the descriptor's declared emit-omission policy
+permits the Go subset, with shared bytes and order checked exactly.
+
+Elapsed covers execute request through acknowledgement, including RPC.
+Preparation, checkpoint GC and observation are excluded. Process peak before
+observation includes launch/preparation/execute; retained RSS is sampled after
+the checkpoint. Full-lifecycle peak includes observation and remains separate.
+This whole-operation capture has no independent startup acknowledgement;
+the separate startup-only runner above measures that boundary. Native retained heap requires the separate instrumented
+allocation capture (`perf.py record --allocation-capture ...`); RSS cannot fill
+that threshold. `embed-size` and `wasm-size` use `size.py` captures and report
+body bytes, with glue and totals separately.
+
+The perf readers replay saved raw observations and recompute comparisons and
+ratios without launching a compiler or reading the original project. They
+authenticate frozen archives, saved helper/manifests and immutable artifacts.
+Capture output is rejected inside the source workload or frozen archives,
+including symlink aliases.
