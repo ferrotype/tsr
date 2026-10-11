@@ -1,6 +1,7 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **R0 recorded** (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md));
+Status: **R1 in progress** (2026-10-11, [docs/PHASE7-R1.md](PHASE7-R1.md));
+R0 recorded (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md)).
 Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
 7, 9 and 11 accepted, the others open. The detailed plan for
 [PLAN Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over),
@@ -260,8 +261,9 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
 
 ## 4. Working rules
 
-- **Who.** Proposed in owner decision 11; the plan is written so that each
-  checkpoint is one agent's, with reviews and records by another.
+- **Who.** One work queue, with no model-based division of checkpoints
+  (owner decision 11). Continue the next unblocked work; use independent
+  review where it helps assess the change.
 - **Order and overlap.** R0 lands first. R1 and R2 run in parallel after
   it; R3 and R4 start their correctness halves after R0 and take their
   budgets after R1; R5 runs alongside; R6 follows the code of R1 to R5;
@@ -684,10 +686,10 @@ again.
    before R6, and Phase 5's status line changes only when it is resolved.
 10. **Dogfood scope.** Which projects, and that the four weeks start when R6
     is merged; crashes get reproducers for their actual entry points.
-11. **Allocation.** Proposed: Claude builds R0 and R7's records and reviews
-    every checkpoint PR; Astra builds R1, R2 and R6; R3, R4 and R5 are split
-    by crate after R0, as Phase 6's A5 was. **Accepted by the owner
-    2026-10-10.**
+11. **Allocation.** **Revised by the owner 2026-10-11:** continue Phase 7
+    as one work queue and drop the Codex–Claude checkpoint split accepted
+    on 2026-10-10. Checkpoint dependencies and acceptance rules stay as
+    written; model identity does not assign implementation or review work.
 12. **The pin bump rehearsal** in R7 (recommended) or after cut-over.
 13. **Plan review:** completed by Codex/Astra on 2026-10-09, with amendments
     on this PR. This review does not approve the remaining owner choices.
