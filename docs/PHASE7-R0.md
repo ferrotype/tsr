@@ -154,73 +154,58 @@ rule for future weekly acceptance runs remains in the Phase 7 plan.
 
 ## The API benchmarks
 
-One capture (`target/phase7/api/capture-r0`, revision `4c9bf18b`, 2026-10-10
-20:13–20:21 UTC, the same host), recorded as
-`status/perf/api/2026-10-10T20-21-01Z-4c9bf18b.json`. The pin's
-`test/sync/api.bench.ts` and `test/async/api.bench.ts` ran unchanged with the
-pin's Node and tinybench (6.1.3), three rounds per runtime in alternating order,
-the pinned client spawning each server through `getExePath()`. A task's ratio
-compares the medians over the rounds of tinybench's per-run median latency.
-That original capture checked matching task names and 10,160-identifier
-counts only; those do not establish answer parity. The corrected harness now
-compares the loaded roots, all three transferred trees and every answer from
-the one-location, sequential and batched symbol tasks before timing. It
-preserves names, flags and declaration handles, renumbering only process-local
-IDs (including the type-ID suffix in unique-symbol escaped names; ADR 0010).
-Wrong-answer and omitted-operation controls must fail. The memory pass runs each file once more per
-runtime in its single-iteration mode, through a wrapper that records every
-spawned server's own peak RSS (12 per file); the ratio compares the largest.
-Owner decision 7's targets are 1.25 elapsed and 0.85 peak RSS. Ratios are Rust
-over Go, with the medians in parentheses (Rust / Go):
+The corrected capture is `target/phase7/api/capture-review-fixed`, revision
+`725aa04b`, 2026-10-11T03:55:08Z to 2026-10-11T04:03:44Z, on the same
+18-CPU macOS arm64 host. Its record is
+`status/perf/api/2026-10-11T04-03-44Z-725aa04b.json`. It supersedes the original
+`2026-10-10T20-21-01Z-4c9bf18b.json`, which remains as history: that run let
+spawned servers accumulate into later tasks and checked task names rather than
+answers.
+
+Before timing, both clients now compare the loaded roots, the full traversal
+of `debug.ts`, `program.ts` and `checker.ts`, and every answer from the
+one-location, sequential and batched symbol tasks. Names, flags and declaration
+handles must agree. Process-local IDs are renumbered, including the type-ID
+suffix of unique-symbol property names (ADR 0010); identity/equality within a
+task is preserved. The observed `__@hasInstance@239` versus
+`__@hasInstance@164` was only such an ID difference. Wrong-answer and
+omitted-operation controls must be rejected. All nine operation groups match
+in both sync and async clients, including all 10,160 identifiers per bulk query.
+
+The pin's task bodies and iteration options are unchanged. Both clients use
+`Bench.run()` so untimed teardown can await child exit; tinybench 6.1.3 still
+measures synchronous tasks through the same synchronous timer as `runSync()`.
+The pinned teardown runs after every spawn iteration as well as each phase.
+Across preflight, timing and memory, **all 29,531 direct child processes were
+reaped, with at most one live at a time and none left over**. In the memory
+pass the RSS wrapper also waits for the server it launches.
+
+There are three rounds per client in alternating Go/Rust order. A task's ratio
+compares the medians of tinybench's per-round median latencies. The memory pass
+uses the pin's single-iteration mode and records each server's own peak RSS;
+the ratio compares the largest per runtime. Client-only tasks (`TS - …`,
+`materialize …`, nodelist and async spawn) are controls, with no server ratio.
+Owner decision 7's targets remain 1.25 elapsed and 0.85 peak RSS. Ratios are
+Rust over Go; parentheses show Rust / Go:
 
 | Task | Sync | Async |
 | --- | ---: | ---: |
-| spawn API | 0.63 (0.61 / 0.97 ms) | control |
-| load snapshot | 1.17 (0.05 / 0.04 ms) | 1.16 (0.12 / 0.11 ms) |
-| transfer debug.ts | 1.62 (0.51 / 0.32 ms) | 1.44 (1.39 / 0.97 ms) |
-| transfer program.ts | 1.95 (1.83 / 0.94 ms) | 1.60 (4.69 / 2.93 ms) |
-| transfer checker.ts | 1.66 (21.0 / 12.7 ms) | 1.53 (54.1 / 35.4 ms) |
-| getSymbolAtPosition, one location | 1.07 (0.01 / 0.01 ms) | 1.12 (0.08 / 0.07 ms) |
-| getSymbolAtPosition, 10,160 identifiers | 1.21 (183 / 152 ms) | 1.18 (905 / 765 ms) |
-| the same, batched | 1.60 (69.0 / 43.1 ms) | 1.69 (70.4 / 41.6 ms) |
-| getSymbolAtLocation, 10,160 identifiers | 1.19 (124 / 104 ms) | 1.15 (866 / 754 ms) |
-| the same, batched | 2.03 (34.5 / 16.9 ms) | 2.10 (36.7 / 17.4 ms) |
-| Peak RSS, largest server | 0.61 (172 / 279 MiB) | 0.67 (193 / 287 MiB) |
+| spawn API | 0.95 (0.237 / 0.25 ms) | control |
+| load snapshot | 1.13 (0.046 / 0.0408 ms) | 1.15 (0.117 / 0.103 ms) |
+| transfer debug.ts | 1.61 (0.506 / 0.314 ms) | 1.44 (1.38 / 0.959 ms) |
+| transfer program.ts | 1.90 (1.77 / 0.932 ms) | 1.61 (4.87 / 3.02 ms) |
+| transfer checker.ts | 1.50 (20.4 / 13.6 ms) | 1.44 (54.2 / 37.6 ms) |
+| getSymbolAtPosition, one location | 1.08 (0.0103 / 0.00954 ms) | 1.09 (0.0767 / 0.0701 ms) |
+| getSymbolAtPosition, 10,160 identifiers | 1.22 (182 / 148 ms) | 1.17 (884 / 757 ms) |
+| the same, batched | 1.61 (66.6 / 41.3 ms) | 1.58 (68 / 43 ms) |
+| getSymbolAtLocation, 10,160 identifiers | 1.14 (119 / 104 ms) | 1.12 (833 / 747 ms) |
+| the same, batched | 1.97 (33 / 16.7 ms) | 2.10 (37.5 / 17.8 ms) |
+| Peak RSS, largest server | 0.59 (170 / 286 MiB) | 0.67 (189 / 282 MiB) |
 
-Ten of the 21 ratios miss: every transfer and every batched query. What R2
-inherits:
-
-- **The query gap is per identifier.** Rust's extra time on the sync queries
-  is about the same with and without batching (getSymbolAtPosition 31.5 ms one
-  at a time, 25.9 ms batched; getSymbolAtLocation 20.2 and 17.5 ms), 1.7–2.6 µs
-  per identifier; one request per identifier adds round trips that dilute the
-  ratio. The async client adds about 10 µs per request on top (140 ms over the
-  10,160 requests of getSymbolAtPosition), which the per-request ratios still
-  absorb.
-- **Transfers** take 1.4–2.0 times Go's time in both clients.
-- **Memory.** The largest server, the one that loads the project, peaks at
-  0.61–0.67 of Go's.
-- **Spawn and snapshot.** The clients initialize on their first request: the
-  sync `spawn API` measures the process launch alone, and the async one only
-  constructs the client, so it is a control. `load snapshot` repeats
-  `updateSnapshot` on an open, unchanged project (the first load falls in a
-  warm-up iteration).
-
-The client-only controls do the same work in both runtimes' runs and agree
-within 7% (`materialize checker.ts` 16.1 against 15.6 ms, `TS - load project`
-221 against 208 ms in the sync file and 206 against 208 in the async one), which
-bounds this capture's noise; `test/nodelist.bench.ts`'s tasks take 0.07–0.10
-ms. In this original capture, the sync spawn task closed only its last
-server: about 700 Go or 1,300 Rust servers survived into later tasks per round.
-These API timings need replacement after the harness fix; the owner's load
-acceptance above applies to the scenario records, not this lifecycle defect.
-
-The corrected runner calls the pin's teardown after every spawn iteration and
-awaits child exit between iterations and phases. Both clients use `Bench.run()`
-so cleanup can await exit; tinybench 6.1.3 still measures sync task bodies through
-its same synchronous timer. The runner records spawned/reaped/peak child counts
-and rejects overlapping or surviving servers. The task bodies, iteration
-options and measurement boundaries are unchanged; process cleanup is untimed.
+**11 of 21 ratios meet their targets.** These numbers replace the API
+starting table; the ten owner-accepted scenario records above are unchanged.
+The new capture records the answer digests, raw round medians and every
+child-lifecycle count so its checks can be inspected independently.
 
 ## Phase 5 L8
 

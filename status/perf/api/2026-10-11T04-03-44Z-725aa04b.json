@@ -1,0 +1,527 @@
+{
+  "workload": "api",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "725aa04b302e2712cadaf8b56020c87f6fa0df3e",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "owner macOS arm64; corrected API answer checks and cleanup"
+  },
+  "recorded_at": "2026-10-11T04:03:44Z",
+  "ratios": {
+    "elapsed_async_getsymbolatlocation_identifiers": 1.1153963097434318,
+    "elapsed_async_getsymbolatlocation_identifiers_batched": 2.103181603773701,
+    "elapsed_async_getsymbolatposition_identifiers": 1.1676959028966452,
+    "elapsed_async_getsymbolatposition_identifiers_batched": 1.5837598754565088,
+    "elapsed_async_getsymbolatposition_one_location": 1.0932905525701886,
+    "elapsed_async_load_snapshot": 1.1459414634142677,
+    "elapsed_async_transfer_checker_ts": 1.44195033863922,
+    "elapsed_async_transfer_debug_ts": 1.439040292085125,
+    "elapsed_async_transfer_program_ts": 1.610592608902307,
+    "elapsed_sync_getsymbolatlocation_identifiers": 1.1441774608594768,
+    "elapsed_sync_getsymbolatlocation_identifiers_batched": 1.9733847868766516,
+    "elapsed_sync_getsymbolatposition_identifiers": 1.2234697583571768,
+    "elapsed_sync_getsymbolatposition_identifiers_batched": 1.609977078136492,
+    "elapsed_sync_getsymbolatposition_one_location": 1.0785998741626868,
+    "elapsed_sync_load_snapshot": 1.1287293765921433,
+    "elapsed_sync_spawn_api": 0.9485086505525174,
+    "elapsed_sync_transfer_checker_ts": 1.5023358905905753,
+    "elapsed_sync_transfer_debug_ts": 1.6088523745589158,
+    "elapsed_sync_transfer_program_ts": 1.9032942753721165,
+    "peak_rss_async": 0.6711918878483959,
+    "peak_rss_sync": 0.5948675948675949
+  },
+  "samples": {
+    "go": {
+      "elapsed_sync_spawn_api": [0.28087500000037835, 0.2278334999996332, 0.2500419999996666],
+      "elapsed_sync_load_snapshot": [0.040790999999444466, 0.04087499999877764, 0.040750000000116415],
+      "elapsed_sync_transfer_debug_ts": [0.31445800000074087, 0.37833300000056624, 0.30899999999928696],
+      "elapsed_sync_transfer_program_ts": [0.9303750000008222, 1.0399790000001303, 0.9323750000003201],
+      "elapsed_sync_transfer_checker_ts": [13.951687499999935, 13.583042000000205, 13.055084000001443],
+      "elapsed_sync_getsymbolatposition_one_location": [0.009500000000116415, 0.009750000001076842, 0.009541999999783002],
+      "elapsed_sync_getsymbolatposition_identifiers": [148.36310400000002, 157.2351669999989, 144.65364600000066],
+      "elapsed_sync_getsymbolatposition_identifiers_batched": [40.634854499998255, 41.33891650000078, 41.69660399999884],
+      "elapsed_sync_getsymbolatlocation_identifiers": [107.67493800000011, 103.48802050000086, 103.95277050000004],
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": [17.532999500001097, 16.722916999999143, 16.67956250000134],
+      "peak_rss_sync": [170311680, 165101568, 166805504, 170917888, 213532672, 168722432, 211075072, 165593088, 273448960, 300072960, 205471744, 224280576],
+      "elapsed_async_load_snapshot": [0.10250000000087311, 0.10454100000060862, 0.10045899999749963],
+      "elapsed_async_transfer_debug_ts": [0.9322919999976875, 0.9586249999993015, 1.0828329999967536],
+      "elapsed_async_transfer_program_ts": [2.8131670000002487, 3.022541500000443, 3.1244579999984126],
+      "elapsed_async_transfer_checker_ts": [36.94195799999943, 37.56195899999875, 39.89849999999933],
+      "elapsed_async_getsymbolatposition_one_location": [0.07033400000000256, 0.07012500000200816, 0.0700829999987036],
+      "elapsed_async_getsymbolatposition_identifiers": [757.2874369999972, 756.8186659999992, 819.8589789999969],
+      "elapsed_async_getsymbolatposition_identifiers_batched": [42.95687500000349, 42.05000000000291, 43.93102100000033],
+      "elapsed_async_getsymbolatlocation_identifiers": [726.5887294999993, 747.242270499999, 756.9600414999986],
+      "elapsed_async_getsymbolatlocation_identifiers_batched": [16.91252049999821, 17.807999999997264, 18.0368129999988],
+      "peak_rss_async": [175767552, 164741120, 168574976, 175882240, 284721152, 175538176, 284901376, 165445632, 274022400, 295682048, 204980224, 221954048]
+    },
+    "rust": {
+      "elapsed_sync_spawn_api": [0.23716700000113633, 0.21883300000081363, 0.24270849999993516],
+      "elapsed_sync_load_snapshot": [0.04604199999994307, 0.04491699999925913, 0.04633300000023155],
+      "elapsed_sync_transfer_debug_ts": [0.5059165000002395, 0.5074164999996356, 0.5034795000001395],
+      "elapsed_sync_transfer_program_ts": [1.7694159999991825, 1.8034999999999854, 1.7745840000006865],
+      "elapsed_sync_transfer_checker_ts": [20.4063744999994, 20.406291499999497, 20.359770999999455],
+      "elapsed_sync_getsymbolatposition_one_location": [0.010291999999026302, 0.010250000002997695, 0.010291999999026302],
+      "elapsed_sync_getsymbolatposition_identifiers": [181.51777100000072, 178.18231300000116, 181.95387550000123],
+      "elapsed_sync_getsymbolatposition_identifiers_batched": [66.55470799999966, 66.88858400000026, 65.34375],
+      "elapsed_sync_getsymbolatlocation_identifiers": [118.466104000001, 168.11710400000084, 118.94041699999798],
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": [32.5267500000009, 33.244833999997354, 33.00074999999924],
+      "peak_rss_sync": [133906432, 132939776, 135610368, 134676480, 173539328, 138117120, 172949504, 133693440, 164708352, 172982272, 167313408, 178503680],
+      "elapsed_async_load_snapshot": [0.118916999999783, 0.11745900000096299, 0.11645800000042072],
+      "elapsed_async_transfer_debug_ts": [1.3794374999997672, 1.4821659999979602, 1.3794999999990978],
+      "elapsed_async_transfer_program_ts": [4.598000500000126, 4.907583000000159, 4.8680830000012065],
+      "elapsed_async_transfer_checker_ts": [53.62995799999953, 58.61275000000023, 54.1624795000007],
+      "elapsed_async_getsymbolatposition_one_location": [0.07695799999783048, 0.07520799999838346, 0.07666700000117999],
+      "elapsed_async_getsymbolatposition_identifiers": [884.281437499998, 896.6170005000022, 866.997083000002],
+      "elapsed_async_getsymbolatposition_identifiers_batched": [68.03337500000634, 72.06010400000014, 65.90183400000387],
+      "elapsed_async_getsymbolatlocation_identifiers": [833.4712710000022, 857.519895999998, 810.0770840000005],
+      "elapsed_async_getsymbolatlocation_identifiers_batched": [37.45345799999632, 37.71158399999695, 33.489041500000894],
+      "peak_rss_async": [134758400, 133365760, 137003008, 139329536, 198459392, 140525568, 198377472, 133677056, 169066496, 173408256, 165101568, 181829632]
+    }
+  },
+  "metadata": {
+    "node": "24.20.0",
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust/target/phase7/bin/tsgo",
+        "sha256": "57ab2bcc2c59862d56fe53a3c87240f22bcd692316e7d261a012f736ae5f4d87",
+        "bytes": 39040034
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust/target/phase7/bin/tsrust",
+        "sha256": "5abc9fb5b89a3276335c49cffecd7a1413540462ea0442faeb8c85175f8ad247",
+        "bytes": 46788464
+      }
+    },
+    "work": {
+      "sync": {
+        "go": {
+          "load_snapshot": {
+            "count": 2,
+            "sha256": "999827b64eb3af46976433e4b9af5894663cdfd3f2bcb7e43d1eef846bd10148"
+          },
+          "transfer_debug_ts": {
+            "count": 7276,
+            "sha256": "dfe63490e8a4f95cb422c28b8bad90d08704f4c827b3c790bbc252377ce20dce"
+          },
+          "transfer_program_ts": {
+            "count": 24574,
+            "sha256": "c6463b146352c4e1b9763c0317548b9bdab9731e2c466be18503027f876f398f"
+          },
+          "transfer_checker_ts": {
+            "count": 298054,
+            "sha256": "d18be4c5b9837f56ce01af5f5960350ed628e751975a31772ea1faeead401617"
+          },
+          "getsymbolatposition_one_location": {
+            "count": 1,
+            "sha256": "1d8fc6ceb1f94c6326d6d5483d258fcb2e179e9869325b245d105c2219bf69fd"
+          },
+          "getsymbolatposition_identifiers": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatposition_identifiers_batched": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatlocation_identifiers": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          },
+          "getsymbolatlocation_identifiers_batched": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          }
+        },
+        "rust": {
+          "load_snapshot": {
+            "count": 2,
+            "sha256": "999827b64eb3af46976433e4b9af5894663cdfd3f2bcb7e43d1eef846bd10148"
+          },
+          "transfer_debug_ts": {
+            "count": 7276,
+            "sha256": "dfe63490e8a4f95cb422c28b8bad90d08704f4c827b3c790bbc252377ce20dce"
+          },
+          "transfer_program_ts": {
+            "count": 24574,
+            "sha256": "c6463b146352c4e1b9763c0317548b9bdab9731e2c466be18503027f876f398f"
+          },
+          "transfer_checker_ts": {
+            "count": 298054,
+            "sha256": "d18be4c5b9837f56ce01af5f5960350ed628e751975a31772ea1faeead401617"
+          },
+          "getsymbolatposition_one_location": {
+            "count": 1,
+            "sha256": "1d8fc6ceb1f94c6326d6d5483d258fcb2e179e9869325b245d105c2219bf69fd"
+          },
+          "getsymbolatposition_identifiers": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatposition_identifiers_batched": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatlocation_identifiers": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          },
+          "getsymbolatlocation_identifiers_batched": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          }
+        }
+      },
+      "async": {
+        "go": {
+          "load_snapshot": {
+            "count": 2,
+            "sha256": "999827b64eb3af46976433e4b9af5894663cdfd3f2bcb7e43d1eef846bd10148"
+          },
+          "transfer_debug_ts": {
+            "count": 7276,
+            "sha256": "dfe63490e8a4f95cb422c28b8bad90d08704f4c827b3c790bbc252377ce20dce"
+          },
+          "transfer_program_ts": {
+            "count": 24574,
+            "sha256": "c6463b146352c4e1b9763c0317548b9bdab9731e2c466be18503027f876f398f"
+          },
+          "transfer_checker_ts": {
+            "count": 298054,
+            "sha256": "d18be4c5b9837f56ce01af5f5960350ed628e751975a31772ea1faeead401617"
+          },
+          "getsymbolatposition_one_location": {
+            "count": 1,
+            "sha256": "1d8fc6ceb1f94c6326d6d5483d258fcb2e179e9869325b245d105c2219bf69fd"
+          },
+          "getsymbolatposition_identifiers": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatposition_identifiers_batched": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatlocation_identifiers": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          },
+          "getsymbolatlocation_identifiers_batched": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          }
+        },
+        "rust": {
+          "load_snapshot": {
+            "count": 2,
+            "sha256": "999827b64eb3af46976433e4b9af5894663cdfd3f2bcb7e43d1eef846bd10148"
+          },
+          "transfer_debug_ts": {
+            "count": 7276,
+            "sha256": "dfe63490e8a4f95cb422c28b8bad90d08704f4c827b3c790bbc252377ce20dce"
+          },
+          "transfer_program_ts": {
+            "count": 24574,
+            "sha256": "c6463b146352c4e1b9763c0317548b9bdab9731e2c466be18503027f876f398f"
+          },
+          "transfer_checker_ts": {
+            "count": 298054,
+            "sha256": "d18be4c5b9837f56ce01af5f5960350ed628e751975a31772ea1faeead401617"
+          },
+          "getsymbolatposition_one_location": {
+            "count": 1,
+            "sha256": "1d8fc6ceb1f94c6326d6d5483d258fcb2e179e9869325b245d105c2219bf69fd"
+          },
+          "getsymbolatposition_identifiers": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatposition_identifiers_batched": {
+            "count": 10160,
+            "sha256": "a941a32f768753c2fd4d00597b29dd69b4925cac3c22a24612441db4965efe20"
+          },
+          "getsymbolatlocation_identifiers": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          },
+          "getsymbolatlocation_identifiers_batched": {
+            "count": 10160,
+            "sha256": "dc3591de98272766262f139f3cfdc31daf26869d5a08e6d0b7ea500bd1ec3103"
+          }
+        }
+      }
+    },
+    "lifecycle": {
+      "async-0-go.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-0-rust.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-1-go.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-1-rust.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-2-go.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-2-rust.json": {
+        "spawned": 23,
+        "reaped": 23,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-memory-go.json": {
+        "spawned": 12,
+        "reaped": 12,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-memory-rust.json": {
+        "spawned": 12,
+        "reaped": 12,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-work-go.json": {
+        "spawned": 9,
+        "reaped": 9,
+        "peak": 1,
+        "remaining": 0
+      },
+      "async-work-rust.json": {
+        "spawned": 9,
+        "reaped": 9,
+        "peak": 1,
+        "remaining": 0
+      },
+      "nodelist.json": {
+        "spawned": 0,
+        "reaped": 0,
+        "peak": 0,
+        "remaining": 0
+      },
+      "sync-0-go.json": {
+        "spawned": 4116,
+        "reaped": 4116,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-0-rust.json": {
+        "spawned": 4652,
+        "reaped": 4652,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-1-go.json": {
+        "spawned": 5249,
+        "reaped": 5249,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-1-rust.json": {
+        "spawned": 5514,
+        "reaped": 5514,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-2-go.json": {
+        "spawned": 4707,
+        "reaped": 4707,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-2-rust.json": {
+        "spawned": 5069,
+        "reaped": 5069,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-memory-go.json": {
+        "spawned": 13,
+        "reaped": 13,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-memory-rust.json": {
+        "spawned": 13,
+        "reaped": 13,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-work-go.json": {
+        "spawned": 9,
+        "reaped": 9,
+        "peak": 1,
+        "remaining": 0
+      },
+      "sync-work-rust.json": {
+        "spawned": 9,
+        "reaped": 9,
+        "peak": 1,
+        "remaining": 0
+      }
+    },
+    "server_lifecycle": "spawn teardown per iteration; all servers reaped before the next task",
+    "controls_median_ms": {
+      "sync: TS - load project": {
+        "go": 206.26179150000098,
+        "rust": 199.7662079999991
+      },
+      "sync: materialize program.ts": {
+        "go": 1.0490419999987353,
+        "rust": 1.0409999999974389
+      },
+      "sync: materialize checker.ts": {
+        "go": 15.695207999999184,
+        "rust": 15.798459000001458
+      },
+      "sync: TS - getSymbolAtPosition - one location": {
+        "go": 0.0004579999986162875,
+        "rust": 0.0004579999986162875
+      },
+      "sync: TS - getSymbolAtLocation - 10160 identifiers": {
+        "go": 6.964874999997846,
+        "rust": 6.856291000000056
+      },
+      "async: spawn API": {
+        "go": 0.0001250000004802132,
+        "rust": 0.0001249999986612238
+      },
+      "async: TS - load project": {
+        "go": 208.85381249999773,
+        "rust": 210.51608300000044
+      },
+      "async: materialize program.ts": {
+        "go": 1.0558750000000146,
+        "rust": 1.0437090000013995
+      },
+      "async: materialize checker.ts": {
+        "go": 15.82287499999984,
+        "rust": 15.969333000000915
+      },
+      "async: TS - getSymbolAtPosition - one location": {
+        "go": 0.000499999998282874,
+        "rust": 0.000499999998282874
+      },
+      "async: TS - getSymbolAtLocation - 10160 identifiers": {
+        "go": 6.793187999999645,
+        "rust": 7.456041499997809
+      },
+      "nodelist": {
+        "index access (list[i])": 0.09387500000002547,
+        "at(i)": 0.07016699999985576,
+        "for..of (iterator)": 0.07308399999965332,
+        "map": 0.09683300000051531,
+        "filter": 0.09808299999986048,
+        "forEach": 0.09554099999968457,
+        "reduce": 0.0955420000009326,
+        "forEachNode": 0.07162499999867578
+      }
+    },
+    "load_average": {
+      "before": [9.33, 7.96, 6.99],
+      "after": [8.93, 9.1, 8.0]
+    },
+    "rounds": 3,
+    "iterations": {
+      "elapsed_sync_spawn_api": {
+        "go": 11248,
+        "rust": 11919
+      },
+      "elapsed_sync_load_snapshot": {
+        "go": 64680,
+        "rust": 60122
+      },
+      "elapsed_sync_transfer_debug_ts": {
+        "go": 7695,
+        "rust": 5724
+      },
+      "elapsed_sync_transfer_program_ts": {
+        "go": 2641,
+        "rust": 1621
+      },
+      "elapsed_sync_transfer_checker_ts": {
+        "go": 218,
+        "rust": 144
+      },
+      "elapsed_sync_getsymbolatposition_one_location": {
+        "go": 295098,
+        "rust": 287593
+      },
+      "elapsed_sync_getsymbolatposition_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_sync_getsymbolatposition_identifiers_batched": {
+        "go": 72,
+        "rust": 33
+      },
+      "elapsed_sync_getsymbolatlocation_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": {
+        "go": 167,
+        "rust": 64
+      },
+      "elapsed_async_load_snapshot": {
+        "go": 24831,
+        "rust": 19798
+      },
+      "elapsed_async_transfer_debug_ts": {
+        "go": 2593,
+        "rust": 1986
+      },
+      "elapsed_async_transfer_program_ts": {
+        "go": 898,
+        "rust": 606
+      },
+      "elapsed_async_transfer_checker_ts": {
+        "go": 79,
+        "rust": 53
+      },
+      "elapsed_async_getsymbolatposition_one_location": {
+        "go": 39765,
+        "rust": 38221
+      },
+      "elapsed_async_getsymbolatposition_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_async_getsymbolatposition_identifiers_batched": {
+        "go": 68,
+        "rust": 32
+      },
+      "elapsed_async_getsymbolatlocation_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_async_getsymbolatlocation_identifiers_batched": {
+        "go": 156,
+        "rust": 60
+      }
+    },
+    "elapsed": "each round's tinybench median latency of the task in ms (samples); the ratio compares the medians of the rounds",
+    "peak_rss": "the memory pass's servers, each its own peak RSS; the ratio compares the largest"
+  }
+}
