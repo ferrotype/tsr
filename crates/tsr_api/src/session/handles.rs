@@ -392,62 +392,93 @@ pub fn resolve_node_handle(
     program: &Program,
     handle: &NodeHandle,
 ) -> SessionResult<tsr_ast::NodeId> {
-    let text = handle.0.as_str();
-    let invalid = || {
-        client_error(format!(
-            "invalid node handle {}",
-            tsr_jsstring::go_quote(text.as_bytes())
-        ))
-    };
-    let first = text.find('.').ok_or_else(invalid)?;
-    let second = text[first + 1..].find('.').ok_or_else(invalid)? + first + 1;
-    // port: strconv.ParseUint(s, 10, 32), with its error text; unlike
-    // Rust's parser, ParseUint refuses a leading sign.
-    let index_text = &text[..first];
-    let index: usize = index_text
-        .parse::<u32>()
-        .map_err(|error| *error.kind())
-        .and_then(|index| {
-            if index_text.starts_with('+') {
-                Err(std::num::IntErrorKind::InvalidDigit)
-            } else {
-                Ok(index)
-            }
-        })
-        .map_err(|kind| {
-            let reason = match kind {
-                std::num::IntErrorKind::PosOverflow => "value out of range",
-                _ => "invalid syntax",
-            };
+    NodeHandleResolver::new(program).resolve(handle)
+}
+
+/// A request's node resolver keeps only the last file's table. The program
+/// borrow retains its node owners; the path borrows the request payload.
+/// Reusing a table never skips parsing or validating the requested slot.
+pub struct NodeHandleResolver<'a> {
+    program: &'a Program,
+    last_table: Option<(&'a str, Arc<tsr_ast::NodeIndexCache>)>,
+}
+
+impl<'a> NodeHandleResolver<'a> {
+    pub fn new(program: &'a Program) -> Self {
+        Self {
+            program,
+            last_table: None,
+        }
+    }
+
+    pub fn resolve(&mut self, handle: &'a NodeHandle) -> SessionResult<tsr_ast::NodeId> {
+        let text = handle.0.as_str();
+        let invalid = || {
             client_error(format!(
-                "invalid node handle {}: strconv.ParseUint: parsing {}: {reason}",
-                tsr_jsstring::go_quote(text.as_bytes()),
-                tsr_jsstring::go_quote(index_text.as_bytes())
+                "invalid node handle {}",
+                tsr_jsstring::go_quote(text.as_bytes())
             ))
-        })
-        .map(|index| index as usize)?;
-    let path = &text[second + 1..];
-    let stale = || {
-        client_error(format!(
-            "node handle {} could not be resolved (file may not be loaded or handle may be stale)",
-            tsr_jsstring::go_quote(text.as_bytes())
-        ))
-    };
-    let file = program.file(path.as_bytes()).ok_or_else(stale)?;
-    let view = file.bound().view().ast();
-    let table = tsr_encoder::get_node_index_table(
-        view,
-        file.source(),
-        &mut tsr_parser::ParserJsDocProvider::default(),
-    )
-    .map_err(checker_error)?
-    .ok_or_else(stale)?;
-    table
-        .nodes()
-        .get(index)
-        .copied()
-        .flatten()
-        .ok_or_else(stale)
+        };
+        let first = text.find('.').ok_or_else(invalid)?;
+        let second = text[first + 1..].find('.').ok_or_else(invalid)? + first + 1;
+        // port: strconv.ParseUint(s, 10, 32), with its error text; unlike
+        // Rust's parser, ParseUint refuses a leading sign.
+        let index_text = &text[..first];
+        let index: usize = index_text
+            .parse::<u32>()
+            .map_err(|error| *error.kind())
+            .and_then(|index| {
+                if index_text.starts_with('+') {
+                    Err(std::num::IntErrorKind::InvalidDigit)
+                } else {
+                    Ok(index)
+                }
+            })
+            .map_err(|kind| {
+                let reason = match kind {
+                    std::num::IntErrorKind::PosOverflow => "value out of range",
+                    _ => "invalid syntax",
+                };
+                client_error(format!(
+                    "invalid node handle {}: strconv.ParseUint: parsing {}: {reason}",
+                    tsr_jsstring::go_quote(text.as_bytes()),
+                    tsr_jsstring::go_quote(index_text.as_bytes())
+                ))
+            })
+            .map(|index| index as usize)?;
+        let path = &text[second + 1..];
+        let stale = || {
+            client_error(format!(
+                "node handle {} could not be resolved (file may not be loaded or handle may be stale)",
+                tsr_jsstring::go_quote(text.as_bytes())
+            ))
+        };
+        let resolve = |table: &tsr_ast::NodeIndexCache| {
+            table
+                .nodes()
+                .get(index)
+                .copied()
+                .flatten()
+                .ok_or_else(stale)
+        };
+        if let Some((cached_path, table)) = &self.last_table {
+            if *cached_path == path {
+                return resolve(table);
+            }
+        }
+        let file = self.program.file(path.as_bytes()).ok_or_else(stale)?;
+        let view = file.bound().view().ast();
+        let table = tsr_encoder::get_node_index_table(
+            view,
+            file.source(),
+            &mut tsr_parser::ParserJsDocProvider::default(),
+        )
+        .map_err(checker_error)?
+        .ok_or_else(stale)?;
+        let node = resolve(&table)?;
+        self.last_table = Some((path, table));
+        Ok(node)
+    }
 }
 
 /// The node whose property name touches a UTF-16 position of a file, or the

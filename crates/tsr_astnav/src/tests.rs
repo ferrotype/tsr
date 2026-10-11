@@ -109,6 +109,40 @@ fn tokens_the_tree_does_not_store_come_from_the_cache_and_are_the_same_node_twic
 }
 
 #[test]
+fn touching_names_at_their_end_keeps_core_and_deferred_jsdoc_identity() {
+    let (file, root) = parse(b"/a.ts", b"alpha(beta, gamma);", tsr_core::ScriptKind::TS);
+    let mut provider = tsr_parser::ParserJsDocProvider::default();
+    let mut navigator = Navigator::new(file.view(), root, &mut provider);
+    // Both an ordinary child (alpha) and binary-searched list children must
+    // include the preceding identifier at its end, before punctuation.
+    for (start, end) in [(0, 5), (6, 10), (11, 17)] {
+        let name = navigator.get_token_at_position(start + 1).unwrap();
+        assert_eq!(
+            describe(&file, Some(name)),
+            Some((K::Identifier, start as i32, end as i32))
+        );
+        assert_eq!(navigator.get_touching_property_name(end).unwrap(), name);
+        assert_ne!(navigator.get_touching_token(end).unwrap(), name);
+    }
+
+    let text = b"/** @param {Widget} value */ function f(value) {}";
+    for kind in [tsr_core::ScriptKind::JS, tsr_core::ScriptKind::TS] {
+        let (file, root) = parse(b"/doc.ts", text, kind);
+        let mut provider = tsr_parser::ParserJsDocProvider::default();
+        let mut navigator = Navigator::new(file.view(), root, &mut provider);
+        let name = navigator.get_token_at_position(13).unwrap();
+        assert_eq!(describe(&file, Some(name)), Some((K::Identifier, 12, 18)));
+        if kind == tsr_core::ScriptKind::TS {
+            assert_ne!(name.arena(), root.arena(), "deferred JSDoc is lazy syntax");
+        }
+        // This invokes the preceding-token search while a read of the tested
+        // JSDoc child remains live, and must retain its published identity.
+        assert_eq!(navigator.get_touching_property_name(18).unwrap(), name);
+        assert_eq!(navigator.get_token_at_position(13).unwrap(), name);
+    }
+}
+
+#[test]
 fn preceding_and_next_tokens_cross_the_gaps_between_nodes() {
     let (file, root) = parse(b"/a.ts", b"f ( a , b ) ;", tsr_core::ScriptKind::TS);
     let mut provider = tsr_parser::ParserJsDocProvider::default();

@@ -1,6 +1,7 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **R1 in progress** (2026-10-11, [docs/PHASE7-R1.md](PHASE7-R1.md));
+Status: **R1 and R2 in progress** (2026-10-11,
+[docs/PHASE7-R1.md](PHASE7-R1.md), [docs/PHASE7-R2.md](PHASE7-R2.md));
 R0 recorded (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md)).
 Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
 7, 9 and 11 accepted, the others open. The detailed plan for
