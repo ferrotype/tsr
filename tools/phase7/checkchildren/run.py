@@ -6,11 +6,24 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
+
+
+def runtime_environment(sysroot):
+    env = dict(os.environ)
+    # rustc_driver also loads LLVM from the host sysroot. An executable rpath
+    # does not cover transitive shared-library dependencies on Linux.
+    variable = ('PATH' if sys.platform == 'win32' else
+                'DYLD_LIBRARY_PATH' if sys.platform == 'darwin' else 'LD_LIBRARY_PATH')
+    library = str(Path(sysroot) / ('bin' if sys.platform == 'win32' else 'lib'))
+    previous = env.get(variable)
+    env[variable] = library + (os.pathsep + previous if previous else '')
+    return env
 
 
 def build():
@@ -21,15 +34,15 @@ def build():
     directory = ROOT / 'target/phase7/checkchildren'
     directory.mkdir(parents=True, exist_ok=True)
     executable = directory / ('checkchildren-' + digest)
+    sysroot = subprocess.check_output([*rustc, '--print', 'sysroot'], text=True).strip()
     if not executable.exists():
-        sysroot = subprocess.check_output([*rustc, '--print', 'sysroot'], text=True).strip()
         subprocess.run([*rustc, str(HERE / 'main.rs'), '--crate-name', 'tsr_checkchildren',
                         '--edition=2021', '-C', 'rpath', '-L', str(Path(sysroot) / 'lib'),
                         '-D', 'warnings', '-o', str(executable)], cwd=ROOT, check=True)
-    return nightly, executable
+    return nightly, executable, runtime_environment(sysroot)
 
 
-def fixtures(executable, nightly):
+def fixtures(executable, nightly, runtime_env):
     source = (HERE / 'fixtures/returns.rs').read_text()
     expected = sorted(re.findall(r'// expect: (\w+)', source))
     if not expected:
@@ -42,7 +55,8 @@ def fixtures(executable, nightly):
             path.write_text(text)
             result = subprocess.run([str(executable), '--crate-name', 'checkchildren_fixture',
                                      str(path), '--edition=2021', '--emit=metadata',
-                                     '--out-dir', str(directory)], cwd=ROOT, capture_output=True, text=True)
+                                     '--out-dir', str(directory)], cwd=ROOT, env=runtime_env,
+                                    capture_output=True, text=True)
             findings = sorted(re.findall(r'checkchildren: Checker::(\w+) returns before', result.stderr))
             return result, findings
 
@@ -73,7 +87,7 @@ def fixtures(executable, nightly):
             '[package]\nname = "checkchildren_fixture"\nversion = "0.0.0"\nedition = "2021"\n'
             '[lib]\npath = "case.rs"\n[workspace]\n')
         (directory / 'case.rs').write_text(fixed)
-        env = dict(os.environ, RUSTC_WORKSPACE_WRAPPER=str(executable),
+        env = dict(runtime_env, RUSTC_WORKSPACE_WRAPPER=str(executable),
                    CARGO_TARGET_DIR=str(directory / 'target'))
         command = ['cargo', '+' + nightly, 'check', '--offline', '--manifest-path',
                    str(directory / 'Cargo.toml'), '-v']
@@ -95,11 +109,11 @@ def main():
     if args.action == 'check' and (args.output is None or args.output.exists()
                                    or 'target' in args.output.resolve().parts):
         parser.error('check requires a new --output log outside target')
-    nightly, executable = build()
-    fixtures(executable, nightly)
+    nightly, executable, runtime_env = build()
+    fixtures(executable, nightly, runtime_env)
     if args.action == 'fixtures':
         return 0
-    env = dict(os.environ, RUSTC_WORKSPACE_WRAPPER=str(executable),
+    env = dict(runtime_env, RUSTC_WORKSPACE_WRAPPER=str(executable),
                CARGO_TARGET_DIR=str(ROOT / 'target/phase7/checkchildren-cargo'))
     env.setdefault('CARGO_BUILD_JOBS', '2')
     command = ['cargo', '+' + nightly, 'check', '--locked', '-p', 'tsr_checker']

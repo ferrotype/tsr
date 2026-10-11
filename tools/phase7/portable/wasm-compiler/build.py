@@ -19,6 +19,14 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def prefetch_registry():
+    # A host/wasm build fetches only its active target dependencies. Unfiltered
+    # metadata resolves the entire locked graph, including Windows packages.
+    # Fetch that graph before the deliberately offline freshness snapshots.
+    subprocess.run(['cargo', 'fetch', '--locked', '--manifest-path', str(HERE / 'Cargo.toml')],
+                   cwd=ROOT, check=True)
+
+
 def source_snapshot():
     metadata = json.loads(subprocess.check_output([
         'cargo', 'metadata', '--locked', '--offline', '--format-version=1',
@@ -62,6 +70,7 @@ def main():
     expected_node = 'v' + json.loads((ROOT / 'upstream/package.json').read_text())['volta']['node']
     if node != expected_node:
         parser.error(f'Node differs from the repository pin: {node}, expected {expected_node}')
+    prefetch_registry()
     before = source_snapshot()
     env = dict(build_environment(), CARGO_TARGET_WASM32_UNKNOWN_UNKNOWN_RUSTFLAGS=pin['wasm_rustflags'])
     for key in ('RUSTFLAGS', 'CARGO_ENCODED_RUSTFLAGS'):

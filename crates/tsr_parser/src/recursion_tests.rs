@@ -56,7 +56,10 @@ fn recursive_grammar_grows_real_segments_from_a_small_initial_stack() {
     for (name, text, kind) in cases {
         let observation = std::thread::Builder::new()
             .name(format!("small-stack-{name}"))
-            .stack_size(512 * 1024)
+            // Leave 64 KiB above the real guard threshold. Optimized Linux
+            // unary frames fit this fixture in 512 KiB without growing; that
+            // is valid parser behavior, not evidence of a broken guard.
+            .stack_size(crate::STACK_RED_ZONE + 64 * 1024)
             .spawn(move || {
                 let source = SourceText::from_loaded_bytes(text);
                 let factory = AstBuilder::new(source.clone(), &Counters::default());
