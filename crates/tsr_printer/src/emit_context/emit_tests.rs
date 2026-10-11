@@ -1251,3 +1251,57 @@ fn pooled_contexts_are_reset_on_release() {
     assert_eq!(retained.emit_flags(node), 0);
     assert_eq!(retained.metadata_entries(), 0);
 }
+
+/// Unlike the source-reading controls above, these rows execute the pinned Go
+/// factories (`nil_name_native_test.go`). This is a direct factory contract,
+/// not a claim that a source transformer ordinarily passes a nil declaration.
+#[test]
+fn nil_declaration_names_match_native_factory_and_preserve_print_failure() {
+    let rows: serde_json::Value =
+        serde_json::from_str(include_str!("nil_name_native.json")).unwrap();
+    let rows = rows.as_array().unwrap();
+    assert_eq!(rows.len(), 3);
+    assert_eq!(
+        rows.iter()
+            .map(|row| row["helper"].as_str().unwrap())
+            .collect::<Vec<_>>(),
+        ["local", "export", "declaration"]
+    );
+    for row in rows {
+        let mut emit = EmitContext::new();
+        let mut ast = builder(&emit);
+        let name = match row["helper"].as_str().unwrap() {
+            "local" => emit.get_local_name(&mut ast, None),
+            "export" => emit.get_export_name(&mut ast, None),
+            "declaration" => emit.get_declaration_name(&mut ast, None),
+            _ => panic!("unknown native helper"),
+        }
+        .unwrap();
+        let info = emit.auto_generate_info(name).unwrap();
+        assert_eq!(u64::from(info.flags), row["kind"].as_u64().unwrap());
+        assert_eq!(info.node.is_none(), row["node_nil"].as_bool().unwrap());
+        assert_eq!(
+            u64::from(emit.emit_flags(name)),
+            row["emit_flags"].as_u64().unwrap()
+        );
+        // The native factory succeeds, but Printer.Emit dereferences a nil
+        // original node. Rust preserves the invalid-input panic boundary.
+        assert_eq!(
+            row["output"],
+            "runtime error: invalid memory address or nil pointer dereference"
+        );
+        let panic = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            crate::Printer::new(crate::PrinterOptions::default(), &emit).emit(
+                ast.view(),
+                name,
+                None,
+            )
+        }))
+        .expect_err("nil generated-node printing must fail");
+        let message = panic
+            .downcast_ref::<String>()
+            .map(String::as_str)
+            .or_else(|| panic.downcast_ref::<&str>().copied());
+        assert_eq!(message, Some("node-generated name has a source"));
+    }
+}

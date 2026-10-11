@@ -4747,3 +4747,162 @@ type Mutable = number[]; type Immutable = readonly number[];",
         assert_eq!(builder.id_to_symbol(name), Some(symbol));
     }
 }
+
+/// The native producer queries a real parsed/bound initializer, rather than
+/// widening the local variable's unique-symbol type to ordinary `symbol`.
+#[test]
+fn computed_unique_symbol_initializer_display_matches_native() {
+    let native: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/computed_entity_native.json")).unwrap();
+    let text = native["source"].as_str().unwrap().as_bytes();
+    let (owner, program, _) = fixture(text, options());
+    let file = program.file(b"/main.ts").unwrap();
+    let source = file.source();
+    let view = file.bound().view().ast();
+    let statement = view
+        .node_slice(view.node(source).unwrap().statements(view).unwrap())
+        .unwrap()
+        .at(2)
+        .unwrap();
+    let list = view
+        .node(statement)
+        .unwrap()
+        .data_source()
+        .as_variable_statement()
+        .unwrap()
+        .declaration_list()
+        .unwrap();
+    let declarations = view
+        .node(list)
+        .unwrap()
+        .data_source()
+        .as_variable_declaration_list()
+        .unwrap()
+        .declarations()
+        .unwrap();
+    let declaration = view
+        .node_slice(view.list(declarations).unwrap().nodes())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let initializer = view.node(declaration).unwrap().initializer().unwrap();
+    let mut operation = owner.operation().unwrap();
+    let ty = operation.get_type_at_location(initializer).unwrap();
+    let flags = [0, tsr_checker::type_format_flags::USE_FULLY_QUALIFIED_TYPE];
+    let expected = native["display"].as_array().unwrap();
+    assert_eq!(expected.len(), flags.len());
+    for (flags, expected) in flags.into_iter().zip(expected) {
+        let display = operation
+            .type_to_string_ex(ty, Some(source), flags, None)
+            .unwrap();
+        assert_eq!(display.as_bytes(), expected.as_str().unwrap().as_bytes());
+    }
+    let mut builder = operation.node_builder();
+    let node = builder
+        .type_to_type_node(ty, Some(source), 0, 0)
+        .unwrap()
+        .unwrap();
+    let syntax = builder.into_syntax();
+    drop(operation);
+    drop(owner);
+    drop(program);
+    let printed = tsr_printer::Printer::new(tsr_printer::PrinterOptions::default(), &syntax.emit)
+        .emit(syntax.ast.view(), node, None)
+        .unwrap();
+    assert_eq!(printed, expected[0].as_str().unwrap().as_bytes());
+}
+
+/// Inferred tuples exclude destructured parameter names from their labels;
+/// ordinary identifier parameters still supply names. The native producer
+/// queries the type alias with InTypeAlias so alias reuse cannot hide labels.
+#[test]
+fn inferred_tuple_parameter_labels_match_native() {
+    let native: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/tuple_label_native.json")).unwrap();
+    let rows = native.as_array().unwrap();
+    assert_eq!(rows.len(), 3);
+    for row in rows {
+        let (owner, program, _) = fixture(row["source"].as_str().unwrap().as_bytes(), options());
+        let file = program.file(b"/main.ts").unwrap();
+        let source = file.source();
+        let view = file.bound().view().ast();
+        let alias = view
+            .node_slice(view.node(source).unwrap().statements(view).unwrap())
+            .unwrap()
+            .at(2)
+            .unwrap();
+        let name = view.node(alias).unwrap().name().unwrap();
+        let mut operation = owner.operation().unwrap();
+        let ty = operation.get_type_at_location(name).unwrap();
+        let display = operation
+            .type_to_string_ex(
+                ty,
+                Some(source),
+                tsr_checker::type_format_flags::IN_TYPE_ALIAS,
+                None,
+            )
+            .unwrap();
+        assert_eq!(
+            display.as_bytes(),
+            row["display"].as_str().unwrap().as_bytes()
+        );
+    }
+}
+
+/// The pin reports this circular auto-accessor annotation on its nil setter,
+/// so the TS2502 is global and appears only after semantic checking.
+#[test]
+fn circular_auto_accessor_type_and_late_globals_match_native() {
+    fn freeze(diagnostics: &[tsr_ast::Diagnostic]) -> serde_json::Value {
+        serde_json::Value::Array(diagnostics.iter().map(|diagnostic| serde_json::json!({
+            "code": diagnostic.code,
+            "file_nil": diagnostic.file.is_none(),
+            "pos": diagnostic.loc.pos(),
+            "end": diagnostic.loc.end(),
+            "args": diagnostic.message_args.iter().map(|arg| std::str::from_utf8(arg.as_bytes()).unwrap()).collect::<Vec<_>>(),
+        })).collect())
+    }
+    let native: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/circular_accessor_native.json")).unwrap();
+    let rows = native.as_array().unwrap();
+    assert_eq!(rows.len(), 3);
+    for row in rows {
+        let (owner, program, _) = fixture(row["source"].as_str().unwrap().as_bytes(), options());
+        let file = program.file(b"/main.ts").unwrap();
+        let source = file.source();
+        let view = file.bound().view().ast();
+        let class = view
+            .node_slice(view.node(source).unwrap().statements(view).unwrap())
+            .unwrap()
+            .at(0)
+            .unwrap();
+        let members = view.node(class).unwrap().member_list().unwrap();
+        let member = view
+            .node_slice(view.list(members).unwrap().nodes())
+            .unwrap()
+            .at(0)
+            .unwrap();
+        let name = view.node(member).unwrap().name().unwrap();
+        let mut operation = owner.operation().unwrap();
+        assert_eq!(
+            freeze(&operation.global_diagnostics().unwrap()),
+            row["before"]
+        );
+        assert_eq!(
+            freeze(&operation.semantic_diagnostics(source).unwrap()),
+            row["semantic"]
+        );
+        let ty = operation.get_type_at_location(name).unwrap();
+        assert_eq!(
+            operation
+                .type_to_string_ex(ty, Some(source), 0, None)
+                .unwrap()
+                .as_bytes(),
+            row["display"].as_str().unwrap().as_bytes()
+        );
+        assert_eq!(
+            freeze(&operation.global_diagnostics().unwrap()),
+            row["after"]
+        );
+    }
+}

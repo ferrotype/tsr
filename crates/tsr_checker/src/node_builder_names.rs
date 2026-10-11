@@ -1575,9 +1575,23 @@ impl NodeBuilder<'_> {
                         .transpose()?
                         .unwrap_or(false)
                 {
-                    return Err(Error::Unsupported(
-                        "createAccessFromSymbolChain: computed entity-name member",
-                    ));
+                    let expression = read.expression().expect("computed entity name expression");
+                    let lhs = self.access_from_symbol_chain(
+                        chain,
+                        index - 1,
+                        stopper,
+                        override_type_arguments,
+                    )?;
+                    if tsr_ast::utilities::is_entity_name(&self.ast.view().node(lhs)?) {
+                        self.retain_source_node(expression)?;
+                        let object = self.ast.new_type_query_node(Some(lhs), None);
+                        let object = self.ast.new_parenthesized_type_node(Some(object));
+                        let index = self.ast.new_type_query_node(Some(expression), None);
+                        return Ok(self
+                            .ast
+                            .new_indexed_access_type_node(Some(object), Some(index)));
+                    }
+                    return Ok(lhs);
                 }
             }
             self.symbol_name(symbol)?

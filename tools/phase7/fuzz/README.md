@@ -179,3 +179,63 @@ This inventories lexical `Unsupported` and `not available` matches in regular
 retain exact file/line/text and a source fingerprint. It makes no semantic,
 reachability, approval or pass-metric claim. See [the current R5 record](../../../docs/PHASE7-R5.md)
 for retained smoke/replay evidence and remaining work.
+
+## Reproduce the narrow native refusal controls
+
+Run from the repository root with the Go version in
+`data/s04/toolchains.toml` installed. This exports the exact pin into a temporary
+directory, copies only the seven retained test producers, runs their named tests,
+and compares every output byte with the frozen JSON fixtures. The output directory
+must be new and outside `target`; it retains the actual Go log and regenerated
+rows. Set `GOCACHE` to a writable persistent cache if the default cache is unavailable.
+
+```sh
+python3 - /absolute/path/to/new-native-controls <<'PY'
+import io, json, shutil, subprocess, sys, tarfile, tempfile
+from pathlib import Path
+sys.path.insert(0, str(Path.cwd() / 'scripts'))
+import s04
+
+root = Path.cwd()
+output = Path(sys.argv[1]).resolve()
+assert 'target' not in output.parts
+output.mkdir(parents=True, exist_ok=False)
+env = s04.go_environment()  # verifies the exact Go pin; GOTOOLCHAIN=local
+pin = json.loads((root / 'data/upstream.json').read_bytes())['pin']
+fixtures = 'crates/tsr_compiler/tests/fixtures/'
+cases = [
+    ('printer', 'crates/tsr_printer/src/emit_context/nil_name_native', 'PHASE7_NIL_NAME_OUTPUT'),
+    ('checker', 'crates/tsr_checker/src/alternate_resolution_native', 'PHASE7_ALTERNATE_OUTPUT'),
+    ('checker', fixtures + 'computed_entity_native', 'PHASE7_COMPUTED_OUTPUT'),
+    ('checker', fixtures + 'circular_accessor_native', 'PHASE7_ACCESSOR_OUTPUT'),
+    ('checker', fixtures + 'tuple_label_native', 'PHASE7_TUPLE_OUTPUT'),
+    ('checker', fixtures + 'tuple_label_guard_native', 'PHASE7_TUPLE_GUARD_OUTPUT'),
+    ('checker', fixtures + 'project_reference_native', 'PHASE7_PROJECTREF_OUTPUT'),
+]
+pattern = '^TestPhase7(NilDeclarationNames|AlternateResolution|ComputedEntityDisplay|CircularAccessor|TupleLabelDisplay|InvalidTupleLabel|ReferencedImporterDisplay)$'
+with tempfile.TemporaryDirectory(prefix='phase7-native-') as temporary:
+    export = Path(temporary)
+    raw = subprocess.check_output(['git', '-C', str(root / 'upstream'), 'archive', pin,
+                                   'tsc/go.mod', 'tsc/go.sum', 'tsc/internal'])
+    with tarfile.open(fileobj=io.BytesIO(raw)) as archive:
+        archive.extractall(export, filter='data')
+    for package, source, variable in cases:
+        source = root / source
+        shutil.copyfile(str(source) + '_test.go', export / 'tsc/internal' / package / (source.name + '_test.go'))
+        env[variable] = str(output / (source.name + '.json'))
+    with (output / 'go.log').open('wb') as log:
+        subprocess.run(['go', 'test', '-trimpath', '-mod=readonly', './internal/printer',
+                        './internal/checker', '-run', pattern, '-count=1', '-v'],
+                       cwd=export / 'tsc', env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+for _, source, _ in cases:
+    frozen = ('crates/tsr_compiler/src/alternate_resolution_native.json'
+              if source.endswith('/alternate_resolution_native') else source + '.json')
+    assert (output / (Path(source).name + '.json')).read_bytes() == (root / frozen).read_bytes(), source
+print('Seven native producers passed; all frozen rows match exactly:', output)
+PY
+```
+
+These controls include direct nullable-factory/invalid-label calls and supplied
+module-resolution state. Only the computed-property, circular-accessor,
+project-reference and ordinary tuple-inference cases claim source reachability;
+the [semantic review](refusals.md) describes each boundary.

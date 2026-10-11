@@ -1,0 +1,10 @@
+[
+  {
+    "name_kind": 207,
+    "panic": "Unhandled case in Node.Text: *ast.BindingPattern"
+  },
+  {
+    "name_kind": 208,
+    "panic": "Unhandled case in Node.Text: *ast.BindingPattern"
+  }
+]

@@ -169,22 +169,20 @@ impl CheckerState {
         let (mut ty, getter, setter, accessor) = result?;
         if !complete {
             let annotated = if self.annotated_accessor_type_node(getter)?.is_some() {
-                getter
-            } else if self.annotated_accessor_type_node(setter)?.is_some() {
-                setter
-            } else if self.annotated_accessor_type_node(accessor)?.is_some() {
-                // The pinned branch reports on `setter`, even for an auto
-                // accessor. Do not invent a different diagnostic location.
-                return Err(Error::Unsupported(
-                    "getTypeOfAccessors: circular auto-accessor diagnostic path",
-                ));
+                Some(getter)
+            } else if self.annotated_accessor_type_node(setter)?.is_some()
+                || self.annotated_accessor_type_node(accessor)?.is_some()
+            {
+                // The pin reports on `setter`, including nil for an auto
+                // accessor. That creates a fileless diagnostic at (0, 0).
+                Some(setter)
             } else {
                 None
             };
             if let Some(declaration) = annotated {
                 let name = self.symbol_to_string(symbol)?;
                 self.error_at(
-                    Some(declaration),
+                    declaration,
                     messages::X_0_is_referenced_directly_or_indirectly_in_its_own_type_annotation,
                     vec![name],
                 )?;

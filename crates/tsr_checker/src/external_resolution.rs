@@ -507,9 +507,18 @@ impl CheckerState {
                     self.error_at(Some(error),d::Relative_import_paths_need_explicit_file_extensions_in_ECMAScript_imports_when_moduleResolution_is_node16_or_nodenext_Consider_adding_an_extension_to_the_import_path,vec![])?;
                 }
             } else if resolved.is_some_and(|resolved| !resolved.alternate_result.is_empty()) {
-                return Err(Error::Unsupported(
-                    "resolveExternalModule: alternate package resolution diagnostic chain",
-                ));
+                let chain = self.module_not_found_chain(
+                    error,
+                    resolved.expect("alternate result resolution"),
+                    &module_reference,
+                    mode,
+                    &module_reference,
+                )?;
+                self.add_diagnostic(tsr_ast::Diagnostic::chain(
+                    Some(std::sync::Arc::new(chain)),
+                    message,
+                    vec![module_reference],
+                ))?;
             } else {
                 self.error_at(Some(error), message, vec![module_reference])?;
             }
@@ -541,7 +550,13 @@ impl CheckerState {
         }
         let chain =
             if !tsr_module::is_relative(name.as_bytes()) && !resolved.package_id.name.is_empty() {
-                Some(self.module_not_found_chain(node, resolved, name, mode)?)
+                Some(self.module_not_found_chain(
+                    node,
+                    resolved,
+                    name,
+                    mode,
+                    &resolved.package_id.name,
+                )?)
             } else {
                 None
             };
@@ -1193,14 +1208,15 @@ impl CheckerState {
         resolved: &tsr_module::ResolvedModule,
         module_reference: &JsString,
         mode: ModuleKind,
+        package_name: &JsString,
     ) -> Result<tsr_ast::Diagnostic, Error> {
         // Store the original packageName for repopulateInfo before any modifications
-        let stored_package_name = if resolved.package_id.name == *module_reference {
+        let stored_package_name = if package_name == module_reference {
             JsString::default()
         } else {
-            resolved.package_id.name.clone()
+            package_name.clone()
         };
-        let mut package_name = resolved.package_id.name.as_bytes().to_vec();
+        let mut package_name = package_name.as_bytes().to_vec();
         let (message, args): (&'static Message, Vec<JsString>) = if resolved
             .alternate_result
             .is_empty()

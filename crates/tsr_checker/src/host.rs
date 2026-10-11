@@ -116,6 +116,14 @@ pub trait CheckerHost: Send + Sync {
         &self,
         path: &[u8],
     ) -> Result<Option<ProjectReferenceSource<'_>>, Error>;
+    /// A loaded declaration output's original source name, for module-path
+    /// ordering. Hosts without project-reference redirection keep the name.
+    fn get_source_of_project_reference_if_output_included<'a>(
+        &'a self,
+        file_name: &'a [u8],
+    ) -> &'a [u8] {
+        file_name
+    }
     fn get_module_specifier_paths(
         &self,
         importer: &[u8],

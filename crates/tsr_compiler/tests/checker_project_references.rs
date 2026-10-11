@@ -293,12 +293,11 @@ fn a_referenced_output_is_named_by_its_source() {
 }
 
 #[test]
-fn an_importer_that_is_a_referenced_output_fails_closed() {
+fn an_importer_that_is_a_referenced_output_orders_paths_from_its_source() {
     // Native answers `() => import("./a").Foo` for b.d.ts: the pin sorts the
     // module's paths from the importer's source directory (ref/src), so the
-    // import "./a" is reused before "../out/a". That directory is chosen inside
-    // tsr_checker's proximity sort, which reads the importer's own name, so the
-    // host refuses rather than answer "../out/a".
+    // import "./a" is reused before "../out/a". Specifier computation itself
+    // retains the output's imports, options and default resolution mode.
     let (owner, program) = load(&[
         (b"/p/tsconfig.json", ROOT_CONFIG),
         (b"/p/ref/tsconfig.json", REF_CONFIG),
@@ -322,9 +321,7 @@ fn an_importer_that_is_a_referenced_output_fails_closed() {
         "() => import(\"./ref/src/a\").Foo"
     );
     assert_eq!(
-        display(&owner, &program, b"/p/ref/out/b.d.ts", 2),
-        Err(Error::Unsupported(
-            "module specifiers for an importer that is a project-reference output"
-        ))
+        display(&owner, &program, b"/p/ref/out/b.d.ts", 2).unwrap(),
+        "() => import(\"./a\").Foo"
     );
 }

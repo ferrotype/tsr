@@ -2997,3 +2997,7 @@ fn replace_diagnostic_source(diagnostic: &mut Diagnostic, old: NodeId, new: Node
         replace_diagnostic_source(Arc::make_mut(child), old, new);
     }
 }
+
+#[cfg(test)]
+#[path = "alternate_resolution_tests.rs"]
+mod alternate_resolution_tests;

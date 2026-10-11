@@ -5,8 +5,8 @@
 //! Upstream evaluates call arguments left to right; constructions keep that
 //! order so nodes are created in the same sequence. The generated-name
 //! constructors are another unit's; `NewGeneratedNameForNode` is reached
-//! through `new_generated_name_for_node_ex` with default options, which is its
-//! whole body upstream.
+//! through `new_generated_name_for_node_ex` with default options. Its nullable
+//! declaration-name case calls the shared generated-identifier constructor.
 
 use super::environment::{is_prologue_directive, new_node_list};
 use super::{AutoGenerateOptions, EmitContext};
@@ -647,9 +647,7 @@ impl EmitContext {
     // Declaration Names
     //
 
-    /// A nil `node` reaches upstream's `NewGeneratedNameForNode(nil)`, which
-    /// the generated-name unit does not accept yet: that is
-    /// `Error::Unsupported`.
+    /// A nil declaration uses the generated-name constructor's auto identity.
     // port: tsc/internal/printer/factory.go:NodeFactory.getName
     fn get_name(
         &mut self,
@@ -679,10 +677,18 @@ impl EmitContext {
             return Ok(name);
         }
 
-        let Some(node) = node else {
-            return Err(crate::Error::Unsupported("NewGeneratedNameForNode(nil)"));
-        };
-        Ok(self.new_generated_name_for_node_ex(factory, node, AutoGenerateOptions::default()))
+        Ok(match node {
+            Some(node) => {
+                self.new_generated_name_for_node_ex(factory, node, AutoGenerateOptions::default())
+            }
+            None => self.new_generated_identifier(
+                factory,
+                super::generated_identifier_flags::NODE,
+                JsString::default(),
+                None,
+                AutoGenerateOptions::default(),
+            ),
+        })
     }
 
     /// Gets the local name of a declaration: a name the declaration's
