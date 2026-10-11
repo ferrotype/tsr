@@ -1,6 +1,7 @@
 """The Phase 7 scenario harness: descriptors, run facts, the comparison with the
 oracle's frozen work, and the reader behind perf.py's scenario workloads."""
 import copy
+from contextlib import ExitStack
 import json
 import os
 from pathlib import Path
@@ -8,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import tomllib
 import unittest
 from unittest import mock
@@ -16,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'scripts'))
 from tools.phase7.api import capture as api  # noqa: E402
-from tools.phase7.bench import capture, common  # noqa: E402
+from tools.phase7.bench import capture, common, pairs  # noqa: E402
 import perf  # noqa: E402
 
 SHA = 'a' * 64
@@ -170,6 +172,158 @@ class ProblemTests(unittest.TestCase):
         self.assertRegex(' '.join(common.problems(changed, work, 'emit', 'go', files)), 'differ')
         self.assertTrue(common.problems(two, work, 'emit', 'go', None), 'no reference, no tolerance')
         self.assertTrue(common.problems(two, work, 'emit', 'rust', files), 'only the oracle may omit')
+
+
+class ConcurrentPairTests(unittest.TestCase):
+    def setUp(self):
+        stack = self.enterContext(ExitStack())
+        self.root = Path(stack.enter_context(tempfile.TemporaryDirectory())).resolve()
+        self.control, self.candidate = self.root / 'control', self.root / 'candidate'
+        self.control.write_bytes(b'control executable')
+        self.candidate.write_bytes(b'candidate executable')
+        stack.enter_context(mock.patch.object(common, 'CACHE', self.root / 'cache'))
+        stack.enter_context(mock.patch.object(common, 'checkout', return_value=Path(ROOT_DIR)))
+        stack.enter_context(mock.patch.object(common, 'provisioned', return_value=True))
+        self.unchanged = stack.enter_context(mock.patch.object(common, 'require_unchanged'))
+        stack.enter_context(mock.patch('builtins.print'))
+        self.descriptor = copy.deepcopy(common.load('xstate'))
+        emitted = self.root / 'expected'
+        emitted.mkdir()
+        (emitted / 'a.js').write_text('compiled output')
+        for mode in common.MODES:
+            facts = common.observe({'exit': 0, 'stdout': stdout()}, ROOT_DIR, emitted if mode == 'emit' else None)
+            self.descriptor['work'][mode] = frozen_work(facts, mode)
+
+    def result(self, wall=100):
+        return {'exit': 0, 'stdout': stdout(), 'stderr': '', 'wall_ns': wall,
+                'peak_rss_bytes': wall, 'user_ns': wall, 'system_ns': 1}
+
+    def screen(self, output, mode='check', count=1):
+        return pairs.screen(self.descriptor, self.control, self.candidate, output,
+                            mode=mode, checkers=4, pairs=count, timeout=17)
+
+    def test_pairs_overlap_and_hash_after_both_finish_with_paired_medians(self):
+        rendezvous = threading.Barrier(2)
+        lock = threading.Lock()
+        calls, counts, finished = [], {'control': 0, 'candidate': 0}, 0
+        timings = {'control': [1, 2, 100], 'candidate': [3, 100, 200]}
+        observe = common.observe
+
+        def run(binary, cwd, args, timeout):
+            nonlocal finished
+            with lock:
+                index = counts[binary.name]
+                counts[binary.name] += 1
+                calls.append((binary, cwd, args, timeout))
+            # A sequential runner fails here instead of making this a timing
+            # assertion sensitive to the test host's scheduler.
+            rendezvous.wait(timeout=5)
+            out = Path(args[args.index('--outDir') + 1])
+            (out / 'a.js').write_text('compiled output')
+            with lock:
+                finished += 1
+            return self.result(timings[binary.name][index])
+
+        def observed(*args):
+            with lock:
+                self.assertEqual(finished, len(calls))
+                self.assertEqual(finished % 2, 0, 'both children must finish before observing either')
+            return observe(*args)
+
+        with mock.patch.object(common, 'run', side_effect=run), mock.patch.object(common, 'observe', side_effect=observed):
+            report = self.screen(self.root / 'screen', mode='emit', count=3)
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['median_ratios'], dict.fromkeys(pairs.METRICS, 3.0))
+        self.assertEqual([row['submission_order'] for row in report['pairs']],
+                         [['control', 'candidate'], ['candidate', 'control'], ['control', 'candidate']])
+        self.assertEqual(counts, {'control': 3, 'candidate': 3})
+        self.assertEqual(report['binaries']['candidate'], common.identity(self.candidate))
+        directories = []
+        for binary, cwd, args, timeout in calls:
+            out = Path(args[args.index('--outDir') + 1])
+            directories.append(out)
+            self.assertEqual(args, common.arguments(self.descriptor, 'emit', 4, out))
+            self.assertEqual((cwd, timeout), (Path(ROOT_DIR), 17))
+            self.assertTrue(binary.is_absolute())
+        self.assertEqual(len(set(directories)), 6)
+        self.assertTrue(all(not directory.exists() for directory in directories))
+        self.assertEqual(self.unchanged.call_count, 2)
+
+    def test_invalid_pairs_keep_raw_results_and_never_publish_ratios(self):
+        cases = {
+            'bad-control': ('control', {'exit': 99}, 'exit'),
+            'bad-candidate': ('candidate', {'exit': 99}, 'exit'),
+            'malformed': ('control', {'stdout': 'compiler failed\n'}, 'statistics'),
+            'unequal-types': ('candidate', {'stdout': stdout(types=1001)}, 'type counts differ'),
+            'stderr': ('candidate', {'stderr': 'internal error'}, 'stderr'),
+            'zero-metric': ('candidate', {'wall_ns': 0}, 'wall_ns must be positive'),
+            'raised': ('control', None, 'timed out'),
+        }
+        for name, (bad, changes, message) in cases.items():
+            with self.subTest(name=name):
+                directories = []
+
+                def run(binary, cwd, args, timeout):
+                    out = Path(args[args.index('--outDir') + 1])
+                    directories.append(out)
+                    (out / 'a.js').write_text('compiled output')
+                    if binary.name == bad and changes is None:
+                        raise ValueError('timed out')
+                    return {**self.result(), **(changes if binary.name == bad else {})}
+
+                output = self.root / name
+                with mock.patch.object(common, 'run', side_effect=run), self.assertRaisesRegex(ValueError, message):
+                    self.screen(output, mode='emit')
+                report = json.loads((output / 'summary.json').read_text())
+                self.assertFalse(report['complete'])
+                self.assertEqual(report['pairs'], [])
+                self.assertNotIn('median_ratios', report)
+                for role in ('control', 'candidate'):
+                    self.assertTrue((output / f'0-{role}.json').is_file())
+                    if name != 'raised' or role != bad:
+                        self.assertTrue((output / f'0-{role}.stdout').is_file())
+                        self.assertTrue((output / f'0-{role}.stderr').is_file())
+                self.assertTrue(all(not directory.exists() for directory in directories))
+
+    def test_changed_inputs_at_the_end_leave_an_incomplete_summary(self):
+        self.unchanged.side_effect = [None, ValueError('inputs changed')]
+        output = self.root / 'changed'
+        with mock.patch.object(common, 'run', side_effect=lambda *a, **k: self.result()), \
+                self.assertRaisesRegex(ValueError, 'inputs changed'):
+            self.screen(output)
+        report = json.loads((output / 'summary.json').read_text())
+        self.assertEqual(len(report['pairs']), 1)
+        self.assertFalse(report['complete'])
+        self.assertNotIn('median_ratios', report)
+
+    def test_invalid_count_or_existing_output_cannot_start_a_compiler(self):
+        with mock.patch.object(common, 'run') as run:
+            with self.assertRaisesRegex(ValueError, 'positive'):
+                self.screen(self.root / 'zero', count=0)
+            with self.assertRaises(FileExistsError):
+                self.screen(self.root)
+        run.assert_not_called()
+
+    def test_cli_uses_explicit_paths_and_restores_the_cache(self):
+        previous = common.CACHE
+        cache = self.root / 'another-cache'
+        output = self.root / 'cli-output'
+        real_screen = pairs.screen
+
+        def screen(*args, **kwargs):
+            self.assertEqual(common.CACHE, cache)
+            return real_screen(*args, **kwargs)
+
+        with mock.patch.object(common, 'load', return_value=self.descriptor), \
+                mock.patch.object(pairs, 'screen', side_effect=screen), \
+                mock.patch.object(common, 'run', side_effect=lambda *a, **k: self.result()):
+            pairs.main(['--scenario', 'xstate', '--mode', 'check', '--pairs', '1',
+                        '--control', str(self.control), '--candidate', str(self.candidate),
+                        '--cache', str(cache), '--output', str(output)])
+        self.assertEqual(common.CACHE, previous)
+        report = json.loads((output / 'summary.json').read_text())
+        self.assertEqual(report['cache'], str(cache))
+        self.assertTrue(report['complete'])
 
 
 def pair(index, go_wall, rust_wall):
