@@ -27,6 +27,16 @@ Workloads, and the harness commands that make their captures:
               (target/s08/checkerbench)
   lsp         five request/diagnostic latency scenarios with matched 20/40 pairs:
               tools/phase5/latency/capture.py (target/phase5/latency)
+  api         the pin's JS API benchmarks (packages/typescript test/sync and
+              test/async api.bench.ts) against both servers, per task and mode,
+              and the servers' peak RSS: tools/phase7/api/capture.py run
+              (target/phase7/api)
+  check-<scenario>, emit-<scenario>
+              full checking, and checking plus emit, of the five Phase 7
+              benchmarking scenarios (vscode, self-compiler, mui-docs, xstate,
+              bluesky) at 2, 4 and 8 checkers (docs/PHASE7-plan.md, R0):
+              scripts/phase7_scenarios.py provision, then
+              tools/phase7/bench/capture.py build and run (target/phase7/bench)
 """
 from __future__ import annotations
 
@@ -188,10 +198,36 @@ def read_lsp(capture, args):
     return lsp_measurement(module.read_capture(capture.resolve()))
 
 
+# ---------------------------------------------------------------- Phase 7 scenarios
+
+SCENARIOS = ("vscode", "self-compiler", "mui-docs", "xstate", "bluesky")
+SCENARIO_MODES = ("check", "emit")
+
+
+def scenario_reader(scenario, mode):
+    """The reader of one scenario workload: elapsed_<n> and peak_rss_<n> at 2,
+    4 and 8 checkers from a complete capture (tools/phase7/bench/capture.py)."""
+    def read(capture, args):
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        module = importlib.import_module("tools.phase7.bench.capture")
+        return module.read_capture(capture.resolve(), scenario, mode)
+    return read
+
+
+def read_api(capture, args):
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    return importlib.import_module("tools.phase7.api.capture").read_capture(capture.resolve())
+
+
 WORKLOADS = {
     "parse-bind": Workload("target/s07-benchmark", read_parse_bind),
+    "api": Workload("target/phase7/api", read_api),
     "checker": Workload("target/s08/checkerbench", read_checker),
     "lsp": Workload("target/phase5/latency", read_lsp),
+    **{f"{mode}-{scenario}": Workload("target/phase7/bench", scenario_reader(scenario, mode))
+       for scenario in SCENARIOS for mode in SCENARIO_MODES},
 }
 
 

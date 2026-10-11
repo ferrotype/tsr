@@ -1,0 +1,240 @@
+{
+  "workload": "api",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "4c9bf18b6eb8abc5a68a5cac98743fc4582e0cb4",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "owner host (macOS arm64, 18 CPUs)"
+  },
+  "recorded_at": "2026-10-10T20:21:01Z",
+  "ratios": {
+    "elapsed_async_getsymbolatlocation_identifiers": 1.14864595779934,
+    "elapsed_async_getsymbolatlocation_identifiers_batched": 2.102338783059213,
+    "elapsed_async_getsymbolatposition_identifiers": 1.1829635533947287,
+    "elapsed_async_getsymbolatposition_identifiers_batched": 1.692622764463799,
+    "elapsed_async_getsymbolatposition_one_location": 1.1186546335686691,
+    "elapsed_async_load_snapshot": 1.1613088134366933,
+    "elapsed_async_transfer_checker_ts": 1.5274202480095385,
+    "elapsed_async_transfer_debug_ts": 1.4360072445031054,
+    "elapsed_async_transfer_program_ts": 1.6009798182355226,
+    "elapsed_sync_getsymbolatlocation_identifiers": 1.1947625661589047,
+    "elapsed_sync_getsymbolatlocation_identifiers_batched": 2.03449805590984,
+    "elapsed_sync_getsymbolatposition_identifiers": 1.2074755458908955,
+    "elapsed_sync_getsymbolatposition_identifiers_batched": 1.6007867099927517,
+    "elapsed_sync_getsymbolatposition_one_location": 1.0715006050808817,
+    "elapsed_sync_load_snapshot": 1.1702557358688521,
+    "elapsed_sync_spawn_api": 0.6324533161617288,
+    "elapsed_sync_transfer_checker_ts": 1.6558030738428526,
+    "elapsed_sync_transfer_debug_ts": 1.618539790593404,
+    "elapsed_sync_transfer_program_ts": 1.9514783882725237,
+    "peak_rss_async": 0.6720954300343156,
+    "peak_rss_sync": 0.614041958041958
+  },
+  "samples": {
+    "go": {
+      "elapsed_sync_spawn_api": [1.1539165000003777, 0.9706250000008367, 0.9050420000003214],
+      "elapsed_sync_load_snapshot": [0.04199999999946158, 0.04258300000037707, 0.04270799999994779],
+      "elapsed_sync_transfer_debug_ts": [0.33010450000074343, 0.31266599999980826, 0.31670800000028976],
+      "elapsed_sync_transfer_program_ts": [0.9757919999992737, 0.9364589999986492, 0.9337500000001455],
+      "elapsed_sync_transfer_checker_ts": [12.697916999999507, 12.218479000000116, 12.753770999999688],
+      "elapsed_sync_getsymbolatposition_one_location": [0.009958000002370682, 0.009874999999738066, 0.009915999999066116],
+      "elapsed_sync_getsymbolatposition_identifiers": [153.96793699999944, 148.15364600000066, 151.846208500001],
+      "elapsed_sync_getsymbolatposition_identifiers_batched": [43.68064549999872, 42.02533400000175, 43.12262499999997],
+      "elapsed_sync_getsymbolatlocation_identifiers": [106.03672949999964, 103.81272900000113, 103.63937450000049],
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": [17.14470800000163, 16.942375000002357, 16.87804099999994],
+      "peak_rss_sync": [169754624, 165232640, 166133760, 167952384, 211271680, 169443328, 209747968, 165380096, 268861440, 292864000, 207372288, 223707136],
+      "elapsed_async_load_snapshot": [0.1064170000008744, 0.11164550000012241, 0.1064169999990554],
+      "elapsed_async_transfer_debug_ts": [0.9662499999994907, 0.9718124999981228, 0.947354500000074],
+      "elapsed_async_transfer_program_ts": [2.939791500000865, 2.9296250000006694, 2.7936249999984284],
+      "elapsed_async_transfer_checker_ts": [37.96875, 35.43193699999938, 34.966457999998966],
+      "elapsed_async_getsymbolatposition_one_location": [0.07104199999957928, 0.07058300000062445, 0.07029200000033597],
+      "elapsed_async_getsymbolatposition_identifiers": [771.2168750000001, 759.1323124999999, 765.0866874999992],
+      "elapsed_async_getsymbolatposition_identifiers_batched": [43.13116599999921, 41.598041499997635, 41.52624999999898],
+      "elapsed_async_getsymbolatlocation_identifiers": [769.2848750000012, 754.026979000002, 751.3219585000006],
+      "elapsed_async_getsymbolatlocation_identifiers_batched": [18.298396000001958, 17.411479500002315, 17.434729500000685],
+      "peak_rss_async": [177356800, 166739968, 167084032, 176488448, 284688384, 176144384, 284606464, 166526976, 267091968, 300793856, 202801152, 216383488]
+    },
+    "rust": {
+      "elapsed_sync_spawn_api": [0.6138750000000073, 0.6682504999998855, 0.6037089999999807],
+      "elapsed_sync_load_snapshot": [0.047207999999955064, 0.049833000000944594, 0.05070800000066811],
+      "elapsed_sync_transfer_debug_ts": [0.5126044999997248, 0.5375625000006039, 0.5107499999994616],
+      "elapsed_sync_transfer_program_ts": [1.8274795000006634, 1.9182079999991402, 1.8061454999997295],
+      "elapsed_sync_transfer_checker_ts": [21.025250000000597, 21.980937500000437, 21.016250499999842],
+      "elapsed_sync_getsymbolatposition_one_location": [0.010665999998309417, 0.010624999998981366, 0.010583999999653315],
+      "elapsed_sync_getsymbolatposition_identifiers": [183.35058350000145, 187.77485400000114, 182.72614599999906],
+      "elapsed_sync_getsymbolatposition_identifiers_batched": [67.36537499999758, 74.12066650000088, 69.03012500000114],
+      "elapsed_sync_getsymbolatlocation_identifiers": [124.97379200000069, 122.4723750000012, 124.03156250000029],
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": [34.46922900000027, 34.275666000001365, 35.02689550000105],
+      "peak_rss_sync": [133414912, 130744320, 132349952, 134774784, 171474944, 136282112, 173998080, 132956160, 164544512, 169295872, 167460864, 179830784],
+      "elapsed_async_load_snapshot": [0.12358300000050804, 0.12216700000135461, 0.12387500000113505],
+      "elapsed_async_transfer_debug_ts": [1.4113330000000133, 1.3875420000003942, 1.3404170000030717],
+      "elapsed_async_transfer_program_ts": [4.718916000001627, 4.690270499999315, 4.458333500000663],
+      "elapsed_async_transfer_checker_ts": [54.119457999997394, 55.40147900000011, 52.21833400000105],
+      "elapsed_async_getsymbolatposition_one_location": [0.0803329999998823, 0.07849999999962165, 0.07895800000187592],
+      "elapsed_async_getsymbolatposition_identifiers": [912.3348959999967, 905.0696665000014, 889.4707705000001],
+      "elapsed_async_getsymbolatposition_identifiers_batched": [70.40979200000584, 71.24633300000278, 69.90637499999866],
+      "elapsed_async_getsymbolatlocation_identifiers": [877.602208500004, 859.1854789999998, 866.1100415000001],
+      "elapsed_async_getsymbolatlocation_identifiers_batched": [37.1530830000047, 35.78314600000158, 36.653707999998005],
+      "peak_rss_async": [136593408, 132857856, 137428992, 137936896, 202162176, 136265728, 197853184, 132005888, 168099840, 174637056, 170180608, 185516032]
+    }
+  },
+  "metadata": {
+    "node": "24.20.0",
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsgo",
+        "sha256": "57ab2bcc2c59862d56fe53a3c87240f22bcd692316e7d261a012f736ae5f4d87",
+        "bytes": 39040034
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsrust",
+        "sha256": "5abc9fb5b89a3276335c49cffecd7a1413540462ea0442faeb8c85175f8ad247",
+        "bytes": 46788464
+      }
+    },
+    "controls_median_ms": {
+      "sync: TS - load project": {
+        "go": 208.17075000000023,
+        "rust": 221.4102499999999
+      },
+      "sync: materialize program.ts": {
+        "go": 1.0309589999997115,
+        "rust": 1.045749999999316
+      },
+      "sync: materialize checker.ts": {
+        "go": 15.602374999998574,
+        "rust": 16.11437500000102
+      },
+      "sync: TS - getSymbolAtPosition - one location": {
+        "go": 0.0004579999986162875,
+        "rust": 0.0004169999992882367
+      },
+      "sync: TS - getSymbolAtLocation - 10160 identifiers": {
+        "go": 7.132124999998268,
+        "rust": 7.065603999999439
+      },
+      "async: spawn API": {
+        "go": 0.0001250000004802132,
+        "rust": 0.0001250000004802132
+      },
+      "async: TS - load project": {
+        "go": 207.9838749999999,
+        "rust": 206.3853954999995
+      },
+      "async: materialize program.ts": {
+        "go": 1.0532079999975394,
+        "rust": 1.0518334999997023
+      },
+      "async: materialize checker.ts": {
+        "go": 15.820416500000647,
+        "rust": 16.189791500000865
+      },
+      "async: TS - getSymbolAtPosition - one location": {
+        "go": 0.000499999998282874,
+        "rust": 0.000499999998282874
+      },
+      "async: TS - getSymbolAtLocation - 10160 identifiers": {
+        "go": 6.761020500001905,
+        "rust": 7.218457999995735
+      },
+      "nodelist": {
+        "index access (list[i])": 0.09629199999972116,
+        "at(i)": 0.07099999999991269,
+        "for..of (iterator)": 0.07404200000019046,
+        "map": 0.09791599999971368,
+        "filter": 0.0994170000003578,
+        "forEach": 0.09724999999980355,
+        "reduce": 0.09691700000075798,
+        "forEachNode": 0.07224999999925785
+      }
+    },
+    "load_average": {
+      "before": [8.55, 10.34, 15.27],
+      "after": [8.51, 11.94, 15.06]
+    },
+    "rounds": 3,
+    "iterations": {
+      "elapsed_sync_spawn_api": {
+        "go": 2106,
+        "rust": 3857
+      },
+      "elapsed_sync_load_snapshot": {
+        "go": 59330,
+        "rust": 52974
+      },
+      "elapsed_sync_transfer_debug_ts": {
+        "go": 7985,
+        "rust": 5373
+      },
+      "elapsed_sync_transfer_program_ts": {
+        "go": 2714,
+        "rust": 1531
+      },
+      "elapsed_sync_transfer_checker_ts": {
+        "go": 227,
+        "rust": 137
+      },
+      "elapsed_sync_getsymbolatposition_one_location": {
+        "go": 275712,
+        "rust": 275756
+      },
+      "elapsed_sync_getsymbolatposition_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_sync_getsymbolatposition_identifiers_batched": {
+        "go": 68,
+        "rust": 32
+      },
+      "elapsed_sync_getsymbolatlocation_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_sync_getsymbolatlocation_identifiers_batched": {
+        "go": 164,
+        "rust": 61
+      },
+      "elapsed_async_load_snapshot": {
+        "go": 23812,
+        "rust": 21476
+      },
+      "elapsed_async_transfer_debug_ts": {
+        "go": 2688,
+        "rust": 2065
+      },
+      "elapsed_async_transfer_program_ts": {
+        "go": 932,
+        "rust": 636
+      },
+      "elapsed_async_transfer_checker_ts": {
+        "go": 84,
+        "rust": 56
+      },
+      "elapsed_async_getsymbolatposition_one_location": {
+        "go": 41716,
+        "rust": 36785
+      },
+      "elapsed_async_getsymbolatposition_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_async_getsymbolatposition_identifiers_batched": {
+        "go": 71,
+        "rust": 32
+      },
+      "elapsed_async_getsymbolatlocation_identifiers": {
+        "go": 30,
+        "rust": 30
+      },
+      "elapsed_async_getsymbolatlocation_identifiers_batched": {
+        "go": 160,
+        "rust": 58
+      }
+    },
+    "elapsed": "each round's tinybench median latency of the task in ms (samples); the ratio compares the medians of the rounds",
+    "peak_rss": "the memory pass's servers, each its own peak RSS; the ratio compares the largest"
+  }
+}

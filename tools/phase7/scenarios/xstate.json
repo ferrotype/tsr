@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "name": "xstate",
+  "source": {
+    "repository": "https://github.com/statelyai/xstate",
+    "commit": "da4c74efa441dd3a4c1d9835c42c3d1f87cdcaba",
+    "origin": "typescript-benchmarking cases/scenarios/xstate-main (unpinned there)"
+  },
+  "install": {
+    "image": "node:24-bookworm@sha256:3d27e5c11e5786e309ec3e03f93ae536eb36e6e5eb3714d5eb3300a36157add0",
+    "commands": [
+      "npx -y pnpm@10.34.5 install --frozen-lockfile"
+    ],
+    "environment": {
+      "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD": "true"
+    }
+  },
+  "project": ".",
+  "modes": {
+    "check": [
+      "--noEmit"
+    ],
+    "emit": [
+      "--noEmit",
+      "false",
+      "--rewriteRelativeImportExtensions",
+      "--outDir",
+      "@OUT@"
+    ]
+  },
+  "notes": "The configuration sets allowImportingTsExtensions with noEmit; checking plus emit adds rewriteRelativeImportExtensions, without which the options error stops checking.",
+  "work": {
+    "check": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 1536,
+      "listed": 1536,
+      "inputs_sha256": "a09265f684eff652a21e3cb836d1e8012a19e0c43bc8db62c04b6f713507e703",
+      "options_sha256": "555ed1511100d85ef646e10719f7546a52cf774b068b956f3393b480bae387ed",
+      "output_sha256": "9118de864b89a6e19e813d75a419c322778bd43b301dcbf046383b437fa528b3",
+      "diagnostics": 0,
+      "types": 387778
+    },
+    "emit": {
+      "checkers": 4,
+      "exit": 0,
+      "files": 1536,
+      "listed": 1536,
+      "inputs_sha256": "a09265f684eff652a21e3cb836d1e8012a19e0c43bc8db62c04b6f713507e703",
+      "options_sha256": "d60f1b2e11526c100780b5dcb9d7ec3568973a8435b220ab66fbad06e7014081",
+      "output_sha256": "9118de864b89a6e19e813d75a419c322778bd43b301dcbf046383b437fa528b3",
+      "diagnostics": 0,
+      "types": 387778,
+      "emitted": 253,
+      "emitted_sha256": "e0932a64a182aead3c7e55914d65b39ff9c45b6eac36e768cfbb6204a5ddd4d4",
+      "oracle_runs": 3
+    }
+  }
+}

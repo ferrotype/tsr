@@ -1,0 +1,221 @@
+{
+  "workload": "check-vscode",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "5468cf024c2b1334bce19bd20002e38a605730a3",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "owner host (macOS arm64, 18 CPUs)"
+  },
+  "recorded_at": "2026-10-10T19:55:37Z",
+  "ratios": {
+    "elapsed_2": 2.8171801361686217,
+    "elapsed_4": 2.4584056962247423,
+    "elapsed_8": 1.973112808884249,
+    "peak_rss_2": 1.0208246575650823,
+    "peak_rss_4": 1.0134852098932357,
+    "peak_rss_8": 1.016485021953611
+  },
+  "samples": {
+    "go": {
+      "wall_ns_2": [6326475875, 6328842917, 6280276625, 6401900875, 6275122042, 6441336667, 6280963375],
+      "peak_rss_bytes_2": [5932204032, 5822808064, 5933826048, 5697617920, 5714001920, 5696815104, 5939658752],
+      "operation_ns_2": [5641000000, 5645000000, 5622000000, 5721000000, 5627000000, 5763000000, 5618000000],
+      "check_ns_2": [4892000000, 4876000000, 4871000000, 4963000000, 4903000000, 4990000000, 4870000000],
+      "user_ns_2": [21755500000, 22320486000, 21719097000, 23098695000, 22581793000, 23455739000, 21767054000],
+      "system_ns_2": [2012919000, 1901525000, 2036115000, 1890014000, 1781024000, 2159303000, 2060531000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [4423532083, 4386896292, 4330275833, 4460542125, 4320464708, 4517101667, 4378491417],
+      "peak_rss_bytes_4": [6529531904, 6457917440, 6257541120, 6253133824, 6422282240, 6530793472, 6244089856],
+      "operation_ns_4": [3693000000, 3646000000, 3622000000, 3724000000, 3609000000, 3780000000, 3670000000],
+      "check_ns_4": [2931000000, 2935000000, 2925000000, 2961000000, 2920000000, 2996000000, 2930000000],
+      "user_ns_4": [26317306000, 24292982000, 25084818000, 25340276000, 24416692000, 26528926000, 25280580000],
+      "system_ns_4": [1941689000, 1943611000, 1930220000, 2040991000, 2141236000, 2072960000, 2085422000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [3629412250, 3601922875, 3580183333, 3651392625, 3424664000, 3586380875, 3363191417],
+      "peak_rss_bytes_8": [7222673408, 7235387392, 7259832320, 7250542592, 7260733440, 7221952512, 7233257472],
+      "operation_ns_8": [2823000000, 2778000000, 2795000000, 2840000000, 2658000000, 2784000000, 2569000000],
+      "check_ns_8": [2068000000, 2026000000, 2075000000, 2063000000, 2069000000, 2030000000, 2011000000],
+      "user_ns_8": [29825849000, 29941954000, 31377333000, 31674713000, 31408193000, 29467868000, 29334705000],
+      "system_ns_8": [2512482000, 2308295000, 2237462000, 2392931000, 2030320000, 2340337000, 2144294000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    },
+    "rust": {
+      "wall_ns_2": [17899899250, 17813865417, 17924254042, 17814294792, 17822822167, 17823357125, 17689476542],
+      "peak_rss_bytes_2": [5982797824, 5937823744, 5944066048, 5937643520, 5976883200, 5934186496, 5963513856],
+      "operation_ns_2": [17308000000, 17222000000, 17357000000, 17253000000, 17253000000, 17247000000, 17084000000],
+      "check_ns_2": [15888000000, 15812000000, 15928000000, 15838000000, 15819000000, 15824000000, 15801000000],
+      "user_ns_2": [33422990000, 33293906000, 33561344000, 33366135000, 33370048000, 33365167000, 33321925000],
+      "system_ns_2": [1713283000, 1693761000, 1685149000, 1663987000, 1651260000, 1617075000, 1670053000],
+      "effective_checkers_2": [2, 2, 2, 2, 2, 2, 2],
+      "wall_ns_4": [10565860584, 10673001167, 10647406500, 10898674584, 10882576500, 10891958208, 10784770833],
+      "peak_rss_bytes_4": [6499205120, 6511034368, 6497599488, 6508888064, 6530023424, 6506135552, 6513360896],
+      "operation_ns_4": [9931000000, 10045000000, 10009000000, 10262000000, 10251000000, 10266000000, 10163000000],
+      "check_ns_4": [8759000000, 8764000000, 8812000000, 8839000000, 8819000000, 8868000000, 8747000000],
+      "user_ns_4": [35172254000, 35222108000, 35348764000, 35565890000, 35513155000, 35480862000, 35259835000],
+      "system_ns_4": [1499474000, 1709260000, 1504277000, 1692374000, 1700137000, 1723184000, 1670603000],
+      "effective_checkers_4": [4, 4, 4, 4, 4, 4, 4],
+      "wall_ns_8": [7175921458, 7071338875, 7076334042, 7068265583, 6936895041, 7130946000, 7167475125],
+      "peak_rss_bytes_8": [7354220544, 7355695104, 7362691072, 7352500224, 7363100672, 7354662912, 7352057856],
+      "operation_ns_8": [6462000000, 6370000000, 6372000000, 6371000000, 6242000000, 6445000000, 6462000000],
+      "check_ns_8": [5064000000, 5080000000, 5068000000, 5061000000, 5101000000, 5043000000, 5105000000],
+      "user_ns_8": [40965624000, 41080362000, 41032826000, 41000436000, 40967278000, 40752726000, 40971974000],
+      "system_ns_8": [1950590000, 1972679000, 1918369000, 1904340000, 1629541000, 1855774000, 1942312000],
+      "effective_checkers_8": [8, 8, 8, 8, 8, 8, 8]
+    }
+  },
+  "summaries": {
+    "elapsed_2": {
+      "samples_per_runtime": 7,
+      "go_median": 6326475875,
+      "rust_median": 17822822167,
+      "ratio": 2.8171801361686217,
+      "go_relative_mad": 0.0073025252783406845,
+      "rust_relative_mad": 0.0005025438685341286,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 2.7826570794881293,
+        "upper": 2.8498652485774127,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_2": {
+      "samples_per_runtime": 7,
+      "go_median": 5822808064,
+      "rust_median": 5944066048,
+      "ratio": 1.0208246575650823,
+      "go_relative_mad": 0.019066055892581795,
+      "rust_relative_mad": 0.001662086511189453
+    },
+    "elapsed_4": {
+      "samples_per_runtime": 7,
+      "go_median": 4386896292,
+      "rust_median": 10784770833,
+      "ratio": 2.4584056962247423,
+      "go_relative_mad": 0.012906723850129257,
+      "rust_relative_mad": 0.010363657024403275,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 2.3927587427503556,
+        "upper": 2.5131370193710243,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_4": {
+      "samples_per_runtime": 7,
+      "go_median": 6422282240,
+      "rust_median": 6508888064,
+      "ratio": 1.0134852098932357,
+      "go_relative_mad": 0.016896054695970508,
+      "rust_relative_mad": 0.0006871883424664775
+    },
+    "elapsed_8": {
+      "samples_per_runtime": 7,
+      "go_median": 3586380875,
+      "rust_median": 7076334042,
+      "ratio": 1.973112808884249,
+      "go_relative_mad": 0.011998551325087578,
+      "rust_relative_mad": 0.007717549465000228,
+      "bootstrap": {
+        "algorithm": "independent-median-ratio/order-statistic-v1",
+        "seed": 21255,
+        "resamples": 10000,
+        "confidence": 0.95,
+        "lower": 1.9474959294028944,
+        "upper": 2.082232300745416,
+        "threshold": 1.0
+      },
+      "stable": false,
+      "needs_more": false
+    },
+    "peak_rss_8": {
+      "samples_per_runtime": 7,
+      "go_median": 7235387392,
+      "rust_median": 7354662912,
+      "ratio": 1.016485021953611,
+      "go_relative_mad": 0.0018568293958737628,
+      "rust_relative_mad": 0.0002940567128469368
+    }
+  },
+  "metadata": {
+    "scenario": "vscode",
+    "mode": "check",
+    "source": {
+      "repository": "https://github.com/microsoft/vscode",
+      "commit": "a44adf7f53e00964ab890f9f8758a334f1fc15bc",
+      "origin": "typescript-benchmarking cases/scenarios/vscode (unpinned there); the commit of the S07 parse-bind inventory"
+    },
+    "project": "src",
+    "arguments": ["--noEmit"],
+    "work": {
+      "checkers": 4,
+      "exit": 2,
+      "files": 9628,
+      "listed": 9628,
+      "inputs_sha256": "1df951cde4cdece0d22a507fe58a3cf338f9a4ad4a93ae1f33c17c0552497766",
+      "options_sha256": "329b6b1e526a92fb440e94e2f8d07697362accffdcf66691f7f3536b3c2f8b57",
+      "output_sha256": "7a4e91c3353391aa5879a1e18d935ccf034fdf87fd12714df5e18791a66bea5d",
+      "diagnostics": 347,
+      "types": 2796771
+    },
+    "binaries": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsgo",
+        "sha256": "57ab2bcc2c59862d56fe53a3c87240f22bcd692316e7d261a012f736ae5f4d87",
+        "bytes": 39040034
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-wt/phase7-r0/target/phase7/bin/tsrust",
+        "sha256": "5abc9fb5b89a3276335c49cffecd7a1413540462ea0442faeb8c85175f8ad247",
+        "bytes": 46788464
+      }
+    },
+    "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+    "load": {
+      "2": {
+        "before": [7.55, 8.76, 9.22],
+        "after": [5.62, 7.02, 8.37],
+        "other_cpu_before": {
+          "percent": 134.3,
+          "busiest": [["StorageManagementService", 72.4], ["ApplicationsStorageExtension", 31.7], ["com.docker.backend", 9.0], ["fseventsd", 6.2], ["coreaudiod", 3.1]]
+        }
+      },
+      "4": {
+        "before": [5.62, 7.02, 8.37],
+        "after": [7.92, 7.15, 8.21],
+        "other_cpu_before": {
+          "percent": 145.3,
+          "busiest": [["StorageManagementService", 85.2], ["Storage", 31.2], ["coreaudiod", 5.3], ["WindowServer", 5.1], ["AppleCentauriAlpha", 1.5]]
+        }
+      },
+      "8": {
+        "before": [7.92, 7.15, 8.21],
+        "after": [8.99, 7.83, 8.38],
+        "other_cpu_before": {
+          "percent": 156.8,
+          "busiest": [["StorageManagementService", 101.2], ["Storage", 22.5], ["WindowServer", 5.4], ["coreaudiod", 5.1], ["airportd", 2.8]]
+        }
+      }
+    },
+    "sampling": "one warm-up pair, then 7 alternating pairs, once extended to 14",
+    "elapsed": "process launch to exit; operation_ns is the binary's own Total time",
+    "host_acceptance": {
+      "status": "accepted",
+      "by": "owner",
+      "date": "2026-10-11",
+      "scope": "R0 scenario starting measurements",
+      "decision": "Accept all ten scenario runs without a load qualification; retain the raw load samples."
+    }
+  }
+}

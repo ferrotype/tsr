@@ -458,7 +458,14 @@ impl CheckerState {
                 || symbol.check_flags() & tsr_ast::check_flags::PARTIAL != 0
                 || assume);
         }
-        let key = self.get_string_literal_type(tsr_ast::JsString::from_bytes(name))?;
+        // getApplicableIndexInfoForName: a late-bound (symbol) name selects the
+        // symbol index signatures, so a string index signature cannot make a
+        // unique symbol key known.
+        let key = if name.starts_with(b"\xfe@") {
+            self.builtins.es_symbol_type
+        } else {
+            self.get_string_literal_type(tsr_ast::JsString::from_bytes(name))?
+        };
         Ok(self.applicable_index_info(ty, key)?.is_some() || !assume)
     }
 

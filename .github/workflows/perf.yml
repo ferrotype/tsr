@@ -20,6 +20,13 @@
 #                       with them that capture and the warm build.
 #           lsp         an explicitly supplied hermetic fixture and fixed scenario;
 #                       no fixture dependencies are fetched during measurement.
+#           scenarios   full checking and checking plus emit of the five Phase 7
+#                       benchmarking scenarios at 2, 4 and 8 checkers
+#                       (docs/PHASE7-plan.md, R0): one capture, ten run files
+#                       (check-<scenario>, emit-<scenario>). Provisioning installs
+#                       each scenario's dependencies in a container (Docker), and
+#                       the capture refuses a host with fewer than eight CPUs, so
+#                       it needs a prepared self-hosted runner.
 #
 # The job writes one status/perf/<workload>/<run>.json with `scripts/perf.py
 # record` and uploads it as an artifact; committing it is a separate, manual step.
@@ -42,6 +49,7 @@ on:
           - parse-bind
           - checker
           - lsp
+          - scenarios
       lsp-fixture:
         description: 'lsp only: prepared local hermetic fixture path on the runner'
         type: string
@@ -188,15 +196,62 @@ jobs:
         if: inputs.workload == 'lsp'
         run: python3 scripts/perf.py record lsp --capture "$LSP_CAPTURE" --label "github $RUNS_ON" | tee target/perf-record.txt
 
+      # scenarios: provision and freeze-check the inputs, then one capture of all
+      # five scenarios in both modes, recorded as ten run files.
+      - name: Provision the scenarios
+        if: inputs.workload == 'scenarios'
+        run: python3 scripts/phase7_scenarios.py provision
+      - name: Build the ordinary binaries
+        if: inputs.workload == 'scenarios'
+        run: python3 tools/phase7/bench/capture.py build
+      - name: Verify the frozen work
+        if: inputs.workload == 'scenarios'
+        run: python3 scripts/phase7_scenarios.py verify
+      - name: Capture the scenarios
+        if: inputs.workload == 'scenarios'
+        run: python3 tools/phase7/bench/capture.py run --output "target/phase7/bench/capture-${{ github.run_id }}"
+      - name: Upload the raw scenario capture
+        if: always() && inputs.workload == 'scenarios'
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase7-scenarios-raw-${{ github.run_id }}
+          path: target/phase7/bench/capture-${{ github.run_id }}
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Record and check the scenario runs
+        if: inputs.workload == 'scenarios'
+        run: |
+          : > target/perf-records.txt
+          for scenario in vscode self-compiler mui-docs xstate bluesky; do
+            for mode in check emit; do
+              python3 scripts/perf.py record "$mode-$scenario" --capture "target/phase7/bench/capture-${{ github.run_id }}" \
+                --label "github $RUNS_ON" | head -n 1 >> target/perf-records.txt
+              python3 scripts/perf.py check "$mode-$scenario" --run "$(tail -n 1 target/perf-records.txt)" || true
+            done
+          done
+      - name: Upload the scenario run files
+        if: inputs.workload == 'scenarios'
+        uses: actions/upload-artifact@v4
+        with:
+          name: perf-scenarios-${{ github.run_id }}
+          path: |
+            status/perf/check-*/*.json
+            status/perf/emit-*/*.json
+          retention-days: 90
+          if-no-files-found: error
+
       - name: Locate the run file
+        if: inputs.workload != 'scenarios'
         id: run
         run: echo "path=$(head -n 1 target/perf-record.txt)" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
+        if: inputs.workload != 'scenarios'
         with:
           name: perf-${{ inputs.workload }}-${{ github.run_id }}
           path: ${{ steps.run.outputs.path }}
           retention-days: 90
           if-no-files-found: error
       - name: Compare with the thresholds
+        if: inputs.workload != 'scenarios'
         continue-on-error: true
         run: python3 scripts/perf.py check "$WORKLOAD" --run "${{ steps.run.outputs.path }}"
