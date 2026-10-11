@@ -75,8 +75,10 @@ warm-up pair: seven pairs, extended once to fourteen when the elapsed ratio's
   omitted operation (`--noCheck`, `--noEmit`) and a changed result, which must
   be rejected before any measurement.
 - **Host.** Before each configuration the capture records the CPU of every
-  other process (by name only); a configuration that started with other
-  processes above two CPUs ran on a busy host, and its run is marked so.
+  other process (identified by PID, reported by name only). Other compiler and
+  Python processes are included; only the capture process itself is excluded.
+  The owner accepted these ten R0 records without a load qualification on
+  2026-10-11. Their raw host observations remain recorded.
 
 The pin's emit on mui-docs is not deterministic: twelve oracle runs emitted
 13,372 to 13,399 of the same 13,399 files, different ones each time, all
@@ -112,18 +114,18 @@ were extended to 14 pairs. Ratios are Rust over Go, with the medians in
 parentheses (Rust / Go); the operation ratio is the binaries' own `Total time` at
 four checkers, and "outside" is the rest of the elapsed time (startup and exit).
 
-| Scenario | Mode | Elapsed, 2 checkers | 4 checkers | 8 checkers | Peak RSS, 2 | 4 | 8 | Operation at 4; outside | Busy |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| vscode | check | 2.82 (17.8 s / 6.3 s) | 2.46 (10.8 s / 4.4 s) | 1.97 (7.1 s / 3.6 s) | 1.02 (5.5 / 5.4 GiB) | 1.01 (6.1 / 6.0 GiB) | 1.02 (6.8 / 6.7 GiB) | 2.77; 0.62 s / 0.72 s | no |
-| vscode | emit | 4.15 (33.9 s / 8.2 s) | 3.75 (21.8 s / 5.8 s) | 3.03 (14.5 s / 4.8 s) | 0.76 (5.6 / 7.3 GiB) | 0.76 (6.1 / 8.0 GiB) | 0.75 (6.9 / 9.2 GiB) | 4.30; 0.64 s / 0.89 s | yes |
-| self-compiler | check | 3.31 (1.5 s / 0.5 s) | 3.19 (1.3 s / 0.4 s) | 2.96 (1.2 s / 0.4 s) | 0.74 (0.3 / 0.4 GiB) | 0.79 (0.4 / 0.5 GiB) | 0.85 (0.5 / 0.6 GiB) | 3.56; 0.04 s / 0.05 s | yes |
-| self-compiler | emit | 3.41 (1.6 s / 0.5 s) | 3.18 (1.4 s / 0.4 s) | 3.03 (1.2 s / 0.4 s) | 0.73 (0.3 / 0.5 GiB) | 0.78 (0.4 / 0.5 GiB) | 0.82 (0.5 / 0.6 GiB) | 3.55; 0.04 s / 0.06 s | no |
-| mui-docs | check | 1.89 (16.0 s / 8.5 s) | 1.56 (12.1 s / 7.8 s) | 1.28 (13.1 s / 10.3 s) | 0.80 (3.8 / 4.8 GiB) | 0.76 (5.4 / 7.1 GiB) | 0.71 (7.2 / 10.1 GiB) | 1.63; 0.44 s / 0.60 s | yes |
-| mui-docs | emit | 1.84 (18.4 s / 10.0 s) | 1.43 (13.4 s / 9.3 s) | 1.29 (13.2 s / 10.2 s) | 0.79 (3.9 / 4.9 GiB) | 0.76 (5.4 / 7.1 GiB) | 0.70 (7.2 / 10.2 GiB) | 1.48; 0.44 s / 0.59 s | yes |
-| xstate | check | 2.01 (1.5 s / 0.7 s) | 1.84 (0.9 s / 0.5 s) | 1.73 (0.7 s / 0.4 s) | 1.03 (0.6 / 0.6 GiB) | 1.00 (0.7 / 0.7 GiB) | 1.00 (0.9 / 0.9 GiB) | 2.04; 0.08 s / 0.09 s | yes |
-| xstate | emit | 2.36 (1.8 s / 0.8 s) | 2.11 (1.1 s / 0.5 s) | 1.78 (0.8 s / 0.5 s) | 0.96 (0.6 / 0.7 GiB) | 0.94 (0.7 / 0.8 GiB) | 0.92 (0.9 / 1.0 GiB) | 2.37; 0.08 s / 0.09 s | yes |
-| bluesky | check | 2.42 (5.5 s / 2.3 s) | 2.11 (3.8 s / 1.8 s) | 1.84 (3.1 s / 1.7 s) | 1.01 (1.7 / 1.6 GiB) | 1.05 (2.1 / 2.0 GiB) | 0.97 (2.8 / 2.9 GiB) | 2.30; 0.24 s / 0.25 s | yes |
-| bluesky | emit | 2.80 (7.2 s / 2.6 s) | 2.05 (4.7 s / 2.3 s) | 1.86 (3.9 s / 2.1 s) | 0.99 (1.7 / 1.7 GiB) | 0.95 (2.1 / 2.2 GiB) | 0.96 (2.8 / 2.9 GiB) | 2.22; 0.24 s / 0.28 s | yes |
+| Scenario | Mode | Elapsed, 2 checkers | 4 checkers | 8 checkers | Peak RSS, 2 | 4 | 8 | Operation at 4; outside |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| vscode | check | 2.82 (17.8 s / 6.3 s) | 2.46 (10.8 s / 4.4 s) | 1.97 (7.1 s / 3.6 s) | 1.02 (5.5 / 5.4 GiB) | 1.01 (6.1 / 6.0 GiB) | 1.02 (6.8 / 6.7 GiB) | 2.77; 0.62 s / 0.72 s |
+| vscode | emit | 4.15 (33.9 s / 8.2 s) | 3.75 (21.8 s / 5.8 s) | 3.03 (14.5 s / 4.8 s) | 0.76 (5.6 / 7.3 GiB) | 0.76 (6.1 / 8.0 GiB) | 0.75 (6.9 / 9.2 GiB) | 4.30; 0.64 s / 0.89 s |
+| self-compiler | check | 3.31 (1.5 s / 0.5 s) | 3.19 (1.3 s / 0.4 s) | 2.96 (1.2 s / 0.4 s) | 0.74 (0.3 / 0.4 GiB) | 0.79 (0.4 / 0.5 GiB) | 0.85 (0.5 / 0.6 GiB) | 3.56; 0.04 s / 0.05 s |
+| self-compiler | emit | 3.41 (1.6 s / 0.5 s) | 3.18 (1.4 s / 0.4 s) | 3.03 (1.2 s / 0.4 s) | 0.73 (0.3 / 0.5 GiB) | 0.78 (0.4 / 0.5 GiB) | 0.82 (0.5 / 0.6 GiB) | 3.55; 0.04 s / 0.06 s |
+| mui-docs | check | 1.89 (16.0 s / 8.5 s) | 1.56 (12.1 s / 7.8 s) | 1.28 (13.1 s / 10.3 s) | 0.80 (3.8 / 4.8 GiB) | 0.76 (5.4 / 7.1 GiB) | 0.71 (7.2 / 10.1 GiB) | 1.63; 0.44 s / 0.60 s |
+| mui-docs | emit | 1.84 (18.4 s / 10.0 s) | 1.43 (13.4 s / 9.3 s) | 1.29 (13.2 s / 10.2 s) | 0.79 (3.9 / 4.9 GiB) | 0.76 (5.4 / 7.1 GiB) | 0.70 (7.2 / 10.2 GiB) | 1.48; 0.44 s / 0.59 s |
+| xstate | check | 2.01 (1.5 s / 0.7 s) | 1.84 (0.9 s / 0.5 s) | 1.73 (0.7 s / 0.4 s) | 1.03 (0.6 / 0.6 GiB) | 1.00 (0.7 / 0.7 GiB) | 1.00 (0.9 / 0.9 GiB) | 2.04; 0.08 s / 0.09 s |
+| xstate | emit | 2.36 (1.8 s / 0.8 s) | 2.11 (1.1 s / 0.5 s) | 1.78 (0.8 s / 0.5 s) | 0.96 (0.6 / 0.7 GiB) | 0.94 (0.7 / 0.8 GiB) | 0.92 (0.9 / 1.0 GiB) | 2.37; 0.08 s / 0.09 s |
+| bluesky | check | 2.42 (5.5 s / 2.3 s) | 2.11 (3.8 s / 1.8 s) | 1.84 (3.1 s / 1.7 s) | 1.01 (1.7 / 1.6 GiB) | 1.05 (2.1 / 2.0 GiB) | 0.97 (2.8 / 2.9 GiB) | 2.30; 0.24 s / 0.25 s |
+| bluesky | emit | 2.80 (7.2 s / 2.6 s) | 2.05 (4.7 s / 2.3 s) | 1.86 (3.9 s / 2.1 s) | 0.99 (1.7 / 1.7 GiB) | 0.95 (2.1 / 2.2 GiB) | 0.96 (2.8 / 2.9 GiB) | 2.22; 0.24 s / 0.28 s |
 
 Against PLAN's budgets (elapsed at most 1.0, peak RSS at most 0.70) every
 ratio misses: elapsed at 1.28 to 4.15, and peak RSS closest on mui-docs at
@@ -143,15 +145,12 @@ eight checkers (0.705 in emit, 0.712 in check). What R1 inherits:
   bluesky and is 0.70–0.85 of it on self-compiler and mui-docs; Go's emit peaks
   are higher, so the emit ratios are lower.
 
-**Host.** The busy column follows the capture's rule: some configuration of the
-workload started while the other processes used more than two CPUs. The heavy
-others were `fseventsd`, processing the file events of the emit runs' own
-outputs and their deletion, and macOS's storage scanning
-(StorageManagementService, ApplicationsStorageExtension); the busiest five are
-in each run's metadata. Pairs alternate, so both runtimes share that load. The
-weekly acceptance runs need a host where neither appears: an emit directory on a
-volume whose file-event log is disabled (`.fseventsd/no_log`) and no storage
-scan.
+**Host acceptance — owner decision, 2026-10-11.** All ten scenario records
+are accepted as R0's starting measurements, with no load qualification. The
+raw CPU/load observations remain intact, including `fseventsd` and macOS
+storage scans; the old busy labels have been removed. No sample, ratio,
+confidence interval or performance budget changed. The separate quiet-host
+rule for future weekly acceptance runs remains in the Phase 7 plan.
 
 ## The API benchmarks
 
@@ -162,9 +161,13 @@ One capture (`target/phase7/api/capture-r0`, revision `4c9bf18b`, 2026-10-10
 pin's Node and tinybench (6.1.3), three rounds per runtime in alternating order,
 the pinned client spawning each server through `getExePath()`. A task's ratio
 compares the medians over the rounds of tinybench's per-run median latency.
-Both servers transferred the same trees: the task names embed the 10,160
-identifiers each server's `program.ts` yields, and the capture refuses runtimes
-that ran differently named tasks. The memory pass runs each file once more per
+That original capture checked matching task names and 10,160-identifier
+counts only; those do not establish answer parity. The corrected harness now
+compares the loaded roots, all three transferred trees and every answer from
+the one-location, sequential and batched symbol tasks before timing. It
+preserves names, flags and declaration handles, renumbering only process-local
+IDs (including the type-ID suffix in unique-symbol escaped names; ADR 0010).
+Wrong-answer and omitted-operation controls must fail. The memory pass runs each file once more per
 runtime in its single-iteration mode, through a wrapper that records every
 spawned server's own peak RSS (12 per file); the ratio compares the largest.
 Owner decision 7's targets are 1.25 elapsed and 0.85 peak RSS. Ratios are Rust
@@ -207,10 +210,17 @@ The client-only controls do the same work in both runtimes' runs and agree
 within 7% (`materialize checker.ts` 16.1 against 15.6 ms, `TS - load project`
 221 against 208 ms in the sync file and 206 against 208 in the async one), which
 bounds this capture's noise; `test/nodelist.bench.ts`'s tasks take 0.07–0.10
-ms. The sync file's `spawn API` closes only its last server (tinybench runs a
-bench's `teardown` once per phase), so the others stay alive and idle until the
-file ends: about 700 Go or 1,300 Rust servers per round, by the iteration
-counts.
+ms. In this original capture, the sync spawn task closed only its last
+server: about 700 Go or 1,300 Rust servers survived into later tasks per round.
+These API timings need replacement after the harness fix; the owner's load
+acceptance above applies to the scenario records, not this lifecycle defect.
+
+The corrected runner calls the pin's teardown after every spawn iteration and
+awaits child exit between iterations and phases. Both clients use `Bench.run()`
+so cleanup can await exit; tinybench 6.1.3 still measures sync task bodies through
+its same synchronous timer. The runner records spawned/reaped/peak child counts
+and rejects overlapping or surviving servers. The task bodies, iteration
+options and measurement boundaries are unchanged; process cleanup is untimed.
 
 ## Phase 5 L8
 

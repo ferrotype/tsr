@@ -212,9 +212,14 @@
         }
       }
     },
-    "host_busy": true,
-    "host_busy_rule": "other processes above 200% of one CPU before a configuration",
     "sampling": "one warm-up pair, then 7 alternating pairs, once extended to 14",
-    "elapsed": "process launch to exit; operation_ns is the binary's own Total time"
+    "elapsed": "process launch to exit; operation_ns is the binary's own Total time",
+    "host_acceptance": {
+      "status": "accepted",
+      "by": "owner",
+      "date": "2026-10-11",
+      "scope": "R0 scenario starting measurements",
+      "decision": "Accept all ten scenario runs without a load qualification; retain the raw load samples."
+    }
   }
 }

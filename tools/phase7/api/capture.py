@@ -21,10 +21,16 @@ recorded without a ratio, as is test/nodelist.bench.ts, which starts no server.
 So is the async file's `spawn API`: the async client spawns its server on the
 first request, so that task only constructs the client (the sync client
 spawns in its constructor). The other tasks are server-dependent: spawn,
-project load, transfer and queries, each its own ratio. Both runtimes must run the same tasks without an error,
-and the task names embed the identifier count each server's transferred AST
-yields, so a server that transfers a different tree runs differently named
-tasks and the capture fails.
+project load, transfer and queries, each its own ratio. Before timing, work.mjs
+compares loaded roots, transferred trees and every symbol answer from the
+same query schedule in both clients. Process-local IDs are canonicalized;
+names, flags and declaration handles are compared. Omitted operations and
+wrong answers are planted and must be rejected. Task names also have to agree.
+
+The task bodies remain pinned. capture.mjs drives their Bench asynchronously
+(sync tasks retain tinybench's sync timer) to reap servers outside the timer.
+The pinned teardown also runs after each spawn iteration, so earlier servers
+cannot accumulate through that task or contaminate subsequent measurements.
 
 The memory pass runs each file once more per runtime with its own
 singleIteration option, with `getExePath()` pointing at server_rss.py, which
@@ -33,11 +39,13 @@ records every spawned server's own peak RSS; a mode's peak is the largest.
 from __future__ import annotations
 
 import argparse
+import copy
 from datetime import datetime, timezone
 import json
 import os
 from pathlib import Path
 import re
+import signal
 import shutil
 from statistics import median
 import subprocess
@@ -57,9 +65,13 @@ FILES = {'sync': 'test/sync/api.bench.ts', 'async': 'test/async/api.bench.ts'}
 CONTROL_FILE = 'test/nodelist.bench.ts'
 CONTROL_PREFIXES = ('TS - ', 'materialize ')
 CLIENT_ONLY = {('async', 'spawn API')}
-FORMAT = 1
+FORMAT = 2
 ROUNDS = 3
 TIMEOUT_SECONDS = 1800
+WORK = {'load_snapshot', 'transfer_debug_ts', 'transfer_program_ts', 'transfer_checker_ts',
+        'getsymbolatposition_one_location', 'getsymbolatposition_identifiers',
+        'getsymbolatposition_identifiers_batched', 'getsymbolatlocation_identifiers',
+        'getsymbolatlocation_identifiers_batched'}
 
 
 def key(name):
@@ -72,20 +84,42 @@ def is_control(mode, name):
     return name.startswith(CONTROL_PREFIXES) or (mode, name) in CLIENT_ONLY
 
 
-def node_command(node, bench, out, single=False):
+def node_command(node, bench, out, single=False, driver='capture.mjs'):
     return [node, '--conditions', '@typescript/source', '--experimental-import-meta-resolve',
-            str(HERE / 'capture.mjs'), str(PACKAGE / bench), str(out), *(['single'] if single else [])]
+            str(HERE / driver), str(PACKAGE / bench), str(out), *(['single'] if single else [])]
 
 
-def run_file(node, bench, out, env=None, single=False):
+def run_node(node, bench, out, env=None, single=False, driver='capture.mjs'):
     # Its own session: when the client cannot spawn its server, its error
     # path calls kill() on a child without a pid, which node sends as
     # kill(0, SIGTERM) to the whole process group.
-    result = subprocess.run(node_command(node, bench, out, single), cwd=PACKAGE, env=env or os.environ,
-                            capture_output=True, text=True, timeout=TIMEOUT_SECONDS, start_new_session=True)
-    if result.returncode != 0 or not Path(out).is_file():
-        raise ValueError(f'{bench} exited {result.returncode}: {result.stderr[-2000:]}')
-    benches = json.loads(Path(out).read_text())['benches']
+    with subprocess.Popen(node_command(node, bench, out, single, driver), cwd=PACKAGE, env=env or os.environ,
+                          stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True) as child:
+        try:
+            _, stderr = child.communicate(timeout=TIMEOUT_SECONDS)
+        except BaseException:
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            child.communicate()
+            raise
+        if child.returncode != 0 or not Path(out).is_file():
+            # Also cover Node dying before its finally/exit hooks can run.
+            try:
+                os.killpg(child.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            raise ValueError(f'{bench} exited {child.returncode}: {stderr[-2000:]}')
+    result = json.loads(Path(out).read_text())
+    lifecycle = result['lifecycle']
+    if lifecycle['remaining'] != 0 or lifecycle['spawned'] != lifecycle['reaped'] or lifecycle['peak'] > 1:
+        raise ValueError(f'{bench}: servers overlapped or leaked: {lifecycle}')
+    return result
+
+
+def run_file(node, bench, out, env=None, single=False):
+    benches = run_node(node, bench, out, env, single)['benches']
     if len(benches) != 1:
         raise ValueError(f'{bench}: expected one bench, captured {len(benches)}')
     tasks = benches[0]['tasks']
@@ -95,6 +129,48 @@ def run_file(node, bench, out, env=None, single=False):
     if failed:
         raise ValueError(f'{bench}: tasks did not complete: {failed}')
     return tasks
+
+
+def work_differences(go, rust):
+    if set(go) != WORK or set(rust) != WORK:
+        return ['missing or extra API operations']
+    return [name for name in sorted(WORK) if go[name] != rust[name]]
+
+
+def validate_work(work):
+    if set(work) != set(FILES):
+        raise ValueError('API work comparison must cover sync and async')
+    for mode in FILES:
+        outputs = work[mode]
+        for runtime in ('go', 'rust'):
+            for name, observation in outputs[runtime].items():
+                if (type(observation.get('count')) is not int or observation['count'] < 1
+                        or not re.fullmatch('[0-9a-f]{64}', str(observation.get('sha256')))):
+                    raise ValueError(f'{mode} {runtime}: invalid API observation {name}')
+        differences = work_differences(outputs['go'], outputs['rust'])
+        if differences:
+            raise ValueError(f'{mode}: API answers differ: {differences}')
+
+
+def preflight(node, binaries, output, log=sys.stdout):
+    """Compare answers before timing; negative controls exercise the same comparator."""
+    work = {}
+    for mode, bench in FILES.items():
+        work[mode] = {}
+        for runtime in ('go', 'rust'):
+            jsapi._place_binary(binaries[runtime])
+            observation = run_node(node, bench, output / f'{mode}-work-{runtime}.json', driver='work.mjs')
+            work[mode][runtime] = observation['work']
+        go, rust = work[mode]['go'], work[mode]['rust']
+        wrong = copy.deepcopy(rust)
+        name = 'getsymbolatposition_identifiers_batched'
+        wrong[name]['sha256'] = common.sha256(b'planted wrong symbol response')
+        omitted = {key: value for key, value in rust.items() if key != name}
+        if not work_differences(go, wrong) or not work_differences(go, omitted):
+            raise ValueError(f'{mode}: API comparator accepted a negative control')
+    validate_work(work)
+    print('api sync/async: trees and symbol answers match; negative controls rejected', file=log, flush=True)
+    return work
 
 
 def latency(task):
@@ -137,6 +213,7 @@ def capture(output, rounds=ROUNDS, log=sys.stdout):
               'runs': [], 'memory': {}, 'controls': {}, 'complete': False}
     path = output / 'capture.json'
     try:
+        report['work'] = preflight(node, binaries, output, log)
         for mode, bench in FILES.items():
             for index in range(rounds):
                 for runtime in (('go', 'rust') if index % 2 == 0 else ('rust', 'go')):
@@ -159,6 +236,9 @@ def capture(output, rounds=ROUNDS, log=sys.stdout):
                 print(f'api {mode} memory {runtime}: {max(values) / 2**20:.0f} MB over {len(values)} servers',
                       file=log, flush=True)
         report['controls']['nodelist'] = run_file(node, CONTROL_FILE, output / 'nodelist.json')
+        report['lifecycle'] = {
+            file.name: json.loads(file.read_text())['lifecycle']
+            for file in sorted(output.glob('*.json')) if file.name != 'capture.json'}
         validate(report)
         report['complete'] = True
     finally:
@@ -169,7 +249,13 @@ def capture(output, rounds=ROUNDS, log=sys.stdout):
 
 
 def validate(report):
-    """Both runtimes ran the same tasks in every round of a mode."""
+    """Answers match and both runtimes ran the same tasks in every round."""
+    if 'work' not in report:
+        raise ValueError('capture has no API answer comparison; run the new preflight')
+    validate_work(report['work'])
+    for name, observed in report.get('lifecycle', {}).items():
+        if observed['remaining'] or observed['spawned'] != observed['reaped'] or observed['peak'] > 1:
+            raise ValueError(f'{name}: servers overlapped or leaked')
     for mode in FILES:
         names = {(run['runtime'], run['round']): [task['name'] for task in run['tasks']]
                  for run in report['runs'] if run['mode'] == mode}
@@ -214,6 +300,8 @@ def read_capture(path):
             samples[runtime][f'peak_rss_{mode}'] = memory[runtime]['server_peaks']
     controls['nodelist'] = {task['name']: latency(task)[0] for task in report['controls']['nodelist']}
     metadata = {'node': report['node'], 'pin': report['pin'], 'binaries': report['binaries'],
+                'work': report['work'], 'lifecycle': report.get('lifecycle', {}),
+                'server_lifecycle': 'spawn teardown per iteration; all servers reaped before the next task',
                 'controls_median_ms': controls, 'load_average': {'before': report['load_before'], 'after': report['load_after']},
                 'rounds': max(run['round'] for run in report['runs']) + 1, 'iterations': pooled_counts,
                 'elapsed': "each round's tinybench median latency of the task in ms (samples); the ratio "

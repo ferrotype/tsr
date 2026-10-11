@@ -57,7 +57,6 @@ PAIRS = (7, 14)
 # average is kept too, but just after a measured compile it reflects that
 # compile, not the host.
 BUSY_OTHER_CPU = 200.0
-OWN_PROCESSES = {'tsgo', 'tsrust'}
 THRESHOLDS = {'elapsed': 1.0, 'peak_rss': 0.70}
 CONTROLS = {'check': ['--noCheck'], 'emit': ['--noEmit']}
 
@@ -190,12 +189,16 @@ def load_average():
 
 def other_cpu():
     """The CPU the host's other processes use, in percent of one CPU, with
-    the five busiest by name (names only, never arguments)."""
+    the five busiest by name (names only, never arguments).
+
+    Called before launching a configuration: no measured child is running.
+    Exclude this capture's PID, not unrelated compilers or Python processes.
+    """
     rows = []
-    for line in subprocess.check_output(['ps', '-Ao', 'pcpu=,comm='], text=True).splitlines():
-        cpu, _, command = line.strip().partition(' ')
-        name = Path(command.strip()).name
-        if name not in OWN_PROCESSES and name != Path(sys.executable).name:
+    for line in subprocess.check_output(['ps', '-Ao', 'pid=,pcpu=,comm='], text=True).splitlines():
+        pid, cpu, command = line.split(maxsplit=2)
+        name = Path(command).name
+        if int(pid) != os.getpid():
             rows.append((float(cpu), name))
     rows.sort(reverse=True)
     return {'percent': round(sum(cpu for cpu, _ in rows), 1), 'busiest': [[name, cpu] for cpu, name in rows[:5]]}

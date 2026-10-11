@@ -2,11 +2,15 @@
 oracle's frozen work, and the reader behind perf.py's scenario workloads."""
 import copy
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 import tempfile
 import tomllib
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -81,6 +85,16 @@ class DescriptorTests(unittest.TestCase):
 
 
 class RunFactsTests(unittest.TestCase):
+    def test_other_cpu_excludes_only_the_capture_pid(self):
+        table = (f'{os.getpid()} 12.0 /usr/bin/python3\n'
+                 '1 350.0 /elsewhere/tsrust\n2 280.0 /elsewhere/tsgo\n'
+                 '3 90.0 /usr/bin/python3\n4 1.0 /usr/bin/other\n')
+        with mock.patch.object(capture.subprocess, 'check_output', return_value=table) as ps:
+            observed = capture.other_cpu()
+        self.assertEqual(observed['percent'], 721.0)
+        self.assertEqual(observed['busiest'][0], ['tsrust', 350.0])
+        self.assertIn('pid=,pcpu=,comm=', ps.call_args.args[0])
+
     def test_output_splits_at_the_statistics_table(self):
         printed, statistics = common.split_output(stdout(diagnostics=['a.ts(1,2): error TS2322: Nope.']))
         self.assertEqual(printed[0], 'a.ts(1,2): error TS2322: Nope.')
@@ -227,12 +241,52 @@ def api_report(**changes):
     report = {'format': api.FORMAT, 'complete': True, 'dirty': False, 'revision': 'f' * 40, 'pin': 'e' * 40,
               'node': '24.20.0', 'finished': '2026-10-10T00:00:00Z', 'host': {'os': 'darwin'}, 'binaries': {},
               'load_before': [1, 1, 1], 'load_after': [1, 1, 1], 'runs': runs, 'memory': memory,
+              'work': {mode: {runtime: {name: {'count': 1, 'sha256': SHA} for name in api.WORK}
+                              for runtime in ('go', 'rust')} for mode in api.FILES},
               'controls': {'nodelist': [{'name': 'decode', 'result': {'latency': {'p50': 3.0, 'samplesCount': 5}}}]}}
     report.update(changes)
     return report, tasks
 
 
 class ApiReaderTests(unittest.TestCase):
+    def test_preflight_refuses_wrong_answers_before_timing(self):
+        report, _ = api_report()
+        observation = {'work': report['work']['sync']['go']}
+        wrong = copy.deepcopy(observation)
+        wrong['work']['getsymbolatlocation_identifiers']['sha256'] = 'b' * 64
+        with tempfile.TemporaryDirectory() as directory, \
+                mock.patch.object(api, 'prerequisites', return_value=('node', '24.20.0')), \
+                mock.patch.object(api.common, 'binaries', return_value={'go': Path('/go'), 'rust': Path('/rust')}), \
+                mock.patch.object(api.common, 'identity', return_value={}), \
+                mock.patch.object(api, 'host_info', return_value={}), \
+                mock.patch.object(api, 'reject_concurrent_builds'), \
+                mock.patch.object(api.jsapi, '_place_binary'), \
+                mock.patch.object(api, 'run_node', side_effect=[observation, wrong, observation, observation]), \
+                mock.patch.object(api, 'run_file') as timed:
+            with self.assertRaisesRegex(ValueError, 'API answers differ'):
+                api.capture(directory)
+            timed.assert_not_called()
+            saved = json.loads((Path(directory) / 'capture.json').read_text())
+            self.assertFalse(saved['complete'])
+
+    def test_matching_names_do_not_hide_wrong_or_missing_answers(self):
+        for mode in api.FILES:
+            for name in api.WORK:
+                with self.subTest(mode=mode, name=name):
+                    report, _ = api_report()
+                    report['work'][mode]['rust'][name]['sha256'] = 'b' * 64
+                    with self.assertRaisesRegex(ValueError, 'API answers differ'):
+                        api.validate(report)
+                    report['work'][mode]['rust'].pop(name)
+                    with self.assertRaisesRegex(ValueError, 'missing or extra'):
+                        api.validate(report)
+
+    def test_legacy_capture_without_answer_check_is_not_accepted(self):
+        report, _ = api_report()
+        report.pop('work')
+        with self.assertRaisesRegex(ValueError, 'no API answer comparison'):
+            api.validate(report)
+
     def test_task_keys_drop_the_identifier_count(self):
         self.assertEqual(api.key('getSymbolAtPosition - 2894 identifiers (batched)'),
                          'getsymbolatposition_identifiers_batched')
@@ -262,6 +316,64 @@ class ApiReaderTests(unittest.TestCase):
             (Path(directory) / 'capture.json').write_text(json.dumps(report))
             with self.assertRaisesRegex(ValueError, 'different tasks'):
                 api.read_capture(directory)
+
+
+@unittest.skipUnless(shutil.which('node') and (ROOT / 'upstream/node_modules/tinybench').is_dir(),
+                     'pinned Node/tinybench dependencies are needed for the lifecycle integration test')
+class ApiLifecycleTests(unittest.TestCase):
+    def test_symbol_normalization_keeps_identity_names_and_declarations(self):
+        module = (api.HERE / 'symbols.mjs').as_uri()
+        code = '''
+import assert from 'node:assert/strict';
+import { symbolObserver } from MODULE;
+const make = (name, index = 10) => ({name, escapedName: name, flags: 1, checkFlags: 0,
+    declarations: [{path: '/root/file.ts', kind: 1, index}]});
+const go = symbolObserver('/root/'), rust = symbolObserver('/root/');
+assert.deepEqual(go(make('__@hasInstance@239')), rust(make('__@hasInstance@164')));
+assert.deepEqual(go(make('__@hasInstance@239')), rust(make('__@hasInstance@164')));
+assert.notDeepEqual(go(make('__@hasInstance@240')), rust(make('__@hasInstance@164')));
+assert.notDeepEqual(go(make('x')), rust(make('y')));
+assert.notDeepEqual(go(make('x', 10)), rust(make('x', 11)));
+assert.notDeepEqual(go(make('___@hasInstance@239')), rust(make('___@hasInstance@164')));
+assert.notDeepEqual(go(make('x')), rust({...make('x'), flags: 2}));
+assert.notDeepEqual(go(make('x')), rust(null));
+'''.replace('MODULE', json.dumps(module))
+        result = subprocess.run([shutil.which('node'), '--input-type=module', '-e', code],
+                                capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_spawn_iterations_reap_children_before_the_next_task(self):
+        # Actual tinybench hooks and actual children; both run()/runSync()
+        # entry points use the same task timer with untimed async cleanup.
+        for entry in ('run', 'runSync'):
+            with self.subTest(entry=entry), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / 'node_modules').symlink_to(ROOT / 'upstream/node_modules')
+                fixture = root / 'lifecycle.mjs'
+                fixture.write_text('''
+import { Bench } from 'tinybench';
+import { spawn } from 'node:child_process';
+export async function runBenchmarks() {
+    let child;
+    const bench = new Bench({time: 0, iterations: 4, warmup: true,
+        warmupIterations: 2, warmupTime: 0, teardown() {
+            child?.stdin.destroy(); child?.stdout.destroy(); child?.kill(); child = undefined;
+        }});
+    bench.add('spawn API', () => {
+        child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)']);
+    }, {async: false});
+    bench.add('later query', () => {}, {async: false});
+    await bench.ENTRY();
+}
+'''.replace('ENTRY', entry))
+                output = root / 'result.json'
+                result = subprocess.run([shutil.which('node'), '--experimental-import-meta-resolve',
+                                         str(api.HERE / 'capture.mjs'), str(fixture), str(output)],
+                                        text=True, capture_output=True, timeout=30)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                report = json.loads(output.read_text())
+                self.assertEqual(report['lifecycle'], {'spawned': 6, 'reaped': 6, 'peak': 1, 'remaining': 0})
+                self.assertTrue(all(task['result']['state'] == 'completed' for task in report['benches'][0]['tasks']))
 
 
 class PerfWiringTests(unittest.TestCase):

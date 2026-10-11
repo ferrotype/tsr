@@ -9,6 +9,12 @@ the last phase: it turns PLAN section 5's exit criteria and the
 work items, witnesses and exit checks. Section 8 distinguishes standing
 owner decisions from proposals that still need approval.
 
+Owner decision, 2026-10-11: all ten R0 scenario records from the 2026-10-10
+capture are accepted without a host-load qualification. Keep their raw load
+samples and remove the busy labels. This does not change any performance
+budget or the quiet-host requirement for future weekly runs. See
+[the R0 record](PHASE7-R0.md).
+
 Reviewed and amended 2026-10-09 against the pin, the current entry points,
 ADR 0020 and the October measurements. Existing accepted budgets remain in
 force; a proposed choice below is not an owner approval. References to
