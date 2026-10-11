@@ -346,6 +346,50 @@ class LatencyTests(unittest.TestCase):
             self.assertTrue(peers[0].stderr_file.closed)
             self.assertFalse(peers[0].thread.is_alive())
 
+    def test_settled_hook_runs_after_cleanup_before_postprocessing_even_on_failure(self):
+        for fail in (False, True):
+            with self.subTest(fail=fail), tempfile.TemporaryDirectory() as directory:
+                base, fixture, command = self.prepare(directory)
+                output = base / 'runtime'
+                peers, events = [], []
+                original_peer, original_write = latency.Peer, Path.write_text
+                original_normalize = latency.replay.normalize
+
+                def create(*args):
+                    peer = original_peer(*args)
+                    peers.append(peer)
+                    return peer
+
+                def settled():
+                    self.assertIsNotNone(peers[0].process.poll())
+                    self.assertTrue(peers[0].stderr_file.closed)
+                    self.assertFalse(peers[0].thread.is_alive())
+                    self.assertFalse((output / 'raw.json').exists())
+                    self.assertEqual(events, [])
+                    events.append('settled')
+
+                def write(path, *args, **kwargs):
+                    if path == output / 'raw.json':
+                        self.assertEqual(events, ['settled'])
+                        events.append('raw')
+                    return original_write(path, *args, **kwargs)
+
+                def normalize(*args):
+                    self.assertEqual(events, ['settled', 'raw'])
+                    events.append('normalized')
+                    return original_normalize(*args)
+
+                with mock.patch.object(latency, 'Peer', side_effect=create), \
+                        mock.patch.object(Path, 'write_text', write), \
+                        mock.patch.object(latency.replay, 'normalize', side_effect=normalize):
+                    if fail:
+                        with mock.patch.object(original_peer, 'exchange', side_effect=RuntimeError('request failure')), \
+                                self.assertRaisesRegex(RuntimeError, 'request failure'):
+                            latency.run_runtime(command, fixture, scenario(), output, on_settled=settled)
+                    else:
+                        latency.run_runtime(command, fixture, scenario(), output, on_settled=settled)
+                self.assertEqual(events, ['settled', 'raw'] + ([] if fail else ['normalized']))
+
     def test_scenario_requires_single_character_versioned_edit(self):
         with tempfile.TemporaryDirectory() as directory:
             _, fixture, _ = self.prepare(directory)

@@ -96,14 +96,16 @@ provisioned scenario cache, and a new result directory. For this workspace's
 saved R1 binaries and cache, run from the repository root:
 
 ```sh
+BENCHMARK_RUNS=../ts-rust-benchmarks
+BENCHMARK_ARCHIVE="$BENCHMARK_RUNS/2026-10-11/target"
 python3 tools/phase7/bench/pairs.py --mode emit --checkers 2 --pairs 3 \
-  --control target/phase7/r1/bin/control --candidate target/phase7/r1/bin/candidate \
+  --control "$BENCHMARK_ARCHIVE"/phase7/r1/bin/control --candidate "$BENCHMARK_ARCHIVE"/phase7/r1/bin/candidate \
   --cache ../ts-rust-wt/.ts-rust-workloads/phase7.noindex \
-  --output target/phase7/r1/NEW_DIRECTORY
+  --output "$BENCHMARK_RUNS"/phase7/r1/NEW_DIRECTORY
 python3 tools/phase7/bench/pairs.py --scenario self-compiler --mode emit --checkers 2 --pairs 6 \
-  --control target/phase7/r1/bin/control --candidate target/phase7/r1/bin/candidate \
+  --control "$BENCHMARK_ARCHIVE"/phase7/r1/bin/control --candidate "$BENCHMARK_ARCHIVE"/phase7/r1/bin/candidate \
   --cache ../ts-rust-wt/.ts-rust-workloads/phase7.noindex \
-  --output target/phase7/r1/ANOTHER_NEW_DIRECTORY
+  --output "$BENCHMARK_RUNS"/phase7/r1/ANOTHER_NEW_DIRECTORY
 ```
 
 All paths can be changed; `--cache` defaults to
@@ -111,9 +113,11 @@ All paths can be changed; `--cache` defaults to
 with `python3 scripts/phase7_scenarios.py provision vscode self-compiler`.
 Build and save the control release executable before making candidate edits,
 then build and save the candidate with the same release flags. Supply those
-two files to the runner; it never rebuilds or overwrites them. Binaries and raw
-results under `target/` remain disposable build artifacts, so keep copies
-outside it if they must survive `cargo clean`. The runner itself survives.
+two files to the runner; it never rebuilds or overwrites them. Historical
+`target/` paths in this record now have verified copies under
+`../ts-rust-benchmarks/2026-10-11/target/`. The commands above use those copies
+and write new runs outside the build directory. Captures and saved comparison
+binaries must survive `cargo clean`.
 
 This development script calls the existing R0 `common.arguments`, `common.run`,
 `common.observe` and `common.problems`. Two threads wait on a barrier before

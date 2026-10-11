@@ -223,7 +223,13 @@ def validate_scenario(scenario, fixture):
         raise ValueError('Edit version must advance the open version by one')
 
 
-def run_runtime(command, cwd, scenario, output):
+def run_runtime(command, cwd, scenario, output, *, on_settled=None):
+    """Run the fixed schedule; optionally rendezvous after retiring the peer.
+
+    The hook also runs after a failed schedule, before raw evidence is written.
+    It lets concurrent development screens defer postprocessing until both
+    runtimes finish, without adding a wait to the serial acceptance capture.
+    """
     output.mkdir(parents=True, exist_ok=True)
     peer = Peer(command, cwd, output / 'stderr.log')
     raw = {'encoding': scenario['encoding'], 'responses': [], 'traffic': peer.traffic,
@@ -293,12 +299,16 @@ def run_runtime(command, cwd, scenario, output):
             if 'method' not in message or 'id' in message:
                 raise ValueError('Unexpected pending response/request after exit')
             peer.respond(message)
-        return measurements, normalize_completion_order(replay.normalize(raw, cwd))
     finally:
         try:
-            (output / 'raw.json').write_text(json.dumps(raw, indent=2, ensure_ascii=False) + '\n')
-        finally:
             peer.close()
+        finally:
+            try:
+                if on_settled is not None:
+                    on_settled()
+            finally:
+                (output / 'raw.json').write_text(json.dumps(raw, indent=2, ensure_ascii=False) + '\n')
+    return measurements, normalize_completion_order(replay.normalize(raw, cwd))
 
 
 def validate_original_evidence(source, encoding):

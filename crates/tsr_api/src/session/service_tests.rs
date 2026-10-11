@@ -614,6 +614,128 @@ fn node_handle_indexes_report_the_pin_parse_errors() {
     }
 }
 
+#[test]
+fn batched_node_locations_match_single_queries_across_files_and_duplicates() {
+    let session = session(&[
+        (CONFIG, r#"{ "compilerOptions": { "noLib": true } }"#),
+        (INDEX, "export const alpha = 1;\n"),
+        (OTHER, "export const beta = 2;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let alpha = handle_at(&session, snapshot, &project, INDEX, 14);
+    let beta = handle_at(&session, snapshot, &project, OTHER, 14);
+    let declaration = ancestor_handle_at(&session, snapshot, &project, INDEX, 14, 1);
+    // The middle field is informational, even on a reused table.
+    let index = alpha.split('.').next().unwrap();
+    let informational_kind = format!("{index}.not-a-kind.{INDEX}");
+    let locations = [
+        alpha.clone(),
+        alpha.clone(),
+        beta.clone(),
+        beta,
+        alpha,
+        declaration,
+        informational_kind,
+    ];
+    let singles: Vec<_> = locations
+        .iter()
+        .map(|location| {
+            request(
+                &session,
+                "getSymbolAtLocation",
+                &json!({"snapshot": snapshot, "project": project, "location": location}),
+            )
+            .unwrap()
+        })
+        .collect();
+    assert_eq!(singles[0]["name"], "alpha");
+    assert_eq!(singles[2]["name"], "beta");
+    assert_eq!(singles[0]["declarations"], json!([locations[5]]));
+    assert_eq!(singles[0]["valueDeclaration"], json!(locations[5]));
+    assert_eq!(singles[5], Value::Null);
+    assert_eq!(singles[6], singles[0]);
+    let batched = request(
+        &session,
+        "getSymbolsAtLocations",
+        &json!({"snapshot": snapshot, "project": project, "locations": locations}),
+    )
+    .unwrap();
+    assert_eq!(batched, json!(singles));
+    assert_eq!(
+        request(
+            &session,
+            "getSymbolsAtLocations",
+            &json!({"snapshot": snapshot, "project": project, "locations": []}),
+        )
+        .unwrap(),
+        json!([])
+    );
+}
+
+#[test]
+fn batched_node_locations_validate_each_handle_after_a_table_hit() {
+    let session = session(&[
+        (
+            CONFIG,
+            r#"{ "compilerOptions": { "noLib": true }, "files": ["src/index.ts"] }"#,
+        ),
+        (INDEX, "export const alpha = 1;\n"),
+        (OTHER, "export const foreign = 2;\n"),
+    ]);
+    let (snapshot, project) = open(&session, CONFIG);
+    let valid = handle_at(&session, snapshot, &project, INDEX, 14);
+    let nil_index = {
+        let data = session.snapshot_data(SnapshotId(snapshot)).unwrap();
+        let program = data.program(&ProjectId(project.clone())).unwrap();
+        let file = program.file(INDEX.as_bytes()).unwrap();
+        let table = tsr_encoder::get_node_index_table(
+            file.bound().view().ast(),
+            file.source(),
+            &mut tsr_parser::ParserJsDocProvider::default(),
+        )
+        .unwrap()
+        .unwrap();
+        table
+            .nodes()
+            .iter()
+            .enumerate()
+            .skip(1)
+            .find_map(|(index, node)| node.is_none().then_some(index))
+            .expect("the source has a list slot")
+    };
+    for invalid in [
+        "missing-dots".to_string(),
+        "1.missing-second-dot".to_string(),
+        format!("abc.1.{INDEX}"),
+        format!("+1.1.{INDEX}"),
+        format!("-1.1.{INDEX}"),
+        format!("4294967296.1.{INDEX}"),
+        format!("0.1.{INDEX}"),
+        format!("{nil_index}.1.{INDEX}"),
+        format!("4294967295.1.{INDEX}"),
+        format!("1.1.{OTHER}"),
+        "1.1./missing.ts".to_string(),
+    ] {
+        let expected = request(
+            &session,
+            "getSymbolAtLocation",
+            &json!({"snapshot": snapshot, "project": project, "location": invalid}),
+        )
+        .unwrap_err();
+        let actual = request(
+            &session,
+            "getSymbolsAtLocations",
+            &json!({
+                "snapshot": snapshot,
+                "project": project,
+                "locations": [valid, invalid, "later-invalid-handle"],
+            }),
+        )
+        .unwrap_err();
+        assert_eq!(actual, expected, "first invalid location: {invalid}");
+    }
+}
+
 /// A diagnostic in a config the root extends keeps that file's name and its
 /// UTF-16 positions: the response resolves the file through the owner of
 /// the diagnostic's node, not the root config's view.

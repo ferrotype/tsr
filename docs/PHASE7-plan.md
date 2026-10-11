@@ -1,6 +1,7 @@
 # Phase 7: hardening, WebAssembly, embedding, cut-over
 
-Status: **R1 in progress** (2026-10-11, [docs/PHASE7-R1.md](PHASE7-R1.md));
+Status: **R1 and R2 in progress** (2026-10-11,
+[docs/PHASE7-R1.md](PHASE7-R1.md), [docs/PHASE7-R2.md](PHASE7-R2.md));
 R0 recorded (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md)).
 Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
 7, 9 and 11 accepted, the others open. The detailed plan for
@@ -278,6 +279,13 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
   commands, the numbers at exit and what the next checkpoint inherits.
   `status/perf` recordings are the owner's host's; a development number is
   labelled as such everywhere it appears.
+- **Capture location.** Keep benchmark captures, profiles and the exact saved
+  comparison binaries outside Cargo's `target/`, under the sibling
+  `../ts-rust-benchmarks/` directory (or an explicitly chosen external path).
+  `target/` is for disposable build outputs. Give each run a new output directory;
+  do not replace earlier results. The 2026-10-11 archive preserves existing
+  captures under `../ts-rust-benchmarks/2026-10-11/target/`, with verified file
+  hashes and materialized executable symlinks.
 - **Measurement cost.** Use focused parity and bounded concurrent candidate/
   control pairs while developing. Screen connected storage/CPU changes as
   one combined candidate; component measurements explain costs, not additive
