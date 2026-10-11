@@ -242,13 +242,30 @@ changes only when it is resolved.
 
 ## Reproduction
 
+Historical `target/` paths above identify the original capture locations.
+Verified copies now live outside the build directories:
+
+- The scenario capture and superseded API capture, originally in the R0
+  worktree, are under
+  `../ts-rust-benchmarks/2026-10-11/r0-worktree/target/phase7/`.
+- The corrected API capture is under
+  `../ts-rust-benchmarks/2026-10-11/target/phase7/api/capture-review-fixed/`.
+
+The archive includes the saved comparison binaries; file hashes were checked
+against their originals. Raw metadata retains its original paths. New captures
+must also stay outside `target/`, as in the commands below. Choose fresh output
+directories for each run; Cargo build outputs remain disposable.
+
 ```sh
+BENCHMARK_RUNS=../ts-rust-benchmarks
+SCENARIO_CAPTURE="$BENCHMARK_RUNS/phase7/bench/NEW_CAPTURE"
+API_CAPTURE="$BENCHMARK_RUNS/phase7/api/NEW_CAPTURE"
 python3 scripts/phase7_scenarios.py provision          # about ten minutes, network and Docker
 python3 tools/phase7/bench/capture.py build            # tsgo from the pin, tsrust from HEAD
 python3 scripts/phase7_scenarios.py verify             # the frozen work still holds
-python3 tools/phase7/bench/capture.py run --output target/phase7/bench/<capture>
-python3 scripts/perf.py record check-vscode --capture target/phase7/bench/<capture> --label "…"   # one per workload
+python3 tools/phase7/bench/capture.py run --output "$SCENARIO_CAPTURE"
+python3 scripts/perf.py record check-vscode --capture "$SCENARIO_CAPTURE" --label "…"   # one per workload
 (cd upstream && npm ci --ignore-scripts)               # the API benchmarks' client dependencies
-python3 tools/phase7/api/capture.py run --output target/phase7/api/<capture>
-python3 scripts/perf.py record api --capture target/phase7/api/<capture> --label "…"
+python3 tools/phase7/api/capture.py run --output "$API_CAPTURE"
+python3 scripts/perf.py record api --capture "$API_CAPTURE" --label "…"
 ```
