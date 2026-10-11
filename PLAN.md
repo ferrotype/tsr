@@ -144,11 +144,11 @@ The Go port's first commit landed on 30 September 2024. The upstream repository 
 - 100 percent of compiler, conformance, transpile, config, tsc, build and watch baselines, modulo the allow-list.
 - At least 99.5 percent of fourslash tests, with the remainder triaged and listed.
 - The `packages/typescript` sync and async suites, the project and LSP suites and the replay corpus pass against the Rust binary.
-- Benchmark and memory targets met on every scenario for four consecutive weekly runs.
+- Benchmark and memory targets met on every scenario. Owner decision 2026-10-11 postpones weekly performance runs and the four-consecutive-run requirement indefinitely; targets and measurement validity rules remain unchanged.
 - Four weeks of the owner's own projects and the VS Code extension running on the Rust binary with no open P1 crash.
 - The WebAssembly library runs the compiler/conformance and transpile corpus through an in-memory host, matching the pinned oracle's applicable diagnostics, type/symbol and emit baselines, including `.js`, `.map` and `.d.ts`, modulo the same approved allow-list. It must not require native processes or native filesystem access. Node runs the corpus; a browser smoke test covers parse, type checking, emit and deep input.
 - A separate Rust consumer links the embedding crate, supplies its host, and runs the same compiler/conformance and transpile comparisons in process. E3 ownership, malformed-input, cancellation, panic-invalidation and repeated-create/drop tests pass through the public API. Required crate operations and host callbacks are documented and exercised by the consumer, not just a Node parse binding.
-- WebAssembly and embedding size, latency and retained-memory budgets are fixed for named workloads before Phase 7 and met for four consecutive weekly runs. E7/E8 parser thresholds remain parser measurements; they are not substituted for full-compiler acceptance. Both deliverables block cut-over.
+- WebAssembly and embedding size, latency and retained-memory budgets are fixed for named workloads before Phase 7 and met in qualified captures. Weekly repetition is deferred by the owner decision above. E7/E8 parser thresholds remain parser measurements; they are not substituted for full-compiler acceptance. Both deliverables block cut-over.
 
 ## 6. Architecture decisions
 
@@ -318,7 +318,7 @@ Phases are ordered by dependency, not by time. The table names the tested slices
 | 4. Programs and CLI | 1 for the driver, build and watch; 2 for full checking | 2, 3, 5 | All tsc, watch, build baselines; smoke test; sanitizer run |
 | 5. Editor | 1's transport contracts and framing; 0's ownership components; 2's tested checker/service operations | 2, 3, 4 | 99.5 percent semantic fourslash; project, LSP, replay suites |
 | 6. JS API server | 2 and 5's project system | 5's tail | `packages/typescript` suites pass unchanged |
-| 7. Hardening, WebAssembly, embedding, cut-over | All parity phases; 0's WebAssembly/embedding prototypes | Nothing | Native, WebAssembly and Rust-consumer acceptance; every exit criterion for four consecutive weeks |
+| 7. Hardening, WebAssembly, embedding, cut-over | All parity phases; 0's WebAssembly/embedding prototypes | Nothing | Native, WebAssembly and Rust-consumer acceptance; four-week dogfood, with weekly performance collections deferred |
 
 ### Phase 0: spike
 
@@ -397,7 +397,7 @@ program-subset capture.
 ### Phase 7: hardening, WebAssembly, embedding, cut-over
 
 - **Scope.** All remaining performance measurement, profiling, optimization and budget acceptance, including the TypeScript-benchmarking scenarios at 2, 4 and 8 checkers, LSP request latency, JS API benchmarks, allocation/layout tuning, retained memory and binary size. Differential fuzzing, crash replay and four native targets remain in scope. Expand the E7/E8 entry points to full compiler checking and emit with explicit in-memory/callback hosts. The WebAssembly library does not include native CLI/watch/process services; it must execute compiler work without them. A separate Rust consumer exercises the documented crate API. Run the corpus, lifetime/failure cases and the pre-agreed WebAssembly/embedding workload budgets through those entry points before dogfood and cut-over.
-- **Gate.** Every exit criterion in section 5, including full WebAssembly and Rust-consumer acceptance, holds for four consecutive weeks. Neither deliverable can be deferred until after cut-over under this plan.
+- **Gate.** Every active exit criterion in section 5, including full WebAssembly and Rust-consumer acceptance, is met. Four-week dogfood remains required; weekly performance collections are postponed indefinitely by owner decision 2026-10-11. Neither deliverable can be deferred until after cut-over under this plan.
 
 **Performance transfer, owner decision 2026-10-07.** L7 is closed on correctness,
 replay and its completed measurement. Phase 7 owns the five outstanding LSP

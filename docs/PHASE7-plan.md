@@ -5,7 +5,7 @@ Status: **R1–R5 in progress** (2026-10-11,
 [R4](PHASE7-R4.md), [R5](PHASE7-R5.md));
 R0 recorded (2026-10-10, [docs/PHASE7-R0.md](PHASE7-R0.md)).
 Phase 5's L8 continues alongside R1–R5, as R0 item 5 provides. Owner decisions
-2, 3, 7, 9 and 11 accepted, the others open. The detailed plan for
+2, 3, 4, 7, 9 and 11 decided, the others open. The detailed plan for
 [PLAN Phase 7](../PLAN.md#phase-7-hardening-webassembly-embedding-cut-over),
 the last phase: it turns PLAN section 5's exit criteria and the
 [acceptance matrix](S12-acceptance.md) of ADR 0020 into checkpoints with
@@ -15,7 +15,8 @@ owner decisions from proposals that still need approval.
 Owner decision, 2026-10-11: all ten R0 scenario records from the 2026-10-10
 capture are accepted without a host-load qualification. Keep their raw load
 samples and remove the busy labels. This does not change any performance
-budget or the quiet-host requirement for future weekly runs. See
+budget or the quiet-host requirement for future measurements. Weekly runs
+are now deferred under decision 4 below. See
 [the R0 record](PHASE7-R0.md).
 
 Reviewed and amended 2026-10-09 against the pin, the current entry points,
@@ -45,8 +46,9 @@ can say so from committed files. At the end of Phase 7:
   self-compiler, mui-docs, xstate, bluesky) are frozen and recorded under
   `status/perf/` for full checking and checking plus emit at 2, 4 and 8
   checkers, and meet PLAN's budgets (elapsed at most 1.0 of Go, peak RSS at
-  most 0.70) for four consecutive weekly runs. The five LSP scenarios meet
-  their 1.0 targets. The WebAssembly and embedding budgets of ADR 0020 are
+  most 0.70) in qualified captures. The weekly cadence and four-consecutive-run
+  requirement are postponed indefinitely by owner decision 4. The five LSP
+  scenarios meet their 1.0 targets. The WebAssembly and embedding budgets of ADR 0020 are
   recorded and met on the same scenarios. The pin's JS API benchmark files
   are recorded against the Rust server.
 - **Hardening.** Differential fuzzing against the pinned Go binary runs in
@@ -191,11 +193,12 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
    Development comparisons use concurrent pairs (baseline and candidate
    started together, scored per pair). Every number in a record or a PR
    says which it is. Thresholds stay informational per PR and are judged
-   on the weekly runs. Before timing, R0 fixes warmups, pair counts,
+   in qualified acceptance captures. Weekly runs are postponed indefinitely
+   (owner decision 4). Before timing, R0 fixes warmups, pair counts,
    confidence/stability rules, any bounded extension, and host eligibility,
    reusing the existing harness rules where applicable. Build, provision and
    profile outside timing; exclude other timed jobs on the measurement host.
-   A busy-host or inconclusive run is retained but does not qualify a weekly
+   A busy-host or inconclusive run is retained but does not qualify an
    acceptance result. Scheduling a job does not establish a quiet host.
 4. **Acceptance through the existing runner.** The WebAssembly instance and
    the consumer do not get their own comparators: `tsr_testrunner` expands
@@ -274,7 +277,8 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
 - **Order and overlap.** R0 lands first. R1 and R2 run in parallel after
   it; R3 and R4 start their correctness halves after R0 and take their
   budgets after R1; R5 runs alongside; R6 follows the code of R1 to R5;
-  R7 is last and includes the four-week acceptance period. R0 establishes
+  R7 is last and includes the four-week dogfood period; weekly performance
+  collections are deferred indefinitely. R0 establishes
   measurements; an optimization miss does not block its completion.
 - **Checks per commit.** The crate's tests and clippy with warnings denied,
   `cargo fmt --all --check`, `cargo xtask validate`, `parity.py run <suite>
@@ -296,9 +300,10 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
   control pairs while developing. Screen connected storage/CPU changes as
   one combined candidate; component measurements explain costs, not additive
   savings. Run the complete affected acceptance matrix at checkpoint exits
-  and weekly acceptance, not after every small landing. Preflight one sample
-  of each new mode, validate its work and estimate the full run before starting
-  it. Preserve valid completed captures and do not repeat them for doc edits.
+  when needed, not after every small landing. Weekly collections are deferred.
+  Preflight one sample of each new mode, validate its work and estimate the
+  full run before starting it. Preserve valid completed captures and do not
+  repeat them for doc edits.
 - **Expectation files.** `parity.py accept` per PR so the files are exact;
   reasons are causes; `approved` is the owner's word.
 - **No new evidence machinery.** The suites, `perf.py`, the records and the
@@ -330,8 +335,7 @@ Work items:
 3. `perf.py` workloads `check-<scenario>` and `emit-<scenario>` with ratios
    `elapsed_2`, `elapsed_4`, `elapsed_8`, `peak_rss_2`, `peak_rss_4`,
    `peak_rss_8`; `thresholds.toml` rows at PLAN's 1.0 and 0.70; `perf.yml`
-   runs them by dispatch and, if owner decision 4 says so, weekly on the owner's
-   runner.
+   runs them only by explicit dispatch on the owner's runner.
 4. The API benchmark workload: enumerate named tasks in the pin's
    `test/sync/api.bench.ts` and `test/async/api.bench.ts`, record one ratio
    per server-dependent task and sync/async mode under `api` (target in owner
@@ -591,7 +595,7 @@ Work items:
    consumers (`scripts/package_assets.py --check`, `scripts/package_verify.py`).
    Keep already published release records unchanged. Registry publication
    needs the owner's release authorization; R6's exit is the verified candidate,
-   not an automatic publish or a claim that four-week acceptance has completed.
+   not an automatic publish or a claim that four-week dogfood has completed.
 
 Witnesses: the four CI jobs green; the glibc check failing on a planted
 newer symbol; the client and the extension running from the staged package.
@@ -606,12 +610,12 @@ Work items:
 1. The dogfood (owner decision 10): the owner's projects and the VS Code
    extension on the Rust binary for four weeks; crash reports into R5's
    replay; the P1 log in the record.
-2. The weekly runs: four consecutive weekly collections on the frozen
-   scenarios, each with all required release budgets met and correctness
-   checks passing on its candidate revision. Retain all misses and invalid/
-   inconclusive samples. A busy host does not qualify merely because a point
-   estimate passes; a week with an unmet required budget does not qualify.
-   Do not assemble closure from each workload's best four disjoint weeks.
+2. **Weekly performance collections: postponed indefinitely** by owner
+   decision 4 (2026-10-11). Do not schedule them or require four consecutive
+   weekly collections for closure while deferred. Existing per-scenario
+   budgets, comparable work, sampling rules and host qualification remain
+   required for explicitly requested acceptance captures. Keep existing runs;
+   postponement neither marks a budget met nor waives a measured miss.
 3. If owner decision 12 places the pin bump rehearsal here, move `upstream/`
    to a later Corsa commit on an isolated branch, regenerate the ledger,
    port the diff for one small package end to end, run the suites, and record
@@ -622,8 +626,8 @@ Work items:
    requires rechecking the affected expectations and comparable workloads.
 4. Closure: the ledger with no planned or in-progress entry (owner decision 9),
    PLAN's phase table and README updated, the status page final,
-   `docs/PHASE7-R7.md` as the cut-over record naming the commit, the four
-   records per workload and the dogfood log.
+   `docs/PHASE7-R7.md` as the cut-over record naming the commit, the applicable
+   qualified performance records, decision 4's deferral and the dogfood log.
 
 Exit: every row of section 6 checked, by the owner.
 
@@ -634,11 +638,11 @@ Exit: every row of section 6 checked, by the owner.
 | Compiler, conformance, transpile, config, tsc, build and watch baselines | The seven expectation files hold only owner-approved entries on the cut-over commit (CI) |
 | At least 99.5% of fourslash with the rest triaged | `fourslash.json` as Phase 5 counts it: N from the Go run, F the distinct non-passing tests, approval does not remove a test from F |
 | The pinned client suites, the LSP and project suites, the replay corpus | `jsapi.json`, `lsp.json`, the replay runner, in CI |
-| Benchmark and memory targets on every scenario for four consecutive weekly runs | Four complete weekly collections under `status/perf`, with all required rows qualifying under the declared sampling/host rules on that week's candidate revision; a changed budget requires an owner ADR and new qualifying runs |
+| Benchmark and memory targets on every scenario | Qualified comparable captures under `status/perf`; weekly cadence and four-consecutive-run requirement deferred indefinitely by owner decision 4. A changed budget still requires an owner decision and qualifying measurements |
 | Four weeks of dogfood with no open P1 crash | The dogfood log in `docs/PHASE7-R7.md`; a P1 is a crash, a wrong diagnostic or wrong emit against the pin on the owner's projects |
 | The WebAssembly library runs the corpus through an in-memory host, emit included, no native process or file system; Node runs it; a browser smoke passes | `compiler-wasm.json` and `transpile-wasm.json` exact with only owner-approved failures; smoke and trap-invalidation results per engine |
 | A separate Rust consumer runs the same comparisons through the public API; applicable E3, malformed-input, cancellation, panic-invalidation and create/drop tests pass through it | `compiler-embed.json` and `transpile-embed.json` exact with only owner-approved failures; the consumer's public-only dependency/call audit and lifetime suite; applicable sanitizer and Miri lanes |
-| WebAssembly and embedding size, latency and retained-memory budgets fixed and met for four consecutive weekly runs | The `wasm-*` and `embed-*` workloads under `status/perf` with ADR 0020's rows in `thresholds.toml` |
+| WebAssembly and embedding size, latency and retained-memory budgets fixed and met | The `wasm-*` and `embed-*` workloads under `status/perf` with ADR 0020's rows in `thresholds.toml`; weekly repetition deferred by owner decision 4 |
 | Four native targets | Required suites execute on all four; both Linux targets pass the glibc 2.28 check and suites on that floor; the pinned client resolves the staged layout |
 | Required operations and direct tests accounted for | L8 and other partial-file audits resolved; `cargo xtask validate` passes and every file is ported or owner-approved out of scope; markers alone do not certify behavior |
 
@@ -656,7 +660,7 @@ as release acceptance. Trace approvals stay scoped to their named `tsc` rows.
 | A requested checker count is silently clamped or overridden | Use the existing `--checkers` option, disable `singleThreaded`, and record effective pool size and the workload's file set |
 | WebAssembly runs the corpus without threads and on a fixed stack; a trap is terminal | The work groups run on the calling thread as program loading's do; the stack configuration is recorded; a trap is a failing entry, and the deep-input fixtures run first |
 | The consumer's public API is narrower than the corpus needs | Architecture item 4 makes every applicable gap a failure in `compiler-embed` or `transpile-embed`, fixed in the public API; no compiler-internal fallback |
-| The weekly runs need a quiet owner host for four weeks | Owner decision 4 chooses scheduling; host eligibility and exclusive measurement are checked separately, and busy-host observations cannot qualify |
+| Explicit performance captures need a quiet measurement host | Weekly collections are deferred by owner decision 4; host eligibility and exclusive measurement still apply to requested captures |
 | The dogfood finds crashes late | R5 starts before R7; minimize and replay each crash through the affected entry point |
 | Blind mutations stop reaching new behavior | Differential comparison can be combined with coverage-guided mutation; use coverage and minimized failures to decide, not an assumption that the methods conflict |
 | The ledger closure uncovers unported behaviour behind passing suites | Port and test the behavior, or obtain a scoped owner exclusion; an uncovered path is not automatically out of scope |
@@ -683,12 +687,14 @@ again.
    automation. Record results per engine version, with stack/worker
    configuration and declared failure behavior; Node results do not certify
    browser defaults.
-4. **Weekly runs.** A scheduled `perf.yml` on a dedicated measurement runner
-   or four weekly manual dispatches. Recommended: scheduled if an exclusive
-   measurement host is available. The existing `runs-on` input can select it;
-   `vars.PARITY_RUNNER` alone does not reserve a quiet host. Use a separate
-   performance runner setting for schedules and prevent overlap with builds,
-   parity and other timed work; retain and enforce the host-eligibility rules.
+4. **Weekly runs.** **Decided by the owner 2026-10-11: postpone indefinitely.**
+   No recurring performance schedule or four-consecutive-week performance
+   requirement is active. Resume only on an explicit owner request; do not
+   create a reminder or replacement cadence. Keep the dispatch-only tooling
+   and existing captures. Performance targets, measurement validity rules
+   and the separate four-week dogfood requirement are unchanged. This amends
+   the weekly repetition requirement in PLAN section 5, ADR 0003 and the
+   S12 acceptance matrix; it does not mark any unmet budget as passed.
 5. **Fuzzing approach.** Start with the bounded differential runner of
    architecture item 5; evaluate coverage-guided mutation on the existing
    instrumentation nightly if needed. Recommended: this staged approach,

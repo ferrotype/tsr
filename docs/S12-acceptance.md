@@ -73,10 +73,13 @@ substitute for any full-compiler row above. Cold startup is reported alongside
 the operation budgets; no unmeasured
 startup claim follows from warm parser throughput.
 
-All required release budgets and correctness checks must hold for four
-consecutive weekly runs, on frozen comparable workloads, alongside PLAN's
-four-week dogfood requirement without an open P1 crash. A later budget change
-requires a separate recorded owner decision and new qualifying evidence.
+Owner decision 2026-10-11 postpones weekly performance runs and the
+four-consecutive-run requirement indefinitely (Phase 7 decision 4). Required
+release budgets and correctness checks still apply on comparable workloads;
+PLAN's separate four-week dogfood requirement without an open P1 crash is
+unchanged. A later budget change requires a separate recorded owner decision
+and qualifying measurements. No weekly schedule or replacement cadence is
+required while this work is deferred.
 
 ## Risks that remain after a go decision
 
@@ -88,4 +91,4 @@ optimization must establish a route to the native release targets after parity.
 Complete transforms/emit and actual project/LSP/API integration are still
 substantial implementation work. The Phase 0 gate establishes that the tested
 architecture can proceed; it does not certify release readiness or make the
-four-week acceptance period optional.
+separate four-week dogfood period optional.

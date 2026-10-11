@@ -150,7 +150,9 @@ are accepted as R0's starting measurements, with no load qualification. The
 raw CPU/load observations remain intact, including `fseventsd` and macOS
 storage scans; the old busy labels have been removed. No sample, ratio,
 confidence interval or performance budget changed. The separate quiet-host
-rule for future weekly acceptance runs remains in the Phase 7 plan.
+rule for future explicitly requested acceptance captures remains in the
+Phase 7 plan. Weekly performance collections are postponed indefinitely by
+owner decision 4 (2026-10-11).
 
 ## The API benchmarks
 

@@ -337,8 +337,10 @@ avoid broad trace/replay infrastructure or a storage rewrite without that need.
 
 Phase 2 is a correctness gate. This proposal introduces no speed or memory
 threshold, and does not repeat S07/S08 benchmarks merely because a fingerprint
-changes. Full native/portable/embedding budgets and four-week acceptance remain
-with [Phase 7](S12-acceptance.md). Report unfavorable results without treating
+changes. Full native/portable/embedding budgets and the separate four-week
+dogfood period remain with [Phase 7](S12-acceptance.md). Weekly performance
+collections are postponed indefinitely by owner decision 2026-10-11.
+Report unfavorable results without treating
 the smaller S08 footprint ratio as whole-checker memory or performance proof.
 
 ## 7. Review decisions and next planning step

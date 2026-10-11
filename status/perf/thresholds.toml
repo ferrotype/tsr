@@ -35,7 +35,9 @@ rename = 1.0
 # Phase 7 targets (PLAN section 5, docs/S12-acceptance.md, docs/PHASE7-plan.md
 # R0): full checking and checking plus emit of each benchmarking scenario at 2,
 # 4 and 8 checkers. Elapsed is launch to exit of a fresh process, peak RSS that
-# process's own; acceptance is four consecutive weekly runs, not one record.
+# process's own. Weekly collections/four-consecutive-run acceptance are
+# deferred indefinitely by owner decision 2026-10-11 (Phase 7 decision 4);
+# numerical targets and measurement validity rules are unchanged.
 
 [check-vscode]
 elapsed_2 = 1.0
