@@ -1,6 +1,6 @@
-//! Environment, emit-helper and factory-helper tests. There are no Go unit
-//! tests for these functions; every expectation below was derived by reading
-//! the pinned `emitcontext.go`, `helpers.go` and `factory.go`.
+//! Environment, emit-helper and factory-helper tests. Most expectations derive
+//! from the pinned `emitcontext.go`, `helpers.go` and `factory.go`; the nil-name
+//! factory controls below additionally compare frozen native executions.
 
 use super::*;
 use crate::emit_flags as ef;
@@ -1181,10 +1181,19 @@ fn local_names_are_flagged_clones() {
         )
         .unwrap();
     assert_eq!(emit.emit_flags(export), ef::EXPORT_NAME | ef::NO_SOURCE_MAP);
+    // As in nil_name_native.json, a nil declaration creates a node-generated
+    // identifier without applying the named clone's LocalName/comment flags.
+    // The native factory succeeds; printing's nil-source panic is covered by
+    // nil_declaration_names_match_native_factory_and_preserve_print_failure.
+    let unnamed = emit.get_local_name(&mut ast, None).unwrap();
+    let info = emit.auto_generate_info(unnamed).unwrap();
     assert_eq!(
-        emit.get_local_name(&mut ast, None),
-        Err(crate::Error::Unsupported("NewGeneratedNameForNode(nil)"))
+        identifier_text(&ast, unnamed),
+        format!("(auto@{})", info.id.get()).as_bytes()
     );
+    assert_eq!(info.flags, generated_identifier_flags::NODE);
+    assert_eq!(info.node, None);
+    assert_eq!(emit.emit_flags(unnamed), 0);
 }
 
 // The helper calls request their helpers and call `__name` with the arguments

@@ -520,12 +520,21 @@ fn checker_host_reads_project_references_and_their_options() {
             .collect::<Vec<_>>(),
         paths
     );
-    // An output importer's source directory drives tsr_checker's sort, which
-    // cannot see it, so the host refuses.
-    assert!(matches!(
-        host.get_module_specifier_paths(b"/src/lib/a.d.ts", b"/src/main.ts"),
-        Err(Error::Unsupported(_))
-    ));
+    // The pin uses the output importer's original source for collection and
+    // ordering; the unrelated target still has only its own path.
+    let importer_source =
+        host.get_source_of_project_reference_if_output_included(b"/src/lib/a.d.ts");
+    assert_eq!(importer_source, b"/src/lib/a.ts");
+    let from_referenced_output = host
+        .get_module_specifier_paths(b"/src/lib/a.d.ts", b"/src/main.ts")
+        .unwrap();
+    assert_eq!(
+        from_referenced_output
+            .iter()
+            .map(|path| (path.file_name.as_bytes(), path.is_redirect))
+            .collect::<Vec<_>>(),
+        [(b"/src/main.ts".as_slice(), false)]
+    );
 }
 
 #[test]

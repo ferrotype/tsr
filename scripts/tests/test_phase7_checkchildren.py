@@ -2,6 +2,7 @@
 import argparse
 import os
 from pathlib import Path
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -10,6 +11,29 @@ from tools.phase7.checkchildren import run
 
 
 class ChildLintEnvironment(unittest.TestCase):
+    def test_colored_cargo_cold_and_cached_summaries_are_observed(self):
+        source = (run.HERE / 'fixtures/returns.rs').read_text()
+        names = re.findall(r'// expect: (\w+)', source)
+        planted = '\n'.join('checkchildren: Checker::' + name + ' returns before' for name in names)
+        summary = '\x1b[1m\x1b[92mnote\x1b[0m\x1b[1m: checkchildren: 1 workers, 18 dispatched methods, 0 early returns\x1b[0m'
+        results = [
+            argparse.Namespace(returncode=1, stderr=planted + '\nearly returns'),
+            argparse.Namespace(returncode=0, stderr='1 reviewed allowances'),
+            argparse.Namespace(returncode=1, stderr='empty allowance reason'),
+            argparse.Namespace(returncode=1, stderr='no dispatch workers found'),
+            argparse.Namespace(returncode=0, stderr=summary),
+            argparse.Namespace(returncode=0, stderr='\x1b[92mFresh\x1b[0m checkchildren_fixture\n' + summary),
+        ]
+        with patch.object(run.subprocess, 'run', side_effect=results) as invoked, patch('builtins.print'):
+            run.fixtures(Path('/checker'), 'pinned-nightly', {})
+        self.assertEqual(invoked.call_count, 6)
+
+    def test_color_normalization_does_not_create_a_missing_or_failed_summary(self):
+        pattern = r'note: checkchildren: 1 workers, \d+ dispatched methods, 0 early returns'
+        for text in ('\x1b[92mnote\x1b[0m: unrelated',
+                     '\x1b[92mnote\x1b[0m: checkchildren: 1 workers, 18 dispatched methods, 1 early returns'):
+            self.assertIsNone(re.search(pattern, run.diagnostic_text(text)))
+
     def test_linux_host_libraries_precede_caller_path_without_losing_environment(self):
         original = {'LD_LIBRARY_PATH': '/caller/lib', 'CARGO_HOME': '/caller/cargo'}
         with patch.dict(os.environ, original, clear=True), patch.object(run.sys, 'platform', 'linux'):

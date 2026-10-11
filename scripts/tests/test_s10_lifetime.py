@@ -36,9 +36,26 @@ class LifetimeControls(unittest.TestCase):
     def save_spec(self):
         (self.root / 'tools/s10/lifetime-cases.json').write_text(json.dumps(self.spec))
 
-    def test_current_manifest_names_all_fourteen_plain_integration_tests(self):
+    def test_current_manifest_names_all_sixteen_plain_integration_tests(self):
         spec = lifetime.manifest()
-        self.assertEqual(len(spec['cases']), 14)
+        self.assertEqual(spec['cases'], [
+            'callback_order_and_inline_maps_are_observed_independently_of_output_files',
+            'compiler_diagnostics_and_queries_share_the_emit_pool',
+            'compiler_request_cancellation_preserves_native_emit_and_checker_contracts',
+            'compiler_scope_panic_retires_both_checker_roots',
+            'concurrent_first_queries_share_a_checker_identity',
+            'emit_refuses_a_target_file_from_another_program',
+            'emitter_records_and_write_metadata_retain_their_source_owners',
+            'malformed_source_keeps_original_bytes_and_resolvable_diagnostics',
+            'native_query_unwind_preserves_payload_and_invalidates_the_session',
+            'public_ownership_retained_results_and_generated_syntax_keep_exact_owners',
+            'public_ownership_shared_file_survives_concurrent_snapshot_edit',
+            'reentry_fails_and_retirement_invalidates_retained_queries_and_emit',
+            'repeated_load_check_query_emit_drop_releases_tracked_storage',
+            'retained_type_survives_session_drop_and_rejects_a_foreign_session',
+            'retirement_before_initialization_refuses_a_query',
+            'transpile_results_retain_sources_and_follow_pinned_cancellation',
+        ])
         self.assertTrue(all('::' not in case for case in spec['cases']))
 
     def test_source_identity_excludes_nested_build_outputs_but_keeps_consumer_code(self):

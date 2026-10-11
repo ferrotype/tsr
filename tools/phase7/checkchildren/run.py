@@ -14,6 +14,13 @@ ROOT = Path(__file__).resolve().parents[3]
 HERE = Path(__file__).resolve().parent
 
 
+def diagnostic_text(text):
+    # CI sets CARGO_TERM_COLOR=always. Rustc can place SGR sequences between
+    # `note` and `:`, and Cargo between `Fresh` and the package name. Keep raw
+    # logs intact while matching the diagnostic content independently of color.
+    return re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', text)
+
+
 def runtime_environment(sysroot):
     env = dict(os.environ)
     # rustc_driver also loads LLVM from the host sysroot. An executable rpath
@@ -93,9 +100,10 @@ def fixtures(executable, nightly, runtime_env):
                    str(directory / 'Cargo.toml'), '-v']
         for cached in (False, True):
             result = subprocess.run(command, cwd=directory, env=env, capture_output=True, text=True)
+            text = diagnostic_text(result.stderr)
             if (result.returncode != 0
-                    or not re.search(r'note: checkchildren: 1 workers, \d+ dispatched methods, 0 early returns', result.stderr)
-                    or (cached and 'Fresh checkchildren_fixture' not in result.stderr)):
+                    or not re.search(r'note: checkchildren: 1 workers, \d+ dispatched methods, 0 early returns', text)
+                    or (cached and 'Fresh checkchildren_fixture' not in text)):
                 raise ValueError(f'Cargo summary cache control failed (cached={cached}):\n' + result.stderr)
     print(f'checkchildren fixtures: {len(expected)} planted returns, repaired control, '
           'empty-roster refusal, precise allowance, empty-reason refusal, Cargo summary replay pass')
@@ -124,7 +132,7 @@ def main():
     print(text)
     if result.returncode != 0:
         return result.returncode
-    if not re.search(r'checkchildren: 2 workers, \d+ dispatched methods, 0 early returns', text):
+    if not re.search(r'checkchildren: 2 workers, \d+ dispatched methods, 0 early returns', diagnostic_text(text)):
         # Cargo replays the rustc diagnostic on a successful cached compile.
         # A missing summary is never evidence of a clean lint run.
         print('No checker lint summary; refusing an unobserved lint result.')
