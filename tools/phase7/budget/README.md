@@ -60,7 +60,11 @@ accepted performance budgets.
 `snapshot.py` captures complete metadata and OS identity provenance. Native
 discovery reads only files requested by the real config/loader/check/emit
 operation, preserving ordered read events, misses, raw physical hashes and
-sizes. Discovery is an untimed OS acquisition tool; ordinary consumers use
+sizes. Compiler reads of immutable UTF-8 snapshot files share the snapshot
+backing; UTF-8 BOMs select a suffix, and UTF-16 uses the pinned decoder. Ordinary
+`io/fs` reads still return caller-owned bytes. Streamed content allocates its
+validated declared length once (at most 256 MiB per file), keeping transport
+capacity slack out of retained accounting. Discovery is an untimed OS acquisition tool; ordinary consumers use
 frozen memory hosts and never fall back to disk. Its CLI and event contract are
 shared by the native Go and Rust tools:
 
@@ -140,9 +144,11 @@ python3 tools/phase7/budget/allocation.py \
 ```
 
 The retained ratio compares Go `runtime.MemStats.HeapAlloc` after collection
-with Rust live requested allocation layout bytes. These are different heap
-accounting authorities; allocator overhead and Rust RSS are not inferred from
-requested bytes. Cumulative allocation traffic has its own samples and ratio.
+with Rust live `mi_usable_size` bytes. Both include allocation-block rounding;
+neither is RSS or a complete allocator-page/metadata census. Requested Rust
+layout bytes remain in every raw checkpoint as a separate diagnostic. Historical
+requested-only captures cannot qualify this comparison. Cumulative rounded
+allocation traffic has its own samples and ratio.
 Every sample retains complete owned observations after the checkpoint and must
 match the ordinary reference, including a same-runtime checking-work floor.
 The reader rechecks raw responses and artifact identities without starting a
@@ -251,7 +257,11 @@ The capture retains the tool identity, both commands, original and stripped
 artifact hashes, and build manifests. Replay authenticates both originals and
 copies without running tools. Legacy native captures without matching stripping
 are rejected; remeasure size only, without rerunning timing or rebuilding.
-Wasm body/glue accounting is unchanged.
+Wasm size schema 2 counts the runtime/bindings and every required loader,
+instance and import-policy JavaScript adapter in glue and deployment totals.
+The body ratio remains explicitly a comparison of those wasm artifacts.
+Legacy wasm schema 1 omitted adapters and remains historical; updated size
+accounting needs only a size capture, not another timing run.
 
 The perf readers replay saved raw observations and recompute comparisons and
 ratios without launching a compiler or reading the original project. They

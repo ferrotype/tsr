@@ -48,8 +48,10 @@ optional emit output. The original physical-byte transport payload is consumed
 and dropped during preparation; it is not a second retained copy. Observation materializes source/diagnostic/output DTOs only afterward.
 The checkpoint reports storage owner/allocation counts. Those counts are not
 heap bytes and cannot be compared with Go `HeapAlloc`. The optional allocator
-reports live/total/peak **requested** bytes and event counts across the process;
-these are not allocator usable bytes, RSS, or an operation-only delta. Its
+reports live/total/peak **requested** and **usable** bytes plus event counts
+across the process. Usable bytes come from mimalloc’s `mi_usable_size` through
+its feature-gated extended API; this feature is enabled only in the instrumented
+consumer. Neither series is RSS or an operation-only delta. Its
 snapshot is sampled before allocating the checkpoint response. External process
 RSS measurements and allocator measurements require separate authorities and
 phase labels; the prototype does not certify a budget.

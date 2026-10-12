@@ -15,16 +15,20 @@ import (
 
 	"github.com/microsoft/TypeScript/tsc/internal/bundled"
 	"github.com/microsoft/TypeScript/tsc/internal/tspath"
-	"github.com/microsoft/TypeScript/tsc/internal/vfs/iovfs"
 )
 
 const streamFrameLimit = 2 * 1024 * 1024
 const streamChunkLimit = 1024 * 1024
 
+// A source cannot exceed the observation-frame cap. Check before allocating
+// its declared storage; corrupt metadata must not request an unbounded block.
+const streamContentLimit = 256 * 1024 * 1024
+
 type streamContent struct {
 	path, hash string
 	size       uint64
 	data       []byte
+	received   uint64
 }
 type streamPreparation struct {
 	expectedEntries, expectedFiles, expectedContents uint64
@@ -309,7 +313,7 @@ func (e *Engine) streamCommand(raw []byte) (response Response, err error) {
 			return response, fmt.Errorf("content requires unique known physical placeholder")
 		}
 		size, err := decimal(fields["raw_size"])
-		if err != nil || size != uint64(n.rawSize) {
+		if err != nil || size != uint64(n.rawSize) || size > streamContentLimit {
 			return response, fmt.Errorf("content size differs from metadata")
 		}
 		var hash string
@@ -320,7 +324,7 @@ func (e *Engine) streamCommand(raw []byte) (response Response, err error) {
 		if err != nil || hex.EncodeToString(decoded) != hash {
 			return response, fmt.Errorf("noncanonical sha256")
 		}
-		p.content = &streamContent{path: n.path, hash: hash, size: size}
+		p.content = &streamContent{path: n.path, hash: hash, size: size, data: make([]byte, int(size))}
 		p.contentStarted = true
 		response.Kind = "content_started"
 	case "content_chunk":
@@ -328,7 +332,7 @@ func (e *Engine) streamCommand(raw []byte) (response Response, err error) {
 			return response, fmt.Errorf("chunk requires open content")
 		}
 		offset, err := decimal(fields["offset"])
-		if err != nil || offset != uint64(len(p.content.data)) {
+		if err != nil || offset != p.content.received {
 			return response, fmt.Errorf("noncontiguous content offset")
 		}
 		data, err := base64Bytes(fields["bytes_b64"])
@@ -338,14 +342,15 @@ func (e *Engine) streamCommand(raw []byte) (response Response, err error) {
 		if len(data) > streamChunkLimit || uint64(len(data)) > p.content.size-offset {
 			return response, fmt.Errorf("chunk exceeds size or 1 MiB")
 		}
-		p.content.data = append(p.content.data, data...)
+		copy(p.content.data[int(offset):], data)
+		p.content.received += uint64(len(data))
 		response.Kind = "content_chunk"
 	case "content_end":
 		if p.content == nil {
 			return response, fmt.Errorf("content_end requires open file")
 		}
 		content := p.content
-		if uint64(len(content.data)) != content.size || fmt.Sprintf("%x", sha256.Sum256(content.data)) != content.hash {
+		if content.received != content.size || fmt.Sprintf("%x", sha256.Sum256(content.data)) != content.hash {
 			return response, fmt.Errorf("content byte count or hash mismatch")
 		}
 		key := e.snapshot.key(content.path)
@@ -362,7 +367,7 @@ func (e *Engine) streamCommand(raw []byte) (response Response, err error) {
 			return response, fmt.Errorf("incomplete streamed snapshot")
 		}
 		e.snapshot.indexChildren()
-		e.fs = bundled.WrapFS(iovfs.From(e.snapshot, e.snapshot.sensitive))
+		e.fs = bundled.WrapFS(immutableSnapshotFS(e.snapshot))
 		e.preparation = nil
 		e.input.Entries = nil
 		e.state = "prepared"

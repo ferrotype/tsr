@@ -82,7 +82,8 @@ class AllocationControls(unittest.TestCase):
             authority='rust_storage_owners_not_heap_bytes', allocator=measure.ALLOCATOR,
             allocation_instrumented='true', tracked_owners='5', tracked_allocations='10',
             live_requested_bytes='60', total_requested_bytes='800', peak_requested_bytes='90',
-            allocation_events='100', deallocation_events='50')
+            allocation_events='100', deallocation_events='50',
+            live_usable_bytes='72', total_usable_bytes='880', peak_usable_bytes='104')
         observation = copy.deepcopy(OBSERVATION)
         header = {key: value for key, value in observation.items() if key not in ('sources', 'writes')}
         header.update(source_count='1', write_count='0')
@@ -120,15 +121,15 @@ class AllocationControls(unittest.TestCase):
         self.assertTrue(report['allocation_eligible'])
         self.assertFalse(report['performance_acceptance'])
         self.assertEqual(self.calls, ['go', 'rust', 'rust', 'go'] * 3 + ['go', 'rust'])
-        self.assertEqual(report['summary']['retained_bytes']['ratio'], 0.6)
-        self.assertEqual(report['summary']['total_allocation_traffic_bytes']['ratio'], 0.8)
+        self.assertEqual(report['summary']['retained_bytes']['ratio'], 0.72)
+        self.assertEqual(report['summary']['total_allocation_traffic_bytes']['ratio'], 0.88)
         self.assertNotIn('elapsed_rpc_ns', report)
         self.assertNotIn('peak_rss', report)
         row = self.read_capture()
-        self.assertEqual(row['ratio'], 0.6)
-        self.assertEqual(row['samples'], {'go': [100] * 7, 'rust': [60] * 7})
+        self.assertEqual(row['ratio'], 0.72)
+        self.assertEqual(row['samples'], {'go': [100] * 7, 'rust': [72] * 7})
         self.assertIn('rounded GC heap', row['authorities']['go'])
-        self.assertIn('requested layout', row['authorities']['rust'])
+        self.assertIn('mi_usable_size', row['authorities']['rust'])
         self.assertEqual(len(self.calls), 14, 'readonly replay must not execute children')
 
     def test_corrupt_observation_or_missing_owner_metrics_retains_failed_capture(self):
@@ -151,6 +152,15 @@ class AllocationControls(unittest.TestCase):
                 allocation.metrics(invalid, 'rust')
         with self.assertRaises(ValueError):
             allocation.metrics(dict(checkpoint, allocation_instrumented='false'), 'rust')
+
+    def test_requested_only_checkpoint_cannot_qualify_allocation_budget(self):
+        checkpoint = self.fake_capture(self.root / 'rust', {}, self.root / 'legacy', 10, 'rust',
+            preparation=self.archive.preparation(), protocol_version=2)['checkpoint']
+        for name in ('live_usable_bytes', 'total_usable_bytes', 'peak_usable_bytes'):
+            checkpoint.pop(name)
+        probe.validate_checkpoint(checkpoint, 'rust')
+        with self.assertRaisesRegex(ValueError, 'requested-only captures are diagnostic'):
+            allocation.metrics(checkpoint, 'rust')
 
     def test_reference_source_mismatch_or_ordinary_rust_artifact_is_rejected(self):
         self.identities['rust']['sources'] = {'compiled.rs': 'different'}
@@ -177,14 +187,14 @@ class AllocationControls(unittest.TestCase):
     def test_readonly_replay_uses_saved_go_contract_without_current_source_discovery(self):
         self.assertTrue(self.run_capture()['complete'])
         with patch.object(measure, 'build_identity', side_effect=AssertionError('current source discovery')):
-            self.assertEqual(self.read_capture()['ratio'], 0.6)
+            self.assertEqual(self.read_capture()['ratio'], 0.72)
 
     def test_source_pairing_uses_archived_ordinary_rust_manifest(self):
         # Both capture and replay must survive deletion of the producer's
         # original metadata after the ordinary capture archived its exact bytes.
         Path(self.reference['artifacts']['rust']['manifest']['path']).unlink()
         self.assertTrue(self.run_capture()['complete'])
-        self.assertEqual(self.read_capture()['ratio'], 0.6)
+        self.assertEqual(self.read_capture()['ratio'], 0.72)
         (self.reference_dir / 'rust-build.json').write_text('{}')
         with self.assertRaisesRegex(ValueError, 'archived ordinary Rust'):
             self.read_capture()

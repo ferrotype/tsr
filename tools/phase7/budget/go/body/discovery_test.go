@@ -152,3 +152,61 @@ func TestNativeDiscoveryRecordedFileDisappearanceAndTargetCapture(t *testing.T) 
 		t.Fatal("resolved target capture accepted")
 	}
 }
+
+func TestNativeDiscoveryRejectsUnsupportedOperation(t *testing.T) {
+	root, metadata, input, _ := discoveryFixture(t)
+	raw, err := os.ReadFile(input)
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw = []byte(strings.Replace(string(raw), `"operation":"check_emit"`, `"operation":"unknown"`, 1))
+	if err := os.WriteFile(input, raw, 0600); err != nil {
+		t.Fatal(err)
+	}
+	output := filepath.Join(root, "unsupported.ndjson")
+	if err := Discover(metadata, input, output); err == nil || !strings.Contains(err.Error(), "unsupported operation") {
+		t.Fatalf("unsupported operation did not fail: %v", err)
+	}
+	events, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(events), `"kind":"complete"`) || !strings.Contains(string(events), `"kind":"failure"`) {
+		t.Fatalf("unsupported operation completed: %s", events)
+	}
+}
+
+func TestNativeDiscoveryRejectsSnapshotLookupFailure(t *testing.T) {
+	root, metadata, input, _ := discoveryFixture(t)
+	config := filepath.Join(root, "tsconfig.json")
+	raw, err := os.ReadFile(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Equal byte length preserves the physical metadata and isolates the lookup
+	// failure. FileExists can swallow the error before any ReadFile call sees it.
+	if err := os.WriteFile(config, []byte(strings.Replace(string(raw), "main.ts", "loop.ts", 1)), 0600); err != nil {
+		t.Fatal(err)
+	}
+	file, err := os.OpenFile(metadata, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := json.NewEncoder(file).Encode(map[string]any{"kind": "symlink", "path_b64": encoded(filepath.Join(root, "loop.ts")), "target_b64": encoded("loop.ts")}); err != nil {
+		t.Fatal(err)
+	}
+	if err := file.Close(); err != nil {
+		t.Fatal(err)
+	}
+	output := filepath.Join(root, "lookup-failure.ndjson")
+	if err := Discover(metadata, input, output); err == nil || !strings.Contains(err.Error(), "snapshot symlink cycle") {
+		t.Fatalf("snapshot lookup error did not fail: %v", err)
+	}
+	events, err := os.ReadFile(output)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(events), `"kind":"complete"`) || !strings.Contains(string(events), `"kind":"failure"`) {
+		t.Fatalf("snapshot lookup failure completed: %s", events)
+	}
+}

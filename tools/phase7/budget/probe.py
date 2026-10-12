@@ -274,6 +274,11 @@ def validate_checkpoint(value, backend):
         metrics = 'live_requested_bytes total_requested_bytes peak_requested_bytes allocation_events deallocation_events'
         if value['allocation_instrumented'] == 'true':
             names += ' ' + metrics
+            # Historical raw observations remain readable. Budget acceptance
+            # separately requires this complete usable-size extension.
+            usable = 'live_usable_bytes total_usable_bytes peak_usable_bytes'
+            if any(name in value for name in usable.split()):
+                names += ' ' + usable
         fields(value, names, 'Rust checkpoint')
         if value['authority'] != 'rust_storage_owners_not_heap_bytes':
             raise ValueError('Rust checkpoint returned an unknown metric authority')

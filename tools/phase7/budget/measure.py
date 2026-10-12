@@ -35,6 +35,7 @@ import hashlib
 import math
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -83,6 +84,19 @@ def command_pair(command, flag, value):
                                            for i, part in enumerate(command[:-1]))
 
 
+def artifact_revision(manifest):
+    revision = manifest.get('revision')
+    if revision is not None and (not isinstance(revision, str) or not re.fullmatch('[0-9a-f]{40}', revision)):
+        raise ValueError('build manifest revision must be a full Git commit identity')
+    return revision
+
+
+def paired_revision(identities):
+    # The run tracks the Rust implementation revision. Go remains bound to its
+    # own recorded revision and upstream pin, and may be reused across builds.
+    return identities['rust'].get('revision')
+
+
 def require_budget_manifest(manifest, engine):
     if (manifest.get('mode') != 'phase7-budget' or type(manifest.get('measurement_contract')) is not int
             or manifest['measurement_contract'] != 2 or manifest.get('performance_eligible') is not True
@@ -101,7 +115,11 @@ def build_identity(runtime, engine, artifact, build):
         raise ValueError('build manifest must be an object')
     files = [probe.identity(build)]
     reasons = []
-    result = {'manifest': files[0], 'runtime': runtime, 'engine': engine, 'eligibility_reasons': reasons}
+    result = {'manifest': files[0], 'runtime': runtime, 'engine': engine,
+              'revision': artifact_revision(manifest), 'eligibility_reasons': reasons}
+    if manifest.get('dirty') is not None and type(manifest['dirty']) is not bool:
+        raise ValueError('build manifest dirty provenance must be a boolean')
+    result['dirty'] = manifest.get('dirty')
     environment = {}
     if engine == 'go':
         if manifest.get('mode') not in ('phase7-budget-prototype', 'phase7-budget'):
@@ -199,9 +217,10 @@ def build_identity(runtime, engine, artifact, build):
         result.update(executable=str(launcher), node=node_identity,
                       node_version=node_version,
                       gc_policy=GC_POLICY, node_arguments=['--expose-gc', '--stack-size=4096'])
-        # The shell launcher resolves Node from PATH. Pin PATH's first entry to
-        # the bound executable's directory and check resolution on every guard.
-        environment['PATH'] = str(Path(node).absolute().parent) + os.pathsep + os.environ.get('PATH', '')
+        # The shell launcher resolves Node and dirname. Keep only the pinned
+        # Node directory plus fixed OS utility directories, never caller PATH.
+        environment['PATH'] = os.pathsep.join(dict.fromkeys(
+            (str(Path(node).absolute().parent), '/usr/bin', '/bin')))
     if engine == 'go':
         environment['GOGC'] = '100'
     environment.update(GOMEMLIMIT=None, GOEXPERIMENT=None, NODE_OPTIONS=None)
@@ -368,7 +387,7 @@ def bind_selection(archive, path):
     try:
         expected, actual = scenario_input.make(selection['scenario'], selection['mode'], scope)
     finally:
-        common.CACHE = old_cache
+        scenario_input.common.CACHE = old_cache
     if expected != archive.input or actual['provisioned'] != selection['provisioned']:
         raise ValueError('selection does not match the actual provisioned workload')
     root, inventory, _ = snapshot.load_inventory(archive.inventory)
@@ -502,7 +521,7 @@ def run(archive, identities, output, timeout, *, input_path=None, selection=None
         shutil.copyfile(item['manifest']['path'], output / (name + '-build.json'))
     report = {'schema': 1, 'started_utc': datetime.now(timezone.utc).isoformat(),
               'performance_acceptance': False, 'qualifies': False, 'complete': False, 'status': 'capturing',
-              'runtime': runtime, 'measurement_contract': 2,
+              'runtime': runtime, 'measurement_contract': 2, 'revision': paired_revision(identities),
               'pin': probe.decode(Path(identities['go']['manifest']['path']).read_bytes())['pin'],
               'scope': 'diagnostic frozen-work resource capture; no accepted budget change',
               'elapsed_definition': 'execute request to acknowledgement; RPC included; preparation/checkpoint GC/observation excluded',
@@ -661,6 +680,10 @@ def verify_saved_artifacts(directory, report):
         if any(actual[key] != identity['manifest'][key] for key in ('bytes', 'sha256')):
             raise ValueError('archived build manifest changed')
         manifest = probe.decode(build.read_bytes())
+        if identity.get('revision') != artifact_revision(manifest):
+            raise ValueError('captured artifact revision differs from its build manifest')
+        if identity.get('dirty') != manifest.get('dirty'):
+            raise ValueError('captured artifact dirty provenance differs from its build manifest')
         if runtime == 'native' or engine == 'go':
             require_budget_manifest(manifest, engine)
         if engine == 'go':
@@ -709,6 +732,8 @@ def verify_saved_artifacts(directory, report):
     for item in report['controllers']:
         if item['path'] not in archived or any(archived[item['path']][key] != item[key] for key in ('bytes', 'sha256')):
             raise ValueError('controller was not archived with its identity')
+    if report.get('revision') != paired_revision(report['artifacts']):
+        raise ValueError('captured revision differs from the built artifacts')
     if runtime == 'wasm':
         go, rust = (report['artifacts'][engine] for engine in ('go', 'rust'))
         if go['node'] != rust['node'] or go['node_version'] != rust['node_version']:
@@ -851,7 +876,7 @@ def read_capture(directory, scenario, mode, runtime, *, require_qualification=Tr
             'samples': {engine: {key: [pair[engine][field] for pair in verified] for key, field in keys.items()}
                         for engine in ('go', 'rust')},
             'summaries': {key: recomputed[field] for key, field in keys.items()},
-            'host': report['host'], 'recorded_at': report['finished_utc'],
+            'host': report['host'], 'recorded_at': report['finished_utc'], 'revision': report.get('revision'),
             'metadata': {'scenario': scenario, 'mode': mode, 'runtime': runtime, 'pin': report['pin'],
                          'selection': selection, 'archive': archive.identity, 'artifacts': report['artifacts'],
                          'measurement_qualified': not qualification_reasons, 'eligibility_reasons': sorted(set(qualification_reasons)),

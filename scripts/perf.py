@@ -300,6 +300,29 @@ def finite(value):
     return type(value) in (int, float) and math.isfinite(value)
 
 
+def published_budget_metadata(metadata):
+    """Keep recorded runtime policy without publishing a caller's search path."""
+    removed = False
+    def sanitize(value):
+        nonlocal removed
+        if isinstance(value, list):
+            return [sanitize(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        result = {}
+        for key, item in value.items():
+            if key == 'environment' and isinstance(item, dict) and 'PATH' in item:
+                item = {name: entry for name, entry in item.items() if name != 'PATH'}
+                removed = True
+            result[key] = sanitize(item)
+        return result
+    result = sanitize(metadata)
+    if removed:
+        result['redactions'] = list(result.get('redactions', [])) + [
+            'environment.PATH omitted from published metadata; capture retains its recorded launch policy']
+    return result
+
+
 def run_document(workload, measurement, label=None, revision=None, recorded_at=None):
     """The status/perf run file of one measurement (docs/EVIDENCE-plan.md, section 3)."""
     ratios = measurement["ratios"]
@@ -309,6 +332,14 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
     if bad:
         raise ValueError(f"{workload}: ratios that are not finite numbers: {', '.join(bad)}")
     when = recorded_at or measurement.get("recorded_at")
+    budget_workload = workload in ('embed-size', 'wasm-size') or workload.startswith(('embed-check-', 'embed-emit-', 'wasm-check-', 'wasm-emit-'))
+    if budget_workload:
+        artifact_revision = measurement.get('revision')
+        if (not isinstance(artifact_revision, str) or len(artifact_revision) != 40 or
+                any(character not in '0123456789abcdef' for character in artifact_revision)):
+            raise ValueError(f'{workload}: capture lacks an artifact-associated revision; recapture from revision-bound builds')
+        if revision is not None and revision != artifact_revision:
+            raise ValueError(f'{workload}: revision override differs from the captured artifacts')
     document = {
         "workload": workload,
         "pin": pin(),
@@ -321,6 +352,8 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
     for optional in ("summaries", "metadata"):
         if optional in measurement:
             document[optional] = measurement[optional]
+    if budget_workload and 'metadata' in document:
+        document['metadata'] = published_budget_metadata(document['metadata'])
     return document
 
 

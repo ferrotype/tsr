@@ -79,6 +79,11 @@ func TestStreamedSnapshotMatchesOrdinaryWorkAndDropsTransport(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	for _, entry := range e.snapshot.entries {
+		if entry.kind == "physical_file" && cap(entry.data) != len(entry.data) {
+			t.Fatalf("stream retained capacity slack: length=%d capacity=%d", len(entry.data), cap(entry.data))
+		}
+	}
 	r, err := streamCall(e, "observe", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -89,6 +94,26 @@ func TestStreamedSnapshotMatchesOrdinaryWorkAndDropsTransport(t *testing.T) {
 	}
 	if _, err := streamCall(e, "release", nil); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestStreamRejectsOversizedAllocationBeforeContent(t *testing.T) {
+	e := &Engine{}
+	input := tiny("check")
+	input.Entries = []Entry{}
+	if _, err := streamCall(e, "prepare_begin", map[string]any{"input": input, "expected_entries": "1", "expected_files": "1", "expected_contents": "1"}); err != nil {
+		t.Fatal(err)
+	}
+	path := base64.StdEncoding.EncodeToString([]byte("/project/main.ts"))
+	size := fmt.Sprint(streamContentLimit + 1)
+	if _, err := streamCall(e, "prepare_metadata", map[string]any{"entries": []any{map[string]any{"kind": "physical_file", "path_b64": path, "raw_size": size}}}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := streamCall(e, "content_begin", map[string]any{"path_b64": path, "raw_size": size, "sha256": fmt.Sprintf("%064d", 0)}); err == nil {
+		t.Fatal("oversized content allocation accepted")
+	}
+	if e.preparation.content != nil {
+		t.Fatal("invalid request allocated content")
 	}
 }
 func TestUnavailableStreamFileFailsOnReadAndIsTerminal(t *testing.T) {

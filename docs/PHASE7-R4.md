@@ -409,3 +409,20 @@ allocation or a retained-byte substitute. Instrumented elapsed/RSS numbers are
 not used. This allocation result can accompany a future ordinary qualified
 comparison only under the tool's exact source/artifact/work binding; the busy
 ordinary run is not made timing-qualified by the allocation result.
+
+### Review corrections after the initial budget captures
+
+The original retained-allocation ratio above compares Go rounded blocks with
+Rust requested layouts and includes an avoidable second Go UTF-8 source copy.
+It is historical diagnostic data, not a result under the corrected accounting.
+New allocation captures use mimalloc usable sizes, retain requested layouts
+separately, and share immutable snapshot source backing on both implementations.
+Go streaming now allocates exact declared file lengths rather than retaining
+append capacity. Existing captures are preserved; no revised ratio is inferred.
+
+Budget artifacts record their build revision and dirty-tree state alongside the
+source digests. Capture replay carries those identities into published records
+instead of attributing old artifacts to the reader's HEAD. Wasm deployment totals
+include required JavaScript adapters, and startup compiles the same bytes it
+hashes. These corrections require new measurements to establish updated numbers;
+the fixes themselves do not change any performance threshold.

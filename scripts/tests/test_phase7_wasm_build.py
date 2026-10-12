@@ -42,6 +42,9 @@ class WasmBuildTests(unittest.TestCase):
                 after = BUILD.source_snapshot()
             self.assertNotEqual(before[str(source.relative_to(ROOT))], after[str(source.relative_to(ROOT))])
             self.assertEqual(before.keys(), after.keys())
+            for name in ('compiler-imports.mjs', 'wasm-identity.mjs'):
+                policy = BUILD.HERE.parent / name
+                self.assertEqual(before[str(policy.relative_to(ROOT))], BUILD.digest(policy))
             for call in query.call_args_list:
                 self.assertEqual(call.args[0], ['cargo', 'metadata', '--locked', '--offline', '--format-version=1',
                                                '--manifest-path', str(BUILD.HERE / 'Cargo.toml')])

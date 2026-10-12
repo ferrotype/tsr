@@ -97,7 +97,9 @@ An insertion event is one of:
 
 - `directory { path }` for explicit directories, including empty directories.
 - `physical_file { path, bytes }` for on-disk bytes. `ReadFile` must use the
-  pinned physical loader's BOM/UTF-16/UTF-8 behavior, not a guessed decoder.
+  pinned physical loader's BOM/UTF-16/UTF-8 behavior. The immutable string-facing
+  adapter shares UTF-8 backing (skipping its BOM) and delegates UTF-16 to the
+  pinned loader. `io/fs` callers still receive independently mutable bytes.
 - `symlink { path, target }` with its explicit target path bytes.
 
 Prepare explicitly inserts the current directory before the supplied events;

@@ -137,6 +137,22 @@ class TemporaryPerf(unittest.TestCase):
 
 
 class RecordTests(TemporaryPerf):
+    def test_budget_record_uses_artifact_revision_and_never_current_head(self):
+        measured = {'ratios': {'artifact_bytes': 1}, 'samples': {'go': {}, 'rust': {}},
+                    'host': HOST, 'recorded_at': '2026-10-12T00:00:00Z', 'revision': REVISION,
+                    'metadata': {'artifacts': {'rust': {'environment': {'PATH': '/secret/inherited/path', 'GOGC': '100'}}}}}
+        for workload in ('embed-size', 'wasm-size', 'embed-check-xstate', 'wasm-emit-xstate'):
+            with self.subTest(workload=workload), patch.object(perf, 'head', side_effect=AssertionError('must not read HEAD')):
+                self.assertEqual(perf.run_document(workload, measured)['revision'], REVISION)
+                published = perf.run_document(workload, measured)['metadata']
+                self.assertEqual(published['artifacts']['rust']['environment'], {'GOGC': '100'})
+                self.assertIn('environment.PATH omitted', published['redactions'][0])
+                self.assertIn('PATH', measured['metadata']['artifacts']['rust']['environment'])
+                with self.assertRaisesRegex(ValueError, 'artifact-associated revision'):
+                    perf.run_document(workload, {**measured, 'revision': None})
+                with self.assertRaisesRegex(ValueError, 'override differs'):
+                    perf.run_document(workload, measured, revision='f' * 40)
+
     def test_parse_bind_capture_becomes_a_run_file(self):
         capture = self.directory / "s07-benchmark"
         report, rows = s07_capture(capture)

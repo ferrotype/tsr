@@ -32,6 +32,11 @@ SCOPE = {
     'ratio': 'Rust body bytes / Go body bytes; runtime glue reported separately',
 }
 STRIP_FLAGS = ['--strip-all']
+JS_ADAPTERS = {
+    'go': ('tools/phase7/budget/go/wasm.mjs',),
+    'rust': ('tools/phase7/budget/production-wasm.mjs',
+             'tools/s10/wasm/instance.mjs', 'tools/s10/wasm/imports.mjs'),
+}
 
 
 def strip_native(bound, output, strip_tool=None):
@@ -132,6 +137,12 @@ def byte_counts(runtime, bound):
                     raise ValueError('missing or ambiguous size asset: ' + name)
                 return rows[0]['bytes']
             body, glue = size(body_name), size(glue_name)
+            for relative in JS_ADAPTERS[engine]:
+                path = str(ROOT / relative)
+                rows = [item for item in identity.get('helpers', []) if item['path'] == path]
+                if len(rows) != 1 or rows[0] not in identity['files']:
+                    raise ValueError('missing or ambiguous deployment JS adapter: ' + relative)
+                glue += rows[0]['bytes']
         measure.positive(body, 'body bytes')
         result[engine] = {'body': body, 'glue': glue, 'total': body + glue}
     return result
@@ -143,6 +154,8 @@ def capture(runtime, go, rust, go_build, rust_build, output, strip_tool=None):
     for identity in bound.values():
         measure.unchanged(identity)
     output.mkdir(parents=True)
+    if runtime == 'wasm':
+        measure.archive_helpers(output, [], bound)
     saved = {}
     for engine in ('go', 'rust'):
         path = output / (engine + '-build.json')
@@ -153,8 +166,9 @@ def capture(runtime, go, rust, go_build, rust_build, output, strip_tool=None):
     normalization = strip_native(bound, output, strip_tool) if runtime == 'native' else None
     counts = (stripped_counts(output, bound, normalization) if runtime == 'native'
               else byte_counts(runtime, bound))
-    report = {'version': 2 if runtime == 'native' else 1,
+    report = {'version': 2,
               'runtime': runtime, 'recorded_at': datetime.now(timezone.utc).isoformat(),
+              'revision': measure.paired_revision(bound),
               'production_eligible': True, 'scope': SCOPE, 'artifacts': bound,
               'saved_manifests': saved, 'artifact_bytes': counts,
               'host': measure.host_info()}
@@ -172,9 +186,9 @@ def read_capture(directory, runtime):
         raise ValueError('unknown size runtime')
     directory = Path(directory).resolve(strict=True)
     report = probe.decode((directory / 'size.json').read_bytes())
-    if runtime == 'native' and report.get('version') == 1:
-        raise ValueError('legacy native size capture compared unmatched stripping; recapture sizes')
-    if (type(report.get('version')) is not int or report['version'] != (2 if runtime == 'native' else 1) or
+    if report.get('version') == 1:
+        raise ValueError('legacy size capture lacks matched stripping or complete JS accounting; recapture sizes')
+    if (type(report.get('version')) is not int or report['version'] != 2 or
             report.get('runtime') != runtime or report.get('production_eligible') is not True or
             report.get('scope') != SCOPE):
         raise ValueError('invalid production size capture')
@@ -188,6 +202,10 @@ def read_capture(directory, runtime):
         if identity != saved or identity['sha256'] != bound[engine]['manifest']['sha256']:
             raise ValueError('saved build metadata changed')
         manifest = probe.decode((directory / (engine + '-build.json')).read_bytes())
+        if bound[engine].get('revision') != measure.artifact_revision(manifest):
+            raise ValueError('captured artifact revision differs from its build manifest')
+        if bound[engine].get('dirty') != manifest.get('dirty'):
+            raise ValueError('captured artifact dirty provenance differs from its build manifest')
         if (bound[engine].get('runtime') != runtime or bound[engine].get('engine') != engine or
                 bound[engine].get('production_eligible') is not True or bound[engine].get('eligibility_reasons') != []):
             raise ValueError('invalid captured size eligibility')
@@ -219,6 +237,13 @@ def read_capture(directory, runtime):
             if actual not in bound[engine]['files']:
                 raise ValueError('native size asset differs from captured identity')
         else:
+            for relative in JS_ADAPTERS[engine]:
+                rows = [item for item in bound[engine].get('helpers', []) if item['path'] == str(ROOT / relative)]
+                if len(rows) != 1:
+                    raise ValueError('missing deployment JS adapter: ' + relative)
+                actual = probe.identity(measure.captured_file(directory, 'helpers/' + relative))
+                if any(actual[key] != rows[0][key] for key in ('bytes', 'sha256')):
+                    raise ValueError('archived deployment JS adapter differs: ' + relative)
             if engine == 'rust':
                 command = manifest.get('command')
                 if (manifest.get('mode') != 'checker' or not measure.command_pair(command, '-p', 'tsr_wasm') or
@@ -233,13 +258,15 @@ def read_capture(directory, runtime):
                 actual = measure.bound_asset(rows[0]['path'], measure.artifact_entry(manifest, name))
                 if actual != rows[0]:
                     raise ValueError('wasm size asset differs from captured identity')
+    if report.get('revision') != measure.paired_revision(bound):
+        raise ValueError('captured revision differs from the built artifacts')
     counts = (stripped_counts(directory, bound, report.get('native_stripping')) if runtime == 'native'
               else byte_counts(runtime, bound))
     if counts != report['artifact_bytes']:
         raise ValueError('saved size differs from artifact bytes')
     return {'ratios': {'artifact_bytes': counts['rust']['body'] / counts['go']['body']},
             'samples': {engine: {'artifact_bytes': [counts[engine]['body']]} for engine in ('go', 'rust')},
-            'host': report['host'], 'recorded_at': report['recorded_at'],
+            'host': report['host'], 'recorded_at': report['recorded_at'], 'revision': report.get('revision'),
             'metadata': {'runtime': runtime, 'scope': SCOPE, 'artifact_bytes': counts,
                          'artifacts': bound, 'saved_manifests': report['saved_manifests'],
                          **({'native_stripping': report['native_stripping']} if runtime == 'native' else {}),

@@ -37,6 +37,8 @@ def main():
     if any(p.casefold() == "target" for p in output.parts):
         parser.error("retained artifacts must be outside target")
     output.mkdir(parents=True, exist_ok=False)
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT))
     before = source_record()
     upstream = verified_upstream()
     env = go_environment()
@@ -62,11 +64,13 @@ def main():
     verified_upstream()
     if source_record() != before:
         raise ValueError("Go consumer sources changed during build")
+    if subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip() != revision:
+        raise ValueError('repository revision changed during Go build')
     files = (output / "budget-go", output / "budget-go.wasm", output / "wasm_exec.cjs")
     record = {"version": 1, "mode": "phase7-budget", "measurement_contract": 2,
               "performance_eligible": True, "source_guard": True, "build_exit": 0,
               "go_gc_policy": "runtime.GC after prepare/prepare_end and checkpoint",
-              "pin": pin, "sources": before, "commands": commands,
+              "pin": pin, "revision": revision, "dirty": dirty, "sources": before, "commands": commands,
               "go": subprocess.check_output(["go", "version"], env=env, text=True).strip(),
               "artifacts": {p.name: {"sha256": digest(p), "bytes": p.stat().st_size} for p in files}}
     (output / "build.json").write_text(json.dumps(record, indent=2) + "\n")

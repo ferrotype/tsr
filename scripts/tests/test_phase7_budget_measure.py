@@ -100,6 +100,7 @@ class MeasurementControls(unittest.TestCase):
                             build_command=['cargo', 'build', '--manifest-path', 'tools/phase7/budget/rust/Cargo.toml'],
                             executable=str(binary), size=digest['bytes'], sha256=digest['sha256'])
         build = self.root / (engine + '.json')
+        manifest['revision'] = 'a' * 40
         probe.write(build, manifest)
         return measure.build_identity('native', engine, binary, build)
 
@@ -306,8 +307,6 @@ class MeasurementControls(unittest.TestCase):
         cases = []
         old = captured('go'); old['checkpoint'] = GO_CHECKPOINT
         cases.append(('go', old))
-        instrumented = captured('rust'); instrumented['checkpoint']['allocation_instrumented'] = 'true'
-        cases.append(('rust', instrumented))
         unknown = captured('rust'); del unknown['checkpoint']['allocator']
         cases.append(('rust', unknown))
         gc = captured('rust-wasm'); gc['checkpoint']['gc_policy'] = 'unknown'
@@ -328,6 +327,27 @@ class MeasurementControls(unittest.TestCase):
             with self.subTest(backend=backend, checkpoint=record['checkpoint']):
                 with self.assertRaises(ValueError):
                     measure.sample_metrics(record, backend, 'check')
+
+    def test_complete_instrumented_checkpoint_reaches_timing_guard(self):
+        record = captured('rust')
+        record['checkpoint'].update(allocation_instrumented='true', **dict.fromkeys(
+            'live_requested_bytes total_requested_bytes peak_requested_bytes allocation_events deallocation_events '
+            'live_usable_bytes total_usable_bytes peak_usable_bytes'.split(), '1'))
+        probe.validate_checkpoint(record['checkpoint'], 'rust')
+        with self.assertRaisesRegex(ValueError, 'native timing requires uninstrumented known mimalloc'):
+            measure.sample_metrics(record, 'rust', 'check')
+
+    def test_artifact_revisions_are_validated_and_paired(self):
+        self.assertEqual(measure.paired_revision(self.identities), 'a' * 40)
+        self.assertIsNone(measure.artifact_revision({}))
+        for value in ('HEAD', 'A' * 40, True, 'a' * 39):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'revision'):
+                measure.artifact_revision({'revision': value})
+        changed = copy.deepcopy(self.identities)
+        changed['rust']['revision'] = 'b' * 40
+        self.assertEqual(measure.paired_revision(changed), 'b' * 40)
+        changed['rust']['revision'] = None
+        self.assertIsNone(measure.paired_revision(changed))
         self.assertEqual(measure.sample_metrics(captured('go-wasm'), 'go-wasm', 'check')['checkpoint_process_peak_rss_bytes'], 1000)
 
     def test_native_manifest_kind_gc_contract_hash_and_instrumentation(self):
@@ -362,6 +382,7 @@ class MeasurementControls(unittest.TestCase):
         node = self.root / 'node'; node.write_bytes(b'node')
         with patch.object(measure.shutil, 'which', return_value=str(node)), patch.object(measure.subprocess, 'check_output', return_value='v24.20.0\n'):
             result = measure.build_identity('wasm', 'rust', directory, build)
+            self.assertEqual(result['environment']['PATH'], os.pathsep.join((str(node.parent), '/usr/bin', '/bin')))
             measure.unchanged(result)
             self.assertIn('bindings.mjs', [Path(item['path']).name for item in result['files']])
             self.assertIn('instance.mjs', [Path(item['path']).name for item in result['files']])
@@ -417,6 +438,18 @@ class MeasurementControls(unittest.TestCase):
             self.identities[engine] = measure.build_identity('native', engine, self.root / engine, build)
         return binding, input_path, project
 
+    def test_bind_selection_restores_the_module_cache_on_success_and_failure(self):
+        original_cache = measure.scenario_input.common.CACHE
+        self.production_fixture()
+        self.assertIs(measure.scenario_input.common.CACHE, original_cache)
+        def fail(*args):
+            measure.scenario_input.common.CACHE = self.root / 'temporary-cache'
+            raise ValueError('selection failure')
+        with patch.object(measure.scenario_input, 'make', side_effect=fail):
+            with self.assertRaisesRegex(ValueError, 'selection failure'):
+                measure.bind_selection(self.archive, self.root / 'selection.json')
+        self.assertIs(measure.scenario_input.common.CACHE, original_cache)
+
     def test_production_capture_readonly_raw_replay_and_native_heap_stays_missing(self):
         binding, input_path, project = self.production_fixture()
         result = self.run_capture(selection=binding, input_path=input_path)
@@ -428,6 +461,7 @@ class MeasurementControls(unittest.TestCase):
         with patch.object(probe, 'capture', side_effect=AssertionError('must not execute')):
             replay = measure.read_capture(self.root / 'output', 'xstate', 'check', 'native')
         self.assertEqual(replay['ratios'], {'elapsed': 0.5, 'peak_rss': 0.9})
+        self.assertEqual(replay['revision'], 'a' * 40)
         self.assertNotIn('retained_rss', replay['ratios'])
         self.assertNotIn('retained_bytes', replay['ratios'])
         self.assertIn('retained_bytes', replay['metadata']['unavailable'])

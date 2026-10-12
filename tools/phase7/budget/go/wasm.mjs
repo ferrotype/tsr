@@ -1,8 +1,8 @@
 // NDJSON frontend over the same pinned Go body as the native consumer.
 import {createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
-import {createRequire} from 'node:module';
-import {resolve} from 'node:path';
+import Module from 'node:module';
+import {dirname, resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createInterface} from 'node:readline';
 
@@ -14,19 +14,27 @@ export function validateBuildRecord(record) {
   throw new Error('not a verified Go budget build');
 }
 
-export async function loadProcessor(directory) {
+export async function loadProcessor(directory, {read = readFile, instantiate = WebAssembly.instantiate} = {}) {
   if (typeof directory !== 'string' || directory.length === 0) throw new Error('TSR_GO_WASM_ARTIFACT_DIR must name the pinned Go budget build');
   directory = resolve(directory);
-  const record = JSON.parse(await readFile(resolve(directory, 'build.json'), 'utf8'));
+  const record = JSON.parse(await read(resolve(directory, 'build.json'), 'utf8'));
   validateBuildRecord(record);
+  const assets = {};
   for (const name of ['budget-go.wasm', 'wasm_exec.cjs']) {
-    const bytes = await readFile(resolve(directory, name));
+    const bytes = await read(resolve(directory, name));
     const entry = record.artifacts?.[name];
     if (entry?.sha256 !== createHash('sha256').update(bytes).digest('hex') || entry.bytes !== bytes.length) throw new Error(`Go artifact differs: ${name}`);
+    assets[name] = bytes;
   }
-  createRequire(import.meta.url)(resolve(directory, 'wasm_exec.cjs'));
+  // Compile the authenticated runtime bytes, bypassing require's file reread
+  // and module cache. The wasm compiler receives the very same checked buffer.
+  const runtimePath = resolve(directory, 'wasm_exec.cjs');
+  const runtime = new Module(runtimePath);
+  runtime.filename = runtimePath;
+  runtime.paths = Module._nodeModulePaths(dirname(runtimePath));
+  runtime._compile(assets['wasm_exec.cjs'].toString('utf8'), runtimePath);
   const go = new globalThis.Go();
-  const wasm = await WebAssembly.instantiate(await readFile(resolve(directory, 'budget-go.wasm')), go.importObject);
+  const wasm = await instantiate(assets['budget-go.wasm'], go.importObject);
   let runtimeFailed = false;
   void go.run(wasm.instance).catch(error => {runtimeFailed = true; process.stderr.write(`Go runtime terminated: ${error}\n`);});
   if (typeof globalThis.phase7BudgetGo !== 'function') throw new Error('Go body did not install its synchronous frontend');

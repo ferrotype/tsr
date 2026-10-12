@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Separate native allocation accounting over an authenticated ordinary capture.
 
-Go HeapAlloc is rounded GC heap accounting; Rust live_requested_bytes counts
-live GlobalAlloc layouts backed by mimalloc. Their authorities are explicit.
+Go HeapAlloc and Rust live_usable_bytes count live allocated blocks, including
+allocator rounding. Requested Rust layouts remain separate raw diagnostics.
 This tool never supplies elapsed, RSS or executable-size acceptance metrics.
 """
 from __future__ import annotations
@@ -22,11 +22,11 @@ from s07_benchmark_stats import ratio_summary  # noqa: E402
 PAIRS = 7
 AUTHORITIES = {
     'go': 'runtime.MemStats.HeapAlloc after runtime.GC; rounded GC heap bytes',
-    'rust': 'GlobalAlloc live requested layout bytes; mimalloc-0.1.48 backing',
+    'rust': 'mimalloc-0.1.48 mi_usable_size for live allocations; rounded allocated blocks',
 }
 TRAFFIC_AUTHORITIES = {
     'go': 'runtime.MemStats.TotalAlloc; cumulative rounded GC heap bytes',
-    'rust': 'GlobalAlloc total requested layout bytes; cumulative process traffic',
+    'rust': 'mimalloc-0.1.48 cumulative mi_usable_size per successful alloc/realloc; logical rounded traffic',
 }
 
 
@@ -56,7 +56,9 @@ def instrumented_identity(binary, build):
     return {'runtime': 'native', 'engine': 'rust', 'executable': executable['path'],
             'manifest': probe.identity(build), 'files': [probe.identity(build), executable],
             'environment': {'GOMEMLIMIT': None, 'GOEXPERIMENT': None, 'NODE_OPTIONS': None},
-            'sources': manifest['sources'], 'pin': manifest.get('pin'), 'allocation_instrumented': True}
+            'sources': manifest['sources'], 'pin': manifest.get('pin'),
+            'revision': measure.artifact_revision(manifest), 'dirty': manifest.get('dirty'),
+            'allocation_instrumented': True}
 
 
 def metrics(checkpoint, engine):
@@ -64,8 +66,11 @@ def metrics(checkpoint, engine):
     if engine == 'rust' and (checkpoint['allocation_instrumented'] != 'true'
                              or checkpoint.get('allocator') != measure.ALLOCATOR):
         raise ValueError('Rust allocation capture requires instrumented mimalloc')
-    retained = checkpoint['heap_alloc' if engine == 'go' else 'live_requested_bytes']
-    traffic = checkpoint['total_alloc' if engine == 'go' else 'total_requested_bytes']
+    if engine == 'rust' and not all(name in checkpoint for name in
+            ('live_usable_bytes', 'total_usable_bytes', 'peak_usable_bytes')):
+        raise ValueError('allocation acceptance requires allocator usable bytes; requested-only captures are diagnostic')
+    retained = checkpoint['heap_alloc' if engine == 'go' else 'live_usable_bytes']
+    traffic = checkpoint['total_alloc' if engine == 'go' else 'total_usable_bytes']
     probe.decimal(retained, engine + ' retained allocation bytes', positive=True)
     probe.decimal(traffic, engine + ' total allocation traffic', positive=True)
     if int(traffic) < int(retained):
@@ -73,8 +78,16 @@ def metrics(checkpoint, engine):
     if engine == 'rust':
         for key in ('tracked_owners', 'tracked_allocations', 'allocation_events', 'peak_requested_bytes'):
             probe.decimal(checkpoint[key], key, positive=True)
-        if int(checkpoint['peak_requested_bytes']) < int(retained):
-            raise ValueError('requested allocation peak is smaller than live bytes')
+        for prefix in ('live', 'total', 'peak'):
+            requested = checkpoint[prefix + '_requested_bytes']
+            usable = checkpoint[prefix + '_usable_bytes']
+            probe.decimal(requested, prefix + ' requested bytes', positive=True)
+            probe.decimal(usable, prefix + ' usable bytes', positive=True)
+            if int(usable) < int(requested):
+                raise ValueError('usable allocation bytes are smaller than requested bytes')
+        for authority in ('requested', 'usable'):
+            if int(checkpoint['peak_' + authority + '_bytes']) < int(checkpoint['live_' + authority + '_bytes']):
+                raise ValueError('allocation peak is smaller than live bytes')
         if int(checkpoint['allocation_events']) < int(checkpoint['deallocation_events']):
             raise ValueError('more deallocations than successful allocations')
     return {'retained_bytes': int(retained), 'total_allocation_traffic_bytes': int(traffic)}
@@ -137,6 +150,7 @@ def run(reference_directory, identities, output, timeout):
     helpers = measure.archive_helpers(output, controllers, identities)
     report = {'schema': 1, 'kind': 'native-allocation-accounting', 'measurement_contract': 2,
               'started_utc': datetime.now(timezone.utc).isoformat(), 'complete': False,
+              'revision': measure.paired_revision(identities),
               'performance_acceptance': False, 'allocation_eligible': False,
               'scope': 'separate allocation accounting; no elapsed/RSS/size acceptance',
               'ordinary_reference': reference_id, 'archive': archive.identity,
@@ -220,6 +234,8 @@ def read_capture(directory, scenario, mode, *, ordinary_reference):
     restored = {'go': identities['go'],
                 'rust': instrumented_identity(Path(identities['rust']['executable']), directory / 'rust-build.json')}
     pair_identity(restored, reference, ordinary_reference / 'rust-build.json')
+    if report.get('revision') != measure.paired_revision(restored):
+        raise ValueError('allocation revision differs from measured artifacts')
     helpers = probe.decode((directory / 'helper-manifest.json').read_bytes())
     for helper in helpers:
         if not same_asset(probe.identity(measure.captured_file(directory, helper['archived'])), helper):
@@ -265,7 +281,7 @@ def read_capture(directory, scenario, mode, *, ordinary_reference):
     total = ratio_summary(traffic['go'], traffic['rust'], accepted_counts=(PAIRS,))
     if report['summary'] != {'retained_bytes': summary, 'total_allocation_traffic_bytes': total}:
         raise ValueError('saved allocation summary differs from raw checkpoints')
-    return {'ratio': summary['ratio'], 'samples': samples, 'authorities': AUTHORITIES,
+    return {'revision': report.get('revision'), 'ratio': summary['ratio'], 'samples': samples, 'authorities': AUTHORITIES,
             'summary': summary, 'traffic': {'samples': traffic, 'authorities': TRAFFIC_AUTHORITIES, 'summary': total},
             'ordinary_reference': reference_id, 'capture': probe.identity(directory / 'allocation.json')}
 

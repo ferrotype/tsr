@@ -103,18 +103,31 @@ for line in sys.stdin:
                 self.assertIn('error', record)
                 self.assertTrue(record['commands'])
 
+    def capture_execute_timeout(self, directory):
+        exchange = probe.Child.exchange
+        children = []
+
+        def with_execute_deadline(child, request, expected):
+            children.append(child)
+            # Preparation must finish before testing execution timeout: process
+            # startup on a loaded CI runner is not the behavior under test.
+            child.timeout = 0.05 if request['command'] == 'execute' else 10
+            return exchange(child, request, expected)
+
+        with patch.object(probe.Child, 'exchange', with_execute_deadline):
+            with self.assertRaises(TimeoutError):
+                probe.capture(self.binary('timeout'), {}, directory, 10)
+        self.assertIsNotNone(children[0].process.poll(), 'direct child was not reaped')
+        return json.loads((directory / 'record.json').read_bytes())
+
     def test_timeout_kills_child_and_preserves_partial_record(self):
-        with self.assertRaises(TimeoutError):
-            probe.capture(self.binary('timeout'), {}, self.root / 'timeout', 0.5)
-        record = json.loads((self.root / 'timeout/record.json').read_bytes())
+        record = self.capture_execute_timeout(self.root / 'timeout')
         self.assertIn('execute', record['error'])
         self.assertFalse(record['complete'])
 
     def test_cleanup_falls_back_to_direct_child_when_group_signal_is_refused(self):
         with patch.object(probe.os, 'killpg', side_effect=PermissionError('group gone')):
-            with self.assertRaises(TimeoutError):
-                probe.capture(self.binary('timeout'), {}, self.root / 'cleanup', 0.5)
-        record = json.loads((self.root / 'cleanup/record.json').read_bytes())
+            record = self.capture_execute_timeout(self.root / 'cleanup')
         self.assertIn('execute', record['error'])
         self.assertNotIn('cleanup_error', record)
 
@@ -208,6 +221,15 @@ for line in sys.stdin:
                 'allocation_instrumented': 'false', 'tracked_owners': '2', 'tracked_allocations': '3'}
         probe.validate_checkpoint(rust, 'rust')
         probe.validate_checkpoint(dict(rust, allocator='mimalloc-0.1.48'), 'rust')
+        counters = dict(live_requested_bytes='17', total_requested_bytes='17',
+                        peak_requested_bytes='17', allocation_events='1', deallocation_events='0')
+        instrumented = dict(rust, allocation_instrumented='true', **counters)
+        probe.validate_checkpoint(instrumented, 'rust')
+        usable = dict(live_usable_bytes='32', total_usable_bytes='32', peak_usable_bytes='32')
+        probe.validate_checkpoint(dict(instrumented, **usable), 'rust')
+        with self.assertRaisesRegex(ValueError, 'checkpoint'):
+            probe.validate_checkpoint(dict(instrumented, live_usable_bytes='32'), 'rust')
+
         peak = {'process_peak_rss_before_observation_bytes': '200',
                 'process_peak_rss_authority': 'getrusage(RUSAGE_SELF).ru_maxrss'}
         probe.validate_checkpoint(dict(rust, **peak), 'rust')

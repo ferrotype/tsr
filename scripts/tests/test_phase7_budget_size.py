@@ -23,6 +23,7 @@ class SizeControls(unittest.TestCase):
             pin.parent.mkdir(); pin.write_text('{"pin":"' + 'a' * 40 + '"}')
             build = directory / 'build.json'
             manifest = {'mode': 'phase7-budget', 'measurement_contract': 2,
+                        'revision': 'a' * 40,
                         'performance_eligible': True, 'source_guard': True, 'build_exit': 0,
                         'sources': {'data/upstream.json': probe.identity(pin)['sha256']},
                         'pin': 'a' * 40, 'go_gc_policy': measure.GO_GC_POLICY,
@@ -43,7 +44,10 @@ class SizeControls(unittest.TestCase):
             files = [probe.identity(build), probe.identity(body), probe.identity(pin)]
             if runtime == 'wasm':
                 files.append(probe.identity(glue))
+            helpers = [probe.identity(size.ROOT / relative) for relative in size.JS_ADAPTERS[engine]] if runtime == 'wasm' else []
+            files += helpers
             bound[engine] = {'manifest': files[0], 'runtime': runtime, 'engine': engine,
+                             'revision': manifest['revision'], 'helpers': helpers,
                              'production_eligible': True, 'files': files, 'executable': str(body),
                              'eligibility_reasons': []}
         return bound
@@ -74,6 +78,7 @@ class SizeControls(unittest.TestCase):
             root = Path(name).resolve(); bound = self.fixture(root)
             result = self.capture(root, bound)
             self.assertEqual(result['ratios'], {'artifact_bytes': 1.4})
+            self.assertEqual(result['revision'], 'a' * 40)
             self.assertEqual(result['samples']['go']['artifact_bytes'], [10])
             self.assertEqual(result['metadata']['artifact_bytes']['rust'], {'body': 14, 'glue': 0, 'total': 14})
             for engine, count in (('go', 20), ('rust', 28)):
@@ -104,7 +109,13 @@ class SizeControls(unittest.TestCase):
         with tempfile.TemporaryDirectory() as name:
             root = Path(name).resolve(); result = self.capture(root, self.fixture(root, 'wasm'), 'wasm')
             self.assertEqual(result['ratios']['artifact_bytes'], 1.4)
-            self.assertEqual(result['metadata']['artifact_bytes']['go'], {'body': 20, 'glue': 3, 'total': 23})
+            for engine, body in (('go', 20), ('rust', 28)):
+                glue = 3 + sum((size.ROOT / relative).stat().st_size for relative in size.JS_ADAPTERS[engine])
+                self.assertEqual(result['metadata']['artifact_bytes'][engine], {'body': body, 'glue': glue, 'total': body + glue})
+            archived = root / 'capture/helpers' / size.JS_ADAPTERS['rust'][0]
+            archived.write_bytes(b'tampered adapter')
+            with self.assertRaisesRegex(ValueError, 'deployment JS adapter differs'):
+                size.read_capture(root / 'capture', 'wasm')
 
     def test_saved_metadata_and_size_tampering_are_rejected(self):
         for member in ('go-build.json', 'size.json'):

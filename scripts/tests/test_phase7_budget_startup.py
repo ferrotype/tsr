@@ -87,16 +87,39 @@ await assert.rejects(loadReady('go','/fixture',async()=>({}),()=>1n), /live proc
             self.assertTrue((self.root / name / 'stderr').is_file())
 
     def test_timeout_kills_process_group_and_retains_partial_stdout(self):
-        self.child.write_text('import os,subprocess,sys,time\np=subprocess.Popen([sys.executable,"-c","import time; time.sleep(20)"],stdout=sys.stdout)\nprint(os.getpid(),p.pid,flush=True)\ntime.sleep(20)\n')
-        with patch.object(startup.os, 'killpg', wraps=os.killpg) as kill:
-            row = startup.capture(self.identity('go'), self.root / 'timeout', .1, child=self.child)
+        archived_stdout = self.root / 'timeout/stdout'
+        self.child.write_text('import os,subprocess,sys,time\np=subprocess.Popen([sys.executable,"-c","import time; time.sleep(30)"],stdout=sys.stdout)\n'
+                              'print(os.getpid(),p.pid,flush=True)\ntime.sleep(30)\n')
+        # Advance only after the parent has consumed and archived the PID row.
+        # Child readiness alone can race with the parent's first stdout read.
+        with patch.object(startup.os, 'killpg', wraps=os.killpg) as kill, \
+             patch.object(startup.time, 'monotonic', side_effect=lambda: 31 if archived_stdout.exists() and b'\n' in archived_stdout.read_bytes() else 0):
+            row = startup.capture(self.identity('go'), self.root / 'timeout', 30, child=self.child)
         self.assertFalse(row['complete'])
         self.assertIn('timeout', row['failure'])
-        parent_pid, descendant_pid = map(int, (self.root / 'timeout/stdout').read_bytes().split())
+        pid_rows = archived_stdout.read_bytes().splitlines()
+        self.assertEqual(len(pid_rows), 1)
+        self.assertEqual(len(pid_rows[0].split()), 2)
+        parent_pid, descendant_pid = map(int, pid_rows[0].split())
         self.assertNotEqual(parent_pid, descendant_pid)
         # Descendants inherit the new process group; kill the group rather than
         # only the process which Popen directly owns. No process-table access.
         kill.assert_called_once_with(parent_pid, startup.signal.SIGKILL)
+
+    def test_cleanup_permission_failure_is_archived_and_direct_child_reaped(self):
+        archived_stdout = self.root / 'eperm/stdout'
+        self.child.write_text('import json,sys,time\n'
+                              'print(json.dumps(dict(version=1,kind="startup_ready",engine=sys.argv[1],load_processor_ns="1")),flush=True)\ntime.sleep(30)\n')
+        with patch.object(startup.os, 'killpg', side_effect=PermissionError('EPERM process group')), \
+             patch.object(startup.time, 'monotonic', side_effect=lambda: 31 if archived_stdout.exists() and b'\n' in archived_stdout.read_bytes() else 0), \
+             patch.object(startup.subprocess, 'Popen', wraps=subprocess.Popen) as launch:
+            row = startup.capture(self.identity('go'), self.root / 'eperm', 30, child=self.child)
+        self.assertFalse(row['complete'])
+        self.assertIn('EPERM', row['cleanup_error'])
+        self.assertEqual(row['exit'], -startup.signal.SIGKILL)
+        self.assertEqual(launch.call_count, 1)
+        self.assertEqual(probe.decode((self.root / 'eperm/record.json').read_bytes()), row)
+        self.assertTrue((self.root / 'eperm/stdout').read_bytes().endswith(b'\n'))
 
     def test_warmup_then_seven_serial_alternating_pairs_and_no_thresholds(self):
         identities = {engine: self.identity(engine) for engine in ('go', 'rust')}

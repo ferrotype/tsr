@@ -100,8 +100,21 @@ def capture(identity, directory, timeout, *, child=CHILD):
                 os.killpg(process.pid, signal.SIGKILL)
             except ProcessLookupError:
                 pass
-            row['exit'] = process.wait()
-            process.stdout.close()
+            except OSError as error:
+                row['cleanup_error'] = str(error)
+                row.update(complete=False, failure=row.get('failure', 'startup child cleanup failed'))
+                try:
+                    if process.poll() is None:
+                        process.kill()
+                except OSError as direct_error:
+                    row['cleanup_error'] += '; direct child: ' + str(direct_error)
+            try:
+                row['exit'] = process.wait(timeout=5)
+            except (OSError, subprocess.TimeoutExpired) as error:
+                row['cleanup_error'] = row.get('cleanup_error', '') + '; wait: ' + str(error)
+                row.update(complete=False, failure=row.get('failure', 'startup child cleanup failed'))
+            finally:
+                process.stdout.close()
         row['raw_files'] = [dict(probe.identity(directory / name), file=name) for name in ('stdout', 'stderr')]
         probe.write(directory / 'record.json', row)
     return row

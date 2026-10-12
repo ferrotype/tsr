@@ -16,7 +16,6 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/locale"
 	"github.com/microsoft/TypeScript/tsc/internal/tsoptions"
 	"github.com/microsoft/TypeScript/tsc/internal/vfs"
-	"github.com/microsoft/TypeScript/tsc/internal/vfs/iovfs"
 )
 
 type parseHost struct {
@@ -155,7 +154,7 @@ func (e *Engine) executeV1(raw []byte) (response Response, err error) {
 		c.Input.Entries = nil
 		e.input = c.Input
 		e.snapshot = s
-		e.fs = bundled.WrapFS(iovfs.From(s, s.sensitive))
+		e.fs = bundled.WrapFS(immutableSnapshotFS(s))
 		runtime.GC()
 		response.Kind = "prepared"
 	case "execute":

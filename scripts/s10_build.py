@@ -33,6 +33,8 @@ def build_environment():
 
 def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
     before = sources()
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT))
     pin = json.loads((ROOT / 'tools/s10/toolchains.json').read_text())
     version = subprocess.check_output([str(bindgen), '--version'], text=True).strip()
     if version != 'wasm-bindgen ' + pin['wasm_bindgen']:
@@ -83,6 +85,8 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
     if post_link:
         files.append(post_input)
     record = {
+        'revision': revision,
+        'dirty': dirty,
         'post_link': post_link,
         'sources': before,
         'mode': mode, 'command': command, 'rustflags': pin['wasm_rustflags'],
@@ -94,6 +98,8 @@ def build(bindgen, *, checker=False, corpus=False, wasm_opt=None):
     }
     if sources() != before:
         raise ValueError('source changed while building wasm; repeat the build before capture')
+    if subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip() != revision:
+        raise ValueError('repository revision changed during wasm build')
     (output / 'build.json').write_text(json.dumps(record, indent=2) + '\n')
     return output
 

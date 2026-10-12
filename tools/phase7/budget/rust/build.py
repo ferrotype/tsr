@@ -55,6 +55,8 @@ def main():
     subprocess.run(['cargo', 'fetch', '--locked', '--manifest-path', MANIFEST],
                    cwd=ROOT, env=environment, check=True)
     before = source_snapshot(environment)
+    revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    dirty = bool(subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT))
     command = ['cargo', 'build', '--offline', '--locked', '--release', '--manifest-path', MANIFEST,
                '--target-dir', 'target', '--message-format=json-render-diagnostics']
     if args.allocation_metrics:
@@ -74,12 +76,14 @@ def main():
     after = source_snapshot(environment)
     if before != after:
         raise ValueError('budget consumer sources changed during build; retained artifact is not qualified')
+    if subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip() != revision:
+        raise ValueError('repository revision changed during Rust build')
     record = {'version': 1, 'mode': 'phase7-budget', 'measurement_contract': 2,
               'performance_eligible': not args.allocation_metrics,
               'source_guard': True, 'source_changes_during_build': [], 'sources': before,
               'allocation_instrumented': args.allocation_metrics, 'allocator': 'mimalloc-0.1.48',
               'profile': {'name': 'release', 'panic': 'unwind', 'lto': 'fat', 'codegen_units': 1},
-              'pin': json.loads((ROOT / 'data/upstream.json').read_bytes())['pin'],
+              'pin': json.loads((ROOT / 'data/upstream.json').read_bytes())['pin'], 'revision': revision, 'dirty': dirty,
               'versions': {name: subprocess.check_output([name, '--version'], cwd=ROOT,
                                                          env=environment, text=True).strip()
                            for name in ('rustc', 'cargo')},

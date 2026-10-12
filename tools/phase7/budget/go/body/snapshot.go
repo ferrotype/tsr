@@ -13,8 +13,8 @@ import (
 	"github.com/microsoft/TypeScript/tsc/internal/tspath"
 )
 
-// An fs.FS backing production iovfs: its ReadFile performs the pinned physical
-// decoding. There is no OS FS or test fixture wrapper beneath this snapshot.
+// An immutable fs.FS backing production iovfs and the compiler string adapter.
+// There is no OS FS or test fixture wrapper beneath this snapshot.
 type snapshot struct {
 	cwd       string
 	sensitive bool
@@ -120,6 +120,24 @@ func (s *snapshot) Stat(name string) (fs.FileInfo, error) {
 		return nil, err
 	}
 	return entryInfo{n}, nil
+}
+
+// Implement all of iovfs.WritableFS so prohibited writes return errors instead
+// of selecting iovfs's panic fallbacks. Emit uses a separate output callback.
+func (s *snapshot) WriteFile(path, _ string, _ fs.FileMode) error {
+	return &fs.PathError{Op: "write", Path: path, Err: fs.ErrPermission}
+}
+func (s *snapshot) AppendFile(path, _ string, _ fs.FileMode) error {
+	return &fs.PathError{Op: "append", Path: path, Err: fs.ErrPermission}
+}
+func (s *snapshot) MkdirAll(path string, _ fs.FileMode) error {
+	return &fs.PathError{Op: "mkdir", Path: path, Err: fs.ErrPermission}
+}
+func (s *snapshot) Remove(path string) error {
+	return &fs.PathError{Op: "remove", Path: path, Err: fs.ErrPermission}
+}
+func (s *snapshot) Chtimes(path string, _, _ time.Time) error {
+	return &fs.PathError{Op: "chtimes", Path: path, Err: fs.ErrPermission}
 }
 func (s *snapshot) recordError(err error) {
 	s.errorMu.Lock()

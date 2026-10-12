@@ -8,7 +8,7 @@ publish = false
 [workspace]
 
 [features]
-allocation-metrics = []
+allocation-metrics = ["mimalloc/extended"]
 
 [dependencies]
 tsr_embed = { path = "../../../../crates/tsr_embed", version = "0.4.0" }

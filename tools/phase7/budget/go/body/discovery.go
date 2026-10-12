@@ -377,6 +377,9 @@ func Discover(metadata, inputPath, outputPath string) (err error) {
 	if err != nil {
 		return err
 	}
+	if command.Input.Operation != "check" && command.Input.Operation != "check_emit" {
+		return fmt.Errorf("unsupported operation")
+	}
 	d, err := loadDiscovery(metadata, command.Input, encoder)
 	if err != nil {
 		return err
@@ -388,6 +391,9 @@ func Discover(metadata, inputPath, outputPath string) (err error) {
 	}
 	if d.failure != nil {
 		return d.failure
+	}
+	if err := d.snapshot.error(); err != nil {
+		return err
 	}
 	return encoder.Encode(map[string]any{"version": 1, "kind": "complete", "read_events": strconv.FormatUint(d.reads, 10)})
 }
