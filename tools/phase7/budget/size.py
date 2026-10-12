@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Capture production consumer body sizes and declare runtime glue separately.
 
-No build or compiler execution occurs. The Go native binary must be stripped;
+No build or compiler execution occurs. Native capture strips private copies of
+both executables with the same tool and policy; originals remain untouched.
 Rust must be the ordinary public embedding build. Rust wasm must be production
 checker wasm, never the portable compiler acceptance artifact. Surfaces share
 parse/config/load/check/emit, but Rust wasm also exports transpile and other
@@ -14,6 +15,8 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timezone
 from pathlib import Path
+import shutil
+import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[3]
@@ -28,6 +31,64 @@ SCOPE = {
     'excluded': 'test-only compiler acceptance wasm, test walker, allocator instrumentation',
     'ratio': 'Rust body bytes / Go body bytes; runtime glue reported separately',
 }
+STRIP_FLAGS = ['--strip-all']
+
+
+def strip_native(bound, output, strip_tool=None):
+    """Normalize both linked artifacts without replacing the timed executables."""
+    # Apple's strip rejects the Go linker's indirect symbol entries. Use LLVM
+    # for both files, including on Darwin, and record the exact tool identity.
+    tool = strip_tool or shutil.which('llvm-strip')
+    if tool is None:
+        raise ValueError('native size capture requires --strip-tool /path/to/llvm-strip')
+    tool = probe.identity(Path(tool).resolve(strict=True))
+    flags = STRIP_FLAGS
+    record = {'policy': 'llvm-strip-all-v1', 'platform': sys.platform,
+              'tool': tool, 'flags': flags, 'artifacts': {}}
+    for engine in ('go', 'rust'):
+        source = Path(bound[engine]['executable'])
+        destination = output / (engine + '-stripped')
+        original = probe.identity(source)
+        shutil.copy2(source, destination)
+        if probe.identity(destination)['sha256'] != original['sha256']:
+            raise ValueError('native executable changed while copying')
+        command = [tool['path'], *flags, str(destination)]
+        if probe.identity(tool['path']) != tool:
+            raise ValueError('strip tool changed during capture')
+        result = subprocess.run(command, capture_output=True, check=False, timeout=60)
+        if probe.identity(tool['path']) != tool:
+            raise ValueError('strip tool changed during capture')
+        if result.returncode:
+            raise ValueError(f'{engine} strip exited {result.returncode}: '
+                             + result.stderr.decode('utf-8', errors='replace'))
+        record['artifacts'][engine] = {
+            'source': original, 'output': probe.identity(destination),
+            'command': command, 'exit': result.returncode,
+            'stdout': result.stdout.decode('utf-8', errors='replace'),
+            'stderr': result.stderr.decode('utf-8', errors='replace'),
+        }
+    return record
+
+
+def stripped_counts(directory, bound, record):
+    """Verify the saved normalization; replay never invokes strip or a compiler."""
+    if (not isinstance(record, dict) or record.get('policy') != 'llvm-strip-all-v1' or
+            record.get('flags') != STRIP_FLAGS):
+        raise ValueError('native size requires matching stripping on both artifacts')
+    result = {}
+    for engine in ('go', 'rust'):
+        row = record['artifacts'][engine]
+        original = next(item for item in bound[engine]['files']
+                        if item['path'] == bound[engine]['executable'])
+        path = directory / (engine + '-stripped')
+        if (row['source'] != original or row['output']['path'] != str(path) or
+                type(row.get('exit')) is not int or row['exit'] != 0 or
+                row['command'] != [record['tool']['path'], *record['flags'], str(path)]):
+            raise ValueError('native stripping provenance differs from captured artifacts')
+        actual = measure.bound_asset(path, row['output'])
+        body = measure.positive(actual['bytes'], 'stripped body bytes')
+        result[engine] = {'body': body, 'glue': 0, 'total': body}
+    return result
 
 
 def new_output(path):
@@ -76,7 +137,7 @@ def byte_counts(runtime, bound):
     return result
 
 
-def capture(runtime, go, rust, go_build, rust_build, output):
+def capture(runtime, go, rust, go_build, rust_build, output, strip_tool=None):
     output = new_output(output)
     bound = identities(runtime, go, rust, go_build, rust_build)
     for identity in bound.values():
@@ -89,10 +150,16 @@ def capture(runtime, go, rust, go_build, rust_build, output):
         saved[engine] = probe.identity(path)
         if saved[engine]['sha256'] != bound[engine]['manifest']['sha256']:
             raise ValueError('build metadata changed during archive')
-    report = {'version': 1, 'runtime': runtime, 'recorded_at': datetime.now(timezone.utc).isoformat(),
+    normalization = strip_native(bound, output, strip_tool) if runtime == 'native' else None
+    counts = (stripped_counts(output, bound, normalization) if runtime == 'native'
+              else byte_counts(runtime, bound))
+    report = {'version': 2 if runtime == 'native' else 1,
+              'runtime': runtime, 'recorded_at': datetime.now(timezone.utc).isoformat(),
               'production_eligible': True, 'scope': SCOPE, 'artifacts': bound,
-              'saved_manifests': saved, 'artifact_bytes': byte_counts(runtime, bound),
+              'saved_manifests': saved, 'artifact_bytes': counts,
               'host': measure.host_info()}
+    if normalization is not None:
+        report['native_stripping'] = normalization
     for identity in bound.values():
         measure.unchanged(identity)
     probe.write(output / 'size.json', report)
@@ -105,7 +172,9 @@ def read_capture(directory, runtime):
         raise ValueError('unknown size runtime')
     directory = Path(directory).resolve(strict=True)
     report = probe.decode((directory / 'size.json').read_bytes())
-    if (type(report.get('version')) is not int or report['version'] != 1 or
+    if runtime == 'native' and report.get('version') == 1:
+        raise ValueError('legacy native size capture compared unmatched stripping; recapture sizes')
+    if (type(report.get('version')) is not int or report['version'] != (2 if runtime == 'native' else 1) or
             report.get('runtime') != runtime or report.get('production_eligible') is not True or
             report.get('scope') != SCOPE):
         raise ValueError('invalid production size capture')
@@ -164,7 +233,8 @@ def read_capture(directory, runtime):
                 actual = measure.bound_asset(rows[0]['path'], measure.artifact_entry(manifest, name))
                 if actual != rows[0]:
                     raise ValueError('wasm size asset differs from captured identity')
-    counts = byte_counts(runtime, bound)
+    counts = (stripped_counts(directory, bound, report.get('native_stripping')) if runtime == 'native'
+              else byte_counts(runtime, bound))
     if counts != report['artifact_bytes']:
         raise ValueError('saved size differs from artifact bytes')
     return {'ratios': {'artifact_bytes': counts['rust']['body'] / counts['go']['body']},
@@ -172,18 +242,20 @@ def read_capture(directory, runtime):
             'host': report['host'], 'recorded_at': report['recorded_at'],
             'metadata': {'runtime': runtime, 'scope': SCOPE, 'artifact_bytes': counts,
                          'artifacts': bound, 'saved_manifests': report['saved_manifests'],
+                         **({'native_stripping': report['native_stripping']} if runtime == 'native' else {}),
                          'production_eligible': True, 'eligibility_reasons': []}}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime', choices=('native', 'wasm'), required=True)
+    parser.add_argument('--strip-tool', type=Path, help='LLVM strip executable for native sizes')
     for name in ('go', 'rust', 'go-build', 'rust-build', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     args = parser.parse_args()
     output = new_output(args.output)
     try:
-        result = capture(args.runtime, args.go, args.rust, args.go_build, args.rust_build, output)
+        result = capture(args.runtime, args.go, args.rust, args.go_build, args.rust_build, output, args.strip_tool)
     except Exception as error:
         # Only this invocation can have created the previously absent output.
         if output.is_dir():

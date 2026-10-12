@@ -227,6 +227,32 @@ allocation capture (`perf.py record --allocation-capture ...`); RSS cannot fill
 that threshold. `embed-size` and `wasm-size` use `size.py` captures and report
 body bytes, with glue and totals separately.
 
+### Comparable native sizes
+
+Native size capture strips **copies of both** linked executables using the same
+`llvm-strip --strip-all`. The ordinary timed artifacts and their build manifests
+remain unchanged. LLVM preserves the dynamic-linking symbols required to run;
+Apple's `strip` rejects the Go linker's indirect-symbol entries, so it is not a
+substitute. Supply LLVM's tool explicitly if it is not on `PATH` (Rust's
+`llvm-tools-preview` component includes it).
+
+```sh
+python3 tools/phase7/budget/size.py --runtime native \
+  --strip-tool /absolute/path/to/llvm-strip \
+  --go /absolute/go-artifacts/budget-go \
+  --rust /absolute/rust-artifacts/phase7_rust_budget \
+  --go-build /absolute/go-artifacts/build.json \
+  --rust-build /absolute/rust-artifacts/build.json \
+  --output /absolute/new/native-size
+python3 scripts/perf.py record embed-size --capture /absolute/new/native-size
+```
+
+The capture retains the tool identity, both commands, original and stripped
+artifact hashes, and build manifests. Replay authenticates both originals and
+copies without running tools. Legacy native captures without matching stripping
+are rejected; remeasure size only, without rerunning timing or rebuilding.
+Wasm body/glue accounting is unchanged.
+
 The perf readers replay saved raw observations and recompute comparisons and
 ratios without launching a compiler or reading the original project. They
 authenticate frozen archives, saved helper/manifests and immutable artifacts.

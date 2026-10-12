@@ -6,6 +6,9 @@
 # script-tests: the Python tests, their output kept in an artifact.
 # msrv:         the locked workspace compiles on the declared minimum Rust.
 # runner:       builds the compiler suite runner once for its shards.
+# portable-build: builds each portable consumer once and runs browser smoke.
+# portable-parity: compiler rosters in four embed/eight wasm shards; transpile
+#               rosters in one shard each, all checked on pull requests.
 # phase5-runner: builds both Go assertion binaries, test2json and one Rust server.
 # parity:       one job per suite shard; each runs its share of the pin's tests and
 #               uploads its results.
@@ -220,14 +223,17 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
-  portable-parity:
-    name: portable parity through ${{ matrix.runtime }}
-    needs: runner
+  portable-build:
+    name: build portable consumers through ${{ matrix.runtime }}
     runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
         runtime: [embed, wasm]
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/phase7-browsers
+      NPM_CONFIG_CACHE: ${{ runner.temp }}/phase7-browser-npm
     steps:
       - uses: actions/checkout@v5
         with:
@@ -237,11 +243,6 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: portable-${{ matrix.runtime }}
-      - uses: actions/download-artifact@v4
-        with:
-          name: tsr-testrunner
-          path: runner
-      - run: chmod +x runner/tsr-testrunner
       - name: Build and test the independent consumer
         id: public_native_consumer
         if: matrix.runtime == 'embed'
@@ -254,10 +255,21 @@ jobs:
         run: |
           echo "node=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
           echo "bindgen=$(python3 -c "import json;print(json.load(open('tools/s10/toolchains.json'))['wasm_bindgen'])")" >> "$GITHUB_OUTPUT"
+          echo "playwright=$(python3 -c "import json;print(json.load(open('tools/phase7/portable/browser/toolchains.json'))['playwright'])")" >> "$GITHUB_OUTPUT"
+          echo "browser-os=$(python3 -c 'import platform; print(platform.platform(terse=True))')" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         if: matrix.runtime == 'wasm'
         with:
           node-version: ${{ steps.portable-pins.outputs.node }}
+      - name: Cache the pinned browser binaries and npm downloads
+        if: matrix.runtime == 'wasm'
+        id: browser-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+            ${{ env.NPM_CONFIG_CACHE }}
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ steps.portable-pins.outputs.browser-os }}-phase7-browsers-${{ steps.portable-pins.outputs.playwright }}-${{ hashFiles('tools/phase7/portable/browser/toolchains.json', 'upstream/package.json') }}
       - name: Provision the pinned wasm tools
         if: matrix.runtime == 'wasm'
         run: |
@@ -277,44 +289,118 @@ jobs:
           cargo clippy --locked --manifest-path tools/phase7/portable/wasm-compiler/Cargo.toml --target-dir target --all-targets -- -D warnings
           node --test tools/phase7/portable/test-compiler-wasm.mjs
           python3 tools/phase7/portable/wasm-compiler/build.py --wasm-bindgen "$(command -v wasm-bindgen)" --output results/wasm-compiler-artifact
-      - name: Run the complete transpile roster
-        if: ${{ !cancelled() && (steps.public_native_consumer.outcome == 'success' || steps.production_wasm.outcome == 'success') }}
-        env:
-          TSR_WASM_ARTIFACT_DIR: ${{ github.workspace }}/target/s10/checker
-          RUNTIME: ${{ matrix.runtime }}
+      - name: Install the pinned Playwright runner
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
         run: |
-          if [ "$RUNTIME" = embed ]; then consumer=target/release/s10_rust_consumer; else consumer=tools/phase7/portable/wasm-consumer; fi
-          python3 scripts/parity.py run "transpile-$RUNTIME" --runner runner/tsr-testrunner --consumer "$consumer" --output "results/transpile-$RUNTIME/1-1"
-      - name: Run the complete compiler roster
-        if: ${{ !cancelled() && (steps.public_native_consumer.outcome == 'success' || steps.test_wasm_compiler.outcome == 'success') }}
-        env:
-          TSR_WASM_COMPILER_ARTIFACT_DIR: ${{ github.workspace }}/results/wasm-compiler-artifact
-          RUNTIME: ${{ matrix.runtime }}
-        run: |
-          if [ "$RUNTIME" = embed ]; then
-            consumer=target/release/s10_rust_consumer
-            jobs=4
-            test -x "$consumer"
-          else
-            consumer=tools/phase7/portable/wasm-consumer
-            jobs=2
-            test -f "$TSR_WASM_COMPILER_ARTIFACT_DIR/build.json"
-          fi
-          python3 scripts/parity.py run "compiler-$RUNTIME" --runner runner/tsr-testrunner --consumer "$consumer" --jobs "$jobs" --output "results/compiler-$RUNTIME/1-1"
+          npm install --prefix "$RUNNER_TEMP/phase7-browser" --ignore-scripts --no-audit --no-fund "playwright@${{ steps.portable-pins.outputs.playwright }}"
+      - name: Download browser binaries on a cache miss
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' && steps.browser-cache.outputs.cache-hit != 'true' }}
+        run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install chromium firefox webkit
+      - name: Install browser OS dependencies on the runner
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
+        run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install-deps chromium firefox webkit
       - name: Run the three-engine browser smoke
         if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
-        env:
-          PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/phase7-browsers
+        timeout-minutes: 15
         run: |
-          version=$(python3 -c "import json;print(json.load(open('tools/phase7/portable/browser/toolchains.json'))['playwright'])")
-          npm install --prefix "$RUNNER_TEMP/phase7-browser" --ignore-scripts --no-audit --no-fund "playwright@$version"
-          node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install --with-deps chromium firefox webkit
           node --test tools/phase7/portable/browser/test-runner.mjs
           node tools/phase7/portable/browser/run.mjs --artifacts target/s10/checker --output results/browser-smoke --playwright-module "$RUNNER_TEMP/phase7-browser/node_modules/playwright"
       - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'embed' }}
+        with:
+          name: portable-consumer-embed
+          path: target/release/s10_rust_consumer
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        with:
+          name: portable-consumer-wasm
+          # The common upload root preserves target/ and results/ below it.
+          path: |
+            target/s10/checker
+            results/wasm-compiler-artifact
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        with:
+          name: parity-portable-browser
+          path: results/browser-smoke
+          retention-days: 7
+          if-no-files-found: error
+
+  portable-parity:
+    name: ${{ matrix.suite }} ${{ matrix.shard }}
+    needs: [runner, portable-build]
+    # Preserve successful runtime/suite results even if another build failed;
+    # missing artifacts or shards still fail the final parity check.
+    if: ${{ !cancelled() }}
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: ${{ matrix.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { suite: compiler-embed, runtime: embed, shard: 1/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 2/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 3/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 4/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 1/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 2/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 3/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 4/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 5/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 6/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 7/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 8/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: transpile-embed, runtime: embed, shard: 1/1, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: transpile-wasm, runtime: wasm, shard: 1/1, jobs: 2, timeout: 90, run_timeout: 75 }
+    env:
+      TSR_WASM_ARTIFACT_DIR: ${{ github.workspace }}/portable/target/s10/checker
+      TSR_WASM_COMPILER_ARTIFACT_DIR: ${{ github.workspace }}/portable/results/wasm-compiler-artifact
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: tsr-testrunner
+          path: runner
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable-consumer-${{ matrix.runtime }}
+          path: portable
+      - name: Read the pinned Node version
+        if: matrix.runtime == 'wasm'
+        id: node
+        run: echo "version=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: matrix.runtime == 'wasm'
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+      - name: Run the portable shard
+        timeout-minutes: ${{ matrix.run_timeout }}
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+          SUITE: ${{ matrix.suite }}
+          SHARD: ${{ matrix.shard }}
+          JOBS: ${{ matrix.jobs }}
+        run: |
+          chmod +x runner/tsr-testrunner
+          if [ "$RUNTIME" = embed ]; then
+            consumer=portable/s10_rust_consumer
+            chmod +x "$consumer"
+          else
+            consumer=tools/phase7/portable/wasm-consumer
+            if [ "$SUITE" = compiler-wasm ]; then artifacts="$TSR_WASM_COMPILER_ARTIFACT_DIR"; else artifacts="$TSR_WASM_ARTIFACT_DIR"; fi
+            test -f "$artifacts/build.json"
+          fi
+          python3 scripts/parity.py run "$SUITE" --runner runner/tsr-testrunner --consumer "$consumer" --shard "$SHARD" --jobs "$JOBS" --output "results/$SUITE/$(echo "$SHARD" | tr / -)"
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: parity-portable-${{ matrix.runtime }}
+          name: parity-portable-${{ matrix.suite }}-${{ strategy.job-index }}
           path: results
           retention-days: 7
           if-no-files-found: error

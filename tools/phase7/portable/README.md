@@ -31,6 +31,28 @@ including in tests. Compiler dependencies reached transitively through
 `tsr_embed` are expected. The source and manifest guard is
 `scripts/tests/test_phase7_consumer_boundary.py`.
 
+This is an entry-point/dependency audit, not a capability restriction on
+reexported types. The facade intentionally exposes the production compiler-level
+`Program` and `QueryOperation` APIs, their returned handles and public host/value
+contracts. The shared walker names those types through `tsr_embed`; it still
+executes their production methods. The facade README documents the
+[exposed surface and compatibility limits](../../../crates/tsr_embed/README.md#compiler-level-api-boundary).
+Passing this audit proves neither a narrow opaque API nor independent facade
+semver stability.
+
+PR CI builds each consumer once, then runs `compiler-embed` in four shards and
+`compiler-wasm` in eight; each transpile roster remains one shard. The existing
+merge rejects missing/duplicate shards or variants. Embed jobs have a 60-minute
+timeout (45 for execution), wasm jobs 90 minutes (75 for execution), leaving
+time to publish partial results. The shared build jobs also have 90-minute
+timeouts. These bounds replace the former unsharded 39/254-minute roster runs;
+the new CI wall time still needs observation.
+
+The wasm build runs browser smoke once, with a 15-minute limit. Browser binaries
+and npm downloads use an exact OS/architecture/Playwright/toolchain cache key.
+Fresh runners still install OS libraries with `install-deps`; a cached browser
+does not supply system packages. Cache hits skip the three browser downloads.
+
 The runner reconstructs source-only frames from returned snapshots so its
 existing diagnostic writer can render filenames, spans and source lines.
 These frames contain source metadata and text; the host does not parse, bind,

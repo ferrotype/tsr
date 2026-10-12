@@ -10,6 +10,55 @@ supported compiler behavior are not stable. See the repository's status and
 sprint records for current coverage. The `tsr_*` crates are released together at
 one version.
 
+## Compiler-level API boundary
+
+`tsr_embed` is a compiler-level Rust entry point. It deliberately exposes the
+production program, checker operation and host/value types; it is not an opaque
+request/result API with an independently stable type system. Reexports preserve
+the underlying type and its complete public methods. For example,
+`QueryOperation` is `tsr_checker::Operation`, `SessionRequest` and
+`TranspileRequest` are `CheckerRequest`, and `Program` is the production compiler
+program. These aliases make existing APIs nameable through the facade; they do
+not restrict their capabilities.
+
+The supported entry points and exposed value families are:
+
+| Family | Public surface |
+| --- | --- |
+| Parsing | `parse`, `parse_and_encode`; syntax and source values come from the public AST/text crates. |
+| Programs and sessions | `Session`, `Program`, `ProgramFile`, `ProgramOptions`, `FileCache`, `CompilerConfigHost`, `SessionServices`. A program can be loaded directly and adopted by a session. |
+| Checking and queries | `DiagnosticKind`, `CompilerOperations`, `QueryOperation`, `SessionRequest`, `TypeRef`, `QueryError`, `SessionError`; `type_flags`, `type_format_flags`, `symbol_format_flags`, `node_builder_flags`, `node_builder_internal_flags`. Other query/retained handle types are also exposed through method return values. |
+| Emission | `EmitOptions`, `EmitOnly`, `EmitOutput`, `EmittedFile`, `EmitWrite`, `EmitWriteData`, `SourceMapEmitResult`. |
+| Single-file transpilation | `transpile_module`, `transpile_declaration`, `TranspileRequest`, `TranspileOptions`, `TranspileOutput`, `TranspileError`. |
+| Host services and observations | `BundledFs`, `BuildInfo`, `BuildInfoReader`, `build_info_reader`, `TraceArg`, and the production host/project/spawner/value contracts in `content_mapper`. |
+
+Session methods select the appropriate checker pool and apply their documented
+diagnostic, cancellation and unwind policies. Lower-level program and checker
+methods keep their own contracts; calling them does not apply a session method's
+phase schedule or combined pool handling. `checker()`, operation `owner()` and
+retained-result `owner()` expose shared checker owners intentionally, including
+for queries after the session is dropped. `Session::retire()` revokes both of its
+checker pools. Direct owner operations validate that owner's generation and
+exact handle identity. Same-owner reentry is detected; callers must coordinate
+cross-owner acquisition order to avoid wait cycles.
+
+Copyable query references do not retain storage and are not lifetime-branded
+borrows. Every consuming operation checks their exact checker identity; use the
+explicit `retain_*`/`import_*` APIs when results must keep their owner alive.
+Mutable checker state remains private. These checks do not impose resource
+limits: type construction, node building and semantic queries can allocate,
+and cancellation applies only where the selected operation documents it.
+The alias also exposes feature-gated checker instrumentation if another
+dependency enables those checker features; it does not filter their methods.
+
+Implementation-crate API changes can therefore change this public API,
+including operation methods, concrete return types, request fields and error
+variants. The current pre-1.0 facade and implementation crates must be versioned
+together; using only `tsr_embed` imports does not provide a separate semver
+compatibility layer. The external-consumer dependency audit verifies the
+declared entry-point path and absence of direct implementation-crate fallback;
+it does not establish that the facade is narrower than those public types.
+
 ## Check an in-memory file
 
 The default `checker` feature enables `Session`. The host explicitly supplies

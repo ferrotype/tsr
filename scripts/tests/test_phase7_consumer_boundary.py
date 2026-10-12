@@ -1,8 +1,11 @@
-"""External acceptance consumers cannot call compiler internals directly.
+"""External acceptance consumers cannot import implementation crates directly.
 
 Compiler/checker dependencies behind tsr_embed are expected. This guard checks
 the independently declared dependencies and every consumer Rust source,
 including integration tests and shared modules, without building Cargo targets.
+Public facade aliases retain their implementation types' methods; this is a
+dependency/entry-point audit, not proof of a smaller capability surface or an
+independently stable facade API.
 """
 from __future__ import annotations
 

@@ -1,6 +1,7 @@
 """Production size identity and readonly recomputation controls; no builds."""
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -53,9 +54,18 @@ class SizeControls(unittest.TestCase):
         # Native fixtures exercise real unchanged/hash validation; wasm mocks
         # only the independent Node executable-resolution guard.
         guard = measure.unchanged if runtime == 'native' else lambda identity: None
+        def strip_copy(command, **kwargs):
+            self.assertEqual(command[1:-1], ['--strip-all'])
+            destination = Path(command[-1])
+            data = destination.read_bytes()
+            destination.write_bytes(data[:len(data) // 2])
+            return subprocess.CompletedProcess(command, 0, b'', b'')
         with patch.object(measure, 'build_identity', side_effect=lambda runtime, engine, *_: bound[engine]), \
              patch.object(measure, 'host_info', return_value={'os': 'test'}), \
-             patch.object(measure, 'unchanged', side_effect=guard):
+             patch.object(measure, 'unchanged', side_effect=guard), \
+             patch.object(size.sys, 'platform', 'linux'), \
+             patch.object(size.shutil, 'which', return_value='/usr/bin/true'), \
+             patch.object(size.subprocess, 'run', side_effect=strip_copy):
             return size.capture(runtime, artifacts['go'], artifacts['rust'],
                                 bound['go']['manifest']['path'], bound['rust']['manifest']['path'], root / 'capture')
 
@@ -64,8 +74,15 @@ class SizeControls(unittest.TestCase):
             root = Path(name).resolve(); bound = self.fixture(root)
             result = self.capture(root, bound)
             self.assertEqual(result['ratios'], {'artifact_bytes': 1.4})
-            self.assertEqual(result['samples']['go']['artifact_bytes'], [20])
-            self.assertEqual(result['metadata']['artifact_bytes']['rust'], {'body': 28, 'glue': 0, 'total': 28})
+            self.assertEqual(result['samples']['go']['artifact_bytes'], [10])
+            self.assertEqual(result['metadata']['artifact_bytes']['rust'], {'body': 14, 'glue': 0, 'total': 14})
+            for engine, count in (('go', 20), ('rust', 28)):
+                self.assertEqual(Path(bound[engine]['executable']).read_bytes(), b'a' * count)
+                normalized = result['metadata']['native_stripping']['artifacts'][engine]
+                self.assertEqual(normalized['source'], probe.identity(bound[engine]['executable']))
+                self.assertEqual(normalized['output']['bytes'], count // 2)
+            with patch.object(size.subprocess, 'run', side_effect=AssertionError('readonly replay')):
+                self.assertEqual(size.read_capture(root / 'capture', 'native')['ratios']['artifact_bytes'], 1.4)
             self.assertEqual((root / 'capture/go-build.json').read_bytes(), Path(bound['go']['manifest']['path']).read_bytes())
             Path(bound['rust']['executable']).write_bytes(b'changed')
             with patch.object(measure, 'build_identity', side_effect=lambda runtime, engine, *_: bound[engine]):
@@ -102,6 +119,55 @@ class SizeControls(unittest.TestCase):
                 with patch.object(measure, 'build_identity', side_effect=lambda runtime, engine, *_: bound[engine]):
                     with self.assertRaisesRegex(ValueError, 'metadata changed|saved size'):
                         size.read_capture(root / 'capture', 'native')
+
+    def test_missing_mismatched_or_tampered_stripping_is_rejected(self):
+        for mutation in ('missing', 'legacy', 'flags', 'command', 'source', 'output'):
+            with self.subTest(mutation=mutation), tempfile.TemporaryDirectory() as name:
+                root = Path(name).resolve(); bound = self.fixture(root); self.capture(root, bound)
+                path = root / 'capture/size.json'
+                report = probe.decode(path.read_bytes())
+                row = report['native_stripping']['artifacts']['rust']
+                if mutation == 'missing':
+                    del report['native_stripping']
+                elif mutation == 'legacy':
+                    report['version'] = 1
+                elif mutation == 'flags':
+                    report['native_stripping']['flags'] = ['--strip-debug']
+                elif mutation == 'command':
+                    row['command'].remove('--strip-all')
+                elif mutation == 'source':
+                    row['source']['sha256'] = '0' * 64
+                else:
+                    Path(row['output']['path']).write_bytes(b'corrupted')
+                probe.write(path, report)
+                with self.assertRaisesRegex(ValueError, 'stripping|artifact differs'):
+                    size.read_capture(root / 'capture', 'native')
+
+    def test_strip_failure_propagates_and_preserves_originals(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name).resolve(); bound = self.fixture(root)
+            output = root / 'capture'; output.mkdir()
+            with patch.object(size.sys, 'platform', 'linux'), \
+                 patch.object(size.shutil, 'which', return_value='/usr/bin/true'), \
+                 patch.object(size.subprocess, 'run', return_value=subprocess.CompletedProcess('strip', 1, b'', b'strip failure')):
+                with self.assertRaisesRegex(ValueError, 'strip exited 1: strip failure'):
+                    size.strip_native(bound, output)
+            self.assertEqual(Path(bound['go']['executable']).read_bytes(), b'a' * 20)
+            self.assertEqual(Path(bound['rust']['executable']).read_bytes(), b'a' * 28)
+            self.assertFalse((output / 'size.json').exists())
+
+    def test_strip_tool_replacement_aborts_before_measuring_the_other_runtime(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name).resolve(); bound = self.fixture(root)
+            output = root / 'capture'; output.mkdir()
+            tool = root / 'llvm-strip'; tool.write_bytes(b'original tool')
+            def replace_tool(command, **kwargs):
+                tool.write_bytes(b'replaced tool')
+                return subprocess.CompletedProcess(command, 0, b'', b'')
+            with patch.object(size.subprocess, 'run', side_effect=replace_tool) as run:
+                with self.assertRaisesRegex(ValueError, 'strip tool changed'):
+                    size.strip_native(bound, output, tool)
+            self.assertEqual(run.call_count, 1)
 
     def test_output_rejects_existing_target_and_symlink_parent(self):
         with tempfile.TemporaryDirectory() as name:

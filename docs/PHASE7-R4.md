@@ -6,6 +6,34 @@ This record tracks [R4 and architecture item 4](PHASE7-plan.md), rather than
 changing their exit criteria. Benchmark and retained-memory results remain
 separate obligations and are not inferred from API tests.
 
+## Public boundary contract
+
+The facade intentionally exposes a compiler-level API, as architecture item 4
+allows: public programs, scoped checker operations, retained results and host
+services. It does not provide an independently stable opaque wrapper around
+those types. `QueryOperation`, requests, errors, `TypeRef`, program/value types
+and transpile values alias their production definitions; their public methods
+and concrete return types are consequently part of the exposed surface.
+The [facade README](../crates/tsr_embed/README.md#compiler-level-api-boundary)
+enumerates the families and lifetime, cancellation and compatibility limits.
+
+Program and checker-owner access predates R4: before this work, `Session`
+already returned `Arc<Program>`, `Arc<CheckerOwner>` and `Operation`, and retained
+results exposed their owner. The new aliases make those types nameable without
+direct implementation-crate dependencies. Compiler-pool diagnostics/queries,
+incremental services and single-file transpilation add actual capabilities.
+Direct owner operations retain exact-owner/generation checks; they do not apply
+the session wrapper's phase schedule or combined pool unwind policy.
+
+The consumer audit proves imports/dependencies route through the declared
+public facade and allowed host/value crates, with no direct internal fallback.
+It does not prove an opaque or smaller capability surface: an alias retains
+all public methods of its implementation type. Public facade and implementation
+API compatibility must therefore be reviewed together before release.
+The acceptance and lifetime receipts cover the consumer's executed operations
+and obligations; they are not exhaustive public-entry-point tests for every
+method reachable through a reexported program, operation or builder.
+
 ## Public transpile operations
 
 `tsr_embed` exposes production `transpile_module` and
@@ -338,7 +366,7 @@ observations match throughout.
 | --- | ---: | ---: | ---: | ---: |
 | Execute request through acknowledgement | 0.888 s | 1.769 s | 1.9913 | 1.0 |
 | Process peak before observation | 668,450,816 B | 702,726,144 B | 1.0513 | 0.70 |
-| Linked consumer bytes | 20,017,170 B | 28,896,848 B | 1.4436 | 1.0 |
+| Linked consumer bytes, both stripped (corrected 2026-10-12) | 20,017,168 B | 25,920,720 B | 1.2949 | 1.0 |
 
 Elapsed excludes preparation, checkpoint GC and later observation. The 95%
 ratio interval is 1.9236–2.0390; Go/Rust relative MAD is 1.61%/1.54%. Every pair
@@ -346,11 +374,21 @@ was under background host load, so this timing/RSS capture is diagnostic and
 is not entered as a qualified performance run. It establishes matching work
 and gives a starting measurement, not a quiet-host acceptance claim.
 
-The size row is separately recorded under `status/perf/embed-size`. Go is
-stripped (`-s -w`); Rust is the ordinary unstripped release consumer with fat
-LTO, one codegen unit and mimalloc. The recorded result describes these actual
-artifacts, without claiming that Rust's size has been minimized. There is no
-allocator instrumentation in the elapsed/RSS/size executable.
+The size row is separately recorded under `status/perf/embed-size`. The original
+1.4436 ratio compared Go stripped by `-s -w` with an unstripped Rust release
+consumer and is withdrawn as a comparable size result. Its raw record remains
+historical. On 2026-10-12, `size.py` copied both retained executables and applied
+the same `llvm-strip --strip-all` to both. The corrected ratio is **1.2949**,
+still above the 1.0 target, recorded in
+`status/perf/embed-size/2026-10-12T03-35-17.387571+00-00-a69cdeb6.json`.
+The durable capture is
+`/Users/cristian/git/ts-rust-benchmarks/2026-10-12/r4-native-size-stripped-04`.
+It preserves the original identities, build manifests, strip-tool identity and
+commands, and stripped binaries; both stripped executables launch successfully.
+Rust still uses fat LTO, one codegen unit and mimalloc. No code was rebuilt, no
+timing was rerun and the original timing artifacts remain unchanged. There is
+no allocator instrumentation in these executables. Native size replay now
+rejects captures without the matching stripping step.
 
 The separate native allocation path uses the same Rust sources, release
 profile and allocator, with allocation instrumentation added. It authenticates

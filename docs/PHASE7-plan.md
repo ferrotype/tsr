@@ -230,6 +230,13 @@ Proposed for the owner's acceptance; section 8 lists what each needs.
    observation or native-only test owns each; do not report an unexecuted
    assertion as a portable pass.
 
+   The facade is intentionally compiler-level: reexported programs and checker
+   operations expose their production public methods. The dependency audit
+   verifies entry-point routing, not an opaque API or independent semver.
+   Review these exposed types together with the implementation crates; the
+   [R4 boundary contract](PHASE7-R4.md#public-boundary-contract) records the
+   ownership and compatibility limits.
+
    The wasm adapter uses the same in-memory test-mapper behavior as native
    through portable host callbacks; no native process or filesystem fallback.
    A compiler-side API gap belongs in the deliverable. Prove the boundary by
