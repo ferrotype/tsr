@@ -23,15 +23,18 @@ the external Rust consumer. Only `run` needs the consumer: `--consumer` supplies
 executable, otherwise Cargo builds tools/s10/rust-consumer in release. An
 explicit `--runner` bypasses the runner build only; it does not bypass consumer
 selection. `list`, `check` and `accept` never build the consumer.
-`compiler-wasm` and `transpile-wasm` use the same external byte protocols with a separately
-provided wasm host executable; `run` requires an explicit `--consumer` and
-never builds or substitutes a native consumer.
+`compiler-wasm` and `transpile-wasm` use the same external byte protocols with
+the verified tools/phase7/portable/wasm-consumer launcher (or an identical copy
+with its transport files). `run` requires an explicit `--consumer`, validates
+the artifact and pinned Node runtime, and records their hashes. Portable shard
+identities must agree at `check`/`accept`; native consumers cannot grade wasm.
 """
 from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -169,6 +172,74 @@ def consumer_path(explicit=None):
     return executable
 
 
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def portable_identity(suite, consumer):
+    """Bind the grade to bytes and a verified transport, never a path label.
+
+    Wasm uses the repository's audited launcher (or an identical relocated
+    copy). Only after checking that code do we ask its artifact loader to
+    validate the wasm, bindings and ABI and report the actual Node runtime.
+    """
+    if suite.endswith("-embed"):
+        return {"version": 1, "runtime": "embed", "consumer_sha256": sha256(consumer)}
+    family = suite.rsplit("-", 1)[0]
+    portable = ROOT / "tools/phase7/portable"
+    names = ["wasm-consumer", "wasm-identity.mjs"]
+    names += (["compiler-wasm.mjs", "compiler-imports.mjs"] if family == "compiler" else
+              ["wasm.mjs", "../../s10/wasm/instance.mjs", "../../s10/wasm/imports.mjs"])
+    transport = {}
+    for name in names:
+        actual = consumer if name == "wasm-consumer" else consumer.parent / name
+        if not actual.is_file() or sha256(actual) != sha256(portable / name):
+            sys.exit(f"{suite} requires the verified wasm launcher and transport: {actual}")
+        transport[name] = sha256(actual)
+    command = [str(consumer), *(["--compiler"] if family == "compiler" else []), "--identity"]
+    completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
+    if completed.returncode:
+        sys.stderr.write(completed.stderr)
+        sys.exit(f"{suite}: wasm runtime/artifact verification failed")
+    try:
+        identity = json.loads(completed.stdout)
+    except ValueError:
+        sys.exit(f"{suite}: invalid wasm identity response")
+    if not isinstance(identity, dict):
+        sys.exit(f"{suite}: invalid wasm identity response")
+    identity["transport"] = transport
+    validate_portable_identity(suite, identity)
+    pins = json.loads((ROOT / "tools/s10/toolchains.json").read_text())
+    node = "v" + json.loads((ROOT / "upstream/package.json").read_text())["volta"]["node"]
+    if identity["engine"]["version"] != node or identity["engine"]["flags"] != pins["node_flags"]:
+        sys.exit(f"{suite}: wasm engine differs from the pinned Node version or flags")
+    return identity
+
+
+def validate_portable_identity(suite, identity):
+    def digest(value):
+        return isinstance(value, str) and len(value) == 64 and all(char in "0123456789abcdef" for char in value)
+
+    runtime = suite.rsplit("-", 1)[1]
+    valid = isinstance(identity, dict) and identity.get("version") == 1 and identity.get("runtime") == runtime
+    if valid and runtime == "embed":
+        valid = digest(identity.get("consumer_sha256"))
+    elif valid:
+        family = suite.rsplit("-", 1)[0]
+        engine = identity.get("engine", {})
+        artifacts = identity.get("artifacts", {})
+        transport = identity.get("transport", {})
+        valid = (identity.get("family") == family and digest(identity.get("build_sha256"))
+                 and isinstance(engine, dict) and digest(engine.get("sha256"))
+                 and isinstance(engine.get("version"), str) and isinstance(engine.get("flags"), list)
+                 and isinstance(artifacts, dict) and set(artifacts) == {family.replace("transpile", "checker") + "_bg.wasm", "bindings.mjs"}
+                 and all(digest(value) for value in artifacts.values())
+                 and isinstance(transport, dict) and "wasm-consumer" in transport
+                 and all(digest(value) for value in transport.values()))
+    if not valid:
+        sys.exit(f"{suite}: missing or invalid verified portable runtime/artifact identity")
+
+
 def runner_command(suite, runner, *rest, consumer=None):
     arguments = [str(runner), *SUITES[suite].arguments]
     if consumer is not None:
@@ -270,6 +341,7 @@ def run(args):
         sys.exit("jsapi runs one file at a time: --jobs must be 1")
     runner = runner_path(suite, args.runner)
     consumer = consumer_path(explicit_consumer) if suite in PORTABLE_SUITES else None
+    identity = portable_identity(suite, consumer) if consumer is not None else None
     roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
     variants = args.id or roster
     if args.id and SUITES[suite].batch and (len(set(variants)) != len(variants) or not set(variants) <= set(roster)):
@@ -298,6 +370,7 @@ def run(args):
         meta["native_selection"] = {key: runner[key] for key in ("goos", "goarch", "compiled_sources")}
     if consumer is not None:
         meta["consumer"] = str(consumer)
+        meta["portable_identity"] = identity
     counts = dict.fromkeys(STATES, 0)
     slowest = []
     with (output / "results.ndjson").open("w") as results, ThreadPoolExecutor(jobs) as pool:
@@ -330,6 +403,8 @@ def run(args):
                 if done % 500 == 0 or done == len(selected):
                     print(f"{done}/{len(selected)} variants; sub-tests pass {counts['pass']} fail {counts['fail']} "
                           f"skip {counts['skip']}", file=sys.stderr)
+    if consumer is not None and portable_identity(suite, consumer) != identity:
+        sys.exit("portable runtime or artifact changed during capture; repeat the run")
     meta["finished"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     meta["counts"] = counts
     meta["slowest"] = [{"variant": variant, "seconds": round(seconds, 1)} for seconds, variant in slowest]
@@ -390,6 +465,12 @@ def merge(suite, directories):
         selections = {json.dumps(meta.get("native_selection"), sort_keys=True) for meta in metas}
         if len(selections) != 1 or "null" in selections:
             sys.exit("the result directories disagree on native host/source selection")
+    if suite in PORTABLE_SUITES:
+        for meta in metas:
+            validate_portable_identity(suite, meta.get("portable_identity"))
+        identities = {json.dumps(meta["portable_identity"], sort_keys=True) for meta in metas}
+        if len(identities) != 1:
+            sys.exit("the result directories disagree on portable runtime/artifact identity")
     counts = {meta["shard"][1] for meta in metas}
     pins = {meta["pin"] for meta in metas}
     totals = {meta["total"] for meta in metas}
@@ -403,7 +484,10 @@ def merge(suite, directories):
     total = totals.pop()
     if len(variants) != total or len(set(variants)) != total:
         sys.exit(f"the shards answer {len(set(variants))} distinct variants of the {total} enumerated")
-    return {"pin": pins.pop(), "total": total}, rows
+    merged = {"pin": pins.pop(), "total": total}
+    if suite in PORTABLE_SUITES:
+        merged["portable_identity"] = metas[0]["portable_identity"]
+    return merged, rows
 
 
 def failing_ids(rows):

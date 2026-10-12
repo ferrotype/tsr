@@ -231,10 +231,11 @@ jobs:
       fail-fast: false
       matrix:
         runtime: [embed, wasm]
-    env:
-      PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/phase7-browsers
-      NPM_CONFIG_CACHE: ${{ runner.temp }}/phase7-browser-npm
     steps:
+      - name: Set runner-local browser cache paths
+        run: |
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/phase7-browsers" >> "$GITHUB_ENV"
+          echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/phase7-browser-npm" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
         with:
           submodules: true

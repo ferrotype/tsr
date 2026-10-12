@@ -38,10 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      FUZZ_OUTPUT: ${{ runner.temp }}/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/${{ matrix.target }}/results
-      FUZZ_BUILD: ${{ runner.temp }}/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/${{ matrix.target }}/binaries
       FUZZ_TARGET: ${{ matrix.target }}
     steps:
+      - name: Set runner-local output paths
+        run: |
+          echo "FUZZ_OUTPUT=$RUNNER_TEMP/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/$FUZZ_TARGET/results" >> "$GITHUB_ENV"
+          echo "FUZZ_BUILD=$RUNNER_TEMP/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/$FUZZ_TARGET/binaries" >> "$GITHUB_ENV"
       - uses: actions/checkout@v5
         with:
           submodules: true

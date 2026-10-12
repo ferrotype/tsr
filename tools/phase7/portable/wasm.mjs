@@ -7,6 +7,7 @@ import { createInterface } from "node:readline";
 import { pathToFileURL } from "node:url";
 import { createInstance } from "../../s10/wasm/instance.mjs";
 import { checkImports } from "../../s10/wasm/imports.mjs";
+import { wasmIdentity } from "./wasm-identity.mjs";
 
 const decode = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 const requestFields = ["version", "declaration", "source", "filename", "compiler_options", "report_diagnostics"];
@@ -142,12 +143,13 @@ export function createProcessor(createBindings, module) {
   });
 }
 
-export async function loadProcessor(directory) {
+export async function loadProcessor(directory, identityOnly = false) {
   if (typeof directory !== "string" || directory.length === 0) {
     throw new Error("TSR_WASM_ARTIFACT_DIR must name the production checker build directory");
   }
   directory = resolve(directory);
-  const record = JSON.parse(readFileSync(resolve(directory, "build.json"), "utf8"));
+  const recordBytes = readFileSync(resolve(directory, "build.json"));
+  const record = JSON.parse(recordBytes);
   if (record.mode !== "checker" || !Array.isArray(record.command) ||
       !record.command.some((part, index) => part === "-p" && record.command[index + 1] === "tsr_wasm") ||
       !record.command.some((part, index) => part === "--features" && record.command[index + 1].split(",").includes("checker"))) {
@@ -168,6 +170,7 @@ export async function loadProcessor(directory) {
   for (const name of ["transpile_module", "transpile_declaration"]) {
     if (!names.has(name)) throw new Error(`production wasm export is missing: ${name}`);
   }
+  if (identityOnly) return wasmIdentity("transpile", recordBytes, files);
   const { createBindings } = await import(pathToFileURL(resolve(directory, "bindings.mjs")));
   if (typeof createBindings !== "function") throw new TypeError("artifact does not export createBindings");
   return createProcessor(createBindings, module);
@@ -186,8 +189,12 @@ export async function consume(input, output, processor) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    if (process.argv.length !== 2) throw new Error("wasm consumer takes no arguments; set TSR_WASM_ARTIFACT_DIR");
-    await consume(process.stdin, process.stdout, await loadProcessor(process.env.TSR_WASM_ARTIFACT_DIR));
+    if (process.argv.length === 3 && process.argv[2] === "--identity") {
+      process.stdout.write(JSON.stringify(await loadProcessor(process.env.TSR_WASM_ARTIFACT_DIR, true)) + "\n");
+    } else {
+      if (process.argv.length !== 2) throw new Error("wasm consumer takes no arguments; set TSR_WASM_ARTIFACT_DIR");
+      await consume(process.stdin, process.stdout, await loadProcessor(process.env.TSR_WASM_ARTIFACT_DIR));
+    }
   } catch (error) {
     process.stderr.write(`wasm transpile consumer: ${error}\n`);
     process.exitCode = 1;

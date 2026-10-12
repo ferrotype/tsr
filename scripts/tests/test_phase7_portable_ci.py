@@ -6,6 +6,7 @@ import tempfile
 import unittest
 
 from scripts import parity
+from scripts.tests.test_parity_embed import fixture_identity
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -93,7 +94,8 @@ class PortableCIControls(unittest.TestCase):
                     output = Path(directory) / suite / row['shard'].replace('/', '-')
                     output.mkdir(parents=True)
                     meta = {'suite': suite, 'pin': 'fixture-pin', 'shard': spec,
-                            'total': len(variants), 'variants': selected, 'partial': False}
+                            'total': len(variants), 'variants': selected, 'partial': False,
+                            'portable_identity': fixture_identity(suite)}
                     (output / 'meta.json').write_text(json.dumps(meta))
                     (output / 'results.ndjson').write_text(''.join(
                         json.dumps({'id': variant + '/error', 'state': 'pass'}) + '\n'
@@ -102,6 +104,7 @@ class PortableCIControls(unittest.TestCase):
                 with self.subTest(suite=suite):
                     meta, merged = parity.merge(suite, outputs)
                     self.assertEqual(meta['total'], len(variants))
+                    self.assertEqual(meta['portable_identity'], fixture_identity(suite))
                     self.assertEqual({row['id'] for row in merged}, {name + '/error' for name in variants})
                     with self.assertRaisesRegex(SystemExit, 'every shard'):
                         parity.merge(suite, outputs + outputs[:1])
@@ -113,9 +116,35 @@ class PortableCIControls(unittest.TestCase):
                     with self.assertRaisesRegex(SystemExit, 'without a result'):
                         parity.merge(suite, outputs)
 
+    def test_portable_merge_rejects_missing_wrong_runtime_and_mixed_artifacts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            outputs = []
+            for index in (1, 2):
+                output = Path(directory) / str(index)
+                output.mkdir()
+                meta = {'suite': 'compiler-wasm', 'pin': 'fixture-pin', 'shard': [index, 2],
+                        'total': 2, 'variants': [f'compiler/{index}'], 'partial': False,
+                        'portable_identity': fixture_identity('compiler-wasm')}
+                (output / 'meta.json').write_text(json.dumps(meta))
+                (output / 'results.ndjson').write_text(json.dumps({'id': f'compiler/{index}/error', 'state': 'pass'}))
+                outputs.append(output)
+            meta_path = outputs[1] / 'meta.json'
+            original = json.loads(meta_path.read_text())
+            for identity, message in (
+                (None, 'missing or invalid'),
+                (fixture_identity('compiler-embed'), 'missing or invalid'),
+                ({**fixture_identity('compiler-wasm'), 'build_sha256': 'a' * 64}, 'disagree on portable'),
+                ({**fixture_identity('compiler-wasm'), 'engine': {**fixture_identity('compiler-wasm')['engine'], 'sha256': 'b' * 64}}, 'disagree on portable'),
+            ):
+                with self.subTest(identity=identity):
+                    meta_path.write_text(json.dumps({**original, 'portable_identity': identity}))
+                    with self.assertRaisesRegex(SystemExit, message):
+                        parity.merge('compiler-wasm', outputs)
+
     def test_browser_and_npm_cache_is_exact_and_os_dependencies_are_not_skipped(self):
-        self.assertIn('PLAYWRIGHT_BROWSERS_PATH: ${{ runner.temp }}/phase7-browsers', self.build)
-        self.assertIn('NPM_CONFIG_CACHE: ${{ runner.temp }}/phase7-browser-npm', self.build)
+        self.assertIn('echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/phase7-browsers" >> "$GITHUB_ENV"', self.build)
+        self.assertIn('echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/phase7-browser-npm" >> "$GITHUB_ENV"', self.build)
+        self.assertLess(self.build.index('Set runner-local browser cache paths'), self.build.index('id: browser-cache'))
         cache = self.build.split('id: browser-cache', 1)[1].split('      - name:', 1)[0]
         self.assertIn('uses: actions/cache@v4', cache)
         self.assertIn('${{ env.PLAYWRIGHT_BROWSERS_PATH }}', cache)

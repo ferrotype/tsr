@@ -34,7 +34,8 @@ def source_snapshot():
     files = {HERE / 'Cargo.lock', HERE / 'Cargo.toml', Path(__file__), ROOT / 'Cargo.toml',
              ROOT / 'rust-toolchain.toml', ROOT / 'tools/s10/toolchains.json', ROOT / 'upstream/package.json',
              ROOT / 'scripts/s10_build.py', ROOT / 'scripts/s04_ownership.py',
-             HERE.parent / 'compiler-wasm.mjs', HERE.parent / 'wasm-consumer'}
+             HERE.parent / 'compiler-wasm.mjs', HERE.parent / 'wasm-consumer',
+             HERE.parent / 'compiler-imports.mjs', HERE.parent / 'wasm-identity.mjs'}
     for package in metadata['packages']:
         if package['source'] is not None:
             continue  # Registry versions/checksums are bound by this crate's lock.
@@ -95,12 +96,14 @@ def main():
     (output / 'bindings.mjs').write_text('export function createBindings() {\n' + glue + '\nreturn wasm_bindgen;\n}\n')
     # Retain the exact transport as well as generated ABI assets. Detached
     # replay must not need target output or a later repository JS revision.
-    for name in ('compiler-wasm.mjs', 'wasm-consumer'):
+    for name in ('compiler-wasm.mjs', 'wasm-consumer', 'compiler-imports.mjs', 'wasm-identity.mjs'):
         shutil.copy2(HERE.parent / name, output / name)
     imports = json.loads(subprocess.check_output([
         'node', '--input-type=module', '-e',
-        'import{readFileSync}from"node:fs";console.log(JSON.stringify(WebAssembly.Module.imports(new WebAssembly.Module(readFileSync(process.argv[1])))))',
-        str(output / 'compiler_bg.wasm')], text=True))
+        'import{readFileSync}from"node:fs";import{pathToFileURL}from"node:url";'
+        'const{checkCompilerImports}=await import(pathToFileURL(process.argv[2]));'
+        'console.log(JSON.stringify(checkCompilerImports(new WebAssembly.Module(readFileSync(process.argv[1])))))',
+        str(output / 'compiler_bg.wasm'), str(HERE.parent / 'compiler-imports.mjs')], text=True))
     after = source_snapshot()
     if before != after:
         raise ValueError('source changed during build; retain failure and repeat before acceptance')
@@ -110,7 +113,8 @@ def main():
               'rustc': subprocess.check_output(['rustc', '--version'], env=env, text=True).strip(),
               'wasm_bindgen': version, 'wasm_bindgen_sha256': digest(args.wasm_bindgen),
               'artifacts': {name: {'sha256': digest(output / name), 'bytes': (output / name).stat().st_size}
-                            for name in ['compiler_bg.wasm', 'compiler.js', 'bindings.mjs', 'compiler-wasm.mjs', 'wasm-consumer']}}
+                            for name in ['compiler_bg.wasm', 'compiler.js', 'bindings.mjs', 'compiler-wasm.mjs',
+                                         'wasm-consumer', 'compiler-imports.mjs', 'wasm-identity.mjs']}}
     (output / 'build.json').write_text(json.dumps(record, indent=2) + '\n')
     print(output)
 

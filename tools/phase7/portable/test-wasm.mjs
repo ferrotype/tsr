@@ -174,3 +174,37 @@ test("the executable shim requires explicit artifacts and pins the engine stack"
   assert.equal(child.stdout, "");
   assert.match(child.stderr, /TSR_WASM_ARTIFACT_DIR/);
 });
+
+test("transpile identity verifies the production ABI and binds actual engine and artifact bytes", async () => {
+  const directory = mkdtempSync(resolve(tmpdir(), "phase7-transpile-identity-"));
+  const leb = number => { const bytes = []; do { const byte = number & 127; number >>>= 7; bytes.push(byte | (number ? 128 : 0)); } while (number); return bytes; };
+  const string = value => { const bytes = Buffer.from(value); return [...leb(bytes.length), ...bytes]; };
+  const section = (id, bytes) => [id, ...leb(bytes.length), ...bytes];
+  const names = ["__wbindgen_init_externref_table", "__wbindgen_cast_0000000000000001", "__wbg___wbindgen_throw_344f42d3211c4765"];
+  const wasm = Buffer.from([0, 97, 115, 109, 1, 0, 0, 0, ...section(1, [1, 96, 0, 0]),
+    ...section(2, [names.length, ...names.flatMap(name => [...string("./checker_bg.js"), ...string(name), 0, 0])]),
+    ...section(7, [2, ...string("transpile_module"), 0, 0, ...string("transpile_declaration"), 0, 0]),
+  ]);
+  const bindings = Buffer.from('throw new Error("identity probe must not execute generated JS");');
+  const digest = bytes => createHash("sha256").update(bytes).digest("hex");
+  try {
+    const files = { "checker_bg.wasm": wasm, "bindings.mjs": bindings };
+    for (const [name, bytes] of Object.entries(files)) writeFileSync(resolve(directory, name), bytes);
+    const record = { mode: "checker", command: ["cargo", "build", "-p", "tsr_wasm", "--features", "checker"],
+      artifacts: Object.fromEntries(Object.entries(files).map(([name, bytes]) => [name, { sha256: digest(bytes), bytes: bytes.length }])) };
+    const recordBytes = JSON.stringify(record);
+    writeFileSync(resolve(directory, "build.json"), recordBytes);
+    const identity = await loadProcessor(directory, true);
+    assert.equal(identity.runtime, "wasm");
+    assert.equal(identity.family, "transpile");
+    assert.equal(identity.build_sha256, digest(recordBytes));
+    assert.equal(identity.artifacts["checker_bg.wasm"], digest(wasm));
+    const child = spawnSync(fileURLToPath(new URL("./wasm-consumer", import.meta.url)), ["--identity"], {
+      encoding: "utf8", env: { ...process.env, TSR_WASM_ARTIFACT_DIR: directory },
+    });
+    assert.equal(child.status, 0, child.stderr);
+    assert.deepEqual(JSON.parse(child.stdout).engine.flags, ["--stack-size=4096"]);
+    writeFileSync(resolve(directory, "bindings.mjs"), "changed after build");
+    await assert.rejects(loadProcessor(directory, true), /artifact bytes differ/);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});

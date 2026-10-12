@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 import { readFileSync, readSync, writeSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { checkCompilerImports } from "./compiler-imports.mjs";
+import { wasmIdentity } from "./wasm-identity.mjs";
 
 const decoder = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true });
 
@@ -88,12 +90,13 @@ export function createCompilerProcessor(createBindings, module, callback) {
   });
 }
 
-export async function loadCompilerProcessor(directory, callback) {
+export async function loadCompilerProcessor(directory, callback, identityOnly = false) {
   if (typeof directory !== "string" || directory.length === 0) {
     throw new Error("TSR_WASM_COMPILER_ARTIFACT_DIR must name the test-only public embedding wasm build");
   }
   directory = resolve(directory);
-  const record = JSON.parse(readFileSync(resolve(directory, "build.json"), "utf8"));
+  const recordBytes = readFileSync(resolve(directory, "build.json"));
+  const record = JSON.parse(recordBytes);
   if (record.mode !== "phase7-test-compiler" || record.package !== "phase7_wasm_compiler" || record.version !== 1 || record.performance_eligible !== false) {
     throw new Error("artifact is not the test-only public embedding compiler build");
   }
@@ -107,9 +110,11 @@ export async function loadCompilerProcessor(directory, callback) {
     files.set(name, data);
   }
   const module = new WebAssembly.Module(files.get("compiler_bg.wasm"));
-  if (JSON.stringify(WebAssembly.Module.imports(module)) !== JSON.stringify(record.imports)) {
-    throw new Error("compiler wasm imports differ from the reviewed build record");
+  const imports = checkCompilerImports(module);
+  if (JSON.stringify(imports) !== JSON.stringify(record.imports)) {
+    throw new Error("compiler wasm imports differ from the build record");
   }
+  if (identityOnly) return wasmIdentity("compiler", recordBytes, files);
   const { createBindings } = await import(pathToFileURL(resolve(directory, "bindings.mjs")));
   return createCompilerProcessor(createBindings, module, callback);
 }
@@ -130,16 +135,20 @@ export function consumeCompiler(processor, receive, send) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
-    if (process.argv.length !== 2) throw new Error("compiler wasm consumer takes no arguments");
-    const receive = lineReader();
-    const send = lineWriter();
-    const callback = request => {
-      send(`{"kind":"callback","value":${request}}`);
-      const reply = receive();
-      if (reply === null) throw new Error("compiler callback reply ended at EOF");
-      return reply;
-    };
-    consumeCompiler(await loadCompilerProcessor(process.env.TSR_WASM_COMPILER_ARTIFACT_DIR, callback), receive, send);
+    if (process.argv.length === 3 && process.argv[2] === "--identity") {
+      process.stdout.write(JSON.stringify(await loadCompilerProcessor(process.env.TSR_WASM_COMPILER_ARTIFACT_DIR, undefined, true)) + "\n");
+    } else {
+      if (process.argv.length !== 2) throw new Error("compiler wasm consumer takes no arguments");
+      const receive = lineReader();
+      const send = lineWriter();
+      const callback = request => {
+        send(`{"kind":"callback","value":${request}}`);
+        const reply = receive();
+        if (reply === null) throw new Error("compiler callback reply ended at EOF");
+        return reply;
+      };
+      consumeCompiler(await loadCompilerProcessor(process.env.TSR_WASM_COMPILER_ARTIFACT_DIR, callback), receive, send);
+    }
   } catch (error) {
     process.stderr.write(`wasm compiler consumer: ${error}\n`);
     process.exitCode = 1;

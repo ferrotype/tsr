@@ -21,6 +21,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import parity
 
 
+def fixture_identity(suite):
+    if suite.endswith('-embed'):
+        return {'version': 1, 'runtime': 'embed', 'consumer_sha256': '0' * 64}
+    family = suite.rsplit('-', 1)[0]
+    return {'version': 1, 'runtime': 'wasm', 'family': family,
+            'engine': {'version': 'v24.20.0', 'flags': ['--stack-size=4096'], 'sha256': '1' * 64},
+            'build_sha256': '2' * 64,
+            'artifacts': {('compiler' if family == 'compiler' else 'checker') + '_bg.wasm': '3' * 64,
+                          'bindings.mjs': '4' * 64},
+            'transport': {'wasm-consumer': '5' * 64}}
+
+
 RUNNER = r'''#!/usr/bin/env python3
 import json, subprocess, sys
 args = sys.argv[1:]
@@ -90,6 +102,8 @@ class EmbedParityTests(unittest.TestCase):
         meta = json.loads((self.directory / "results/meta.json").read_text())
         self.assertEqual(meta["suite"], "transpile-embed")
         self.assertEqual(meta["consumer"], str(self.consumer.resolve()))
+        self.assertEqual(meta['portable_identity'], {'version': 1, 'runtime': 'embed',
+                                                    'consumer_sha256': parity.sha256(self.consumer)})
         self.assertEqual(meta["total"], 2)
 
     def test_runner_override_still_resolves_or_builds_a_consumer(self):
@@ -110,7 +124,8 @@ class EmbedParityTests(unittest.TestCase):
             with self.subTest(suite=suite):
                 with patch.object(parity, "consumer_path", side_effect=AssertionError("consumer build")):
                     self.assertEqual(parity.list_variants(suite, self.runner), native)
-                self.quiet(self.arguments("--consumer", str(self.consumer), suite=suite))
+                with patch.object(parity, 'portable_identity', return_value=fixture_identity(suite)):
+                    self.quiet(self.arguments("--consumer", str(self.consumer), suite=suite))
                 rows = [json.loads(line) for line in
                         (self.directory / "results/results.ndjson").read_text().splitlines()]
                 self.assertEqual(len(rows), 6)
@@ -118,7 +133,8 @@ class EmbedParityTests(unittest.TestCase):
                 (self.directory / "results").rename(self.directory / suite)
 
     def test_wasm_runs_an_explicit_host_without_building_a_native_consumer(self):
-        with patch.object(parity.subprocess, "run", wraps=subprocess.run) as run:
+        with patch.object(parity.subprocess, "run", wraps=subprocess.run) as run, \
+                patch.object(parity, 'portable_identity', return_value=fixture_identity('transpile-wasm')):
             self.quiet(self.arguments("--consumer", str(self.consumer), suite="transpile-wasm"))
         self.assertFalse(any(command.args[0][0] == "cargo" for command in run.call_args_list))
         meta = json.loads((self.directory / "results/meta.json").read_text())
@@ -129,7 +145,8 @@ class EmbedParityTests(unittest.TestCase):
         self.quiet(self.arguments("--consumer", str(self.consumer)))
         embedded = self.directory / "embedded"
         (self.directory / "results").rename(embedded)
-        self.quiet(self.arguments("--consumer", str(self.consumer), suite="transpile-wasm"))
+        with patch.object(parity, 'portable_identity', return_value=fixture_identity('transpile-wasm')):
+            self.quiet(self.arguments("--consumer", str(self.consumer), suite="transpile-wasm"))
         wasm = self.directory / "results"
         with patch.object(parity, "consumer_path", side_effect=AssertionError("consumer build")), \
                 patch.object(parity, "runner_path", side_effect=AssertionError("runner build")):
@@ -142,6 +159,38 @@ class EmbedParityTests(unittest.TestCase):
                 self.quiet(["accept", "transpile-embed", "--results", str(wasm)])
         self.assertTrue((self.directory / "expectations/transpile-embed.json").exists())
         self.assertTrue((self.directory / "expectations/transpile-wasm.json").exists())
+
+    def test_native_consumer_cannot_be_graded_as_wasm(self):
+        for suite in ('compiler-wasm', 'transpile-wasm'):
+            with self.subTest(suite=suite), self.assertRaisesRegex(SystemExit, 'verified wasm launcher'):
+                self.quiet(self.arguments('--consumer', str(self.consumer), suite=suite))
+        self.assertFalse((self.directory / 'results/meta.json').exists())
+
+    def test_verified_wasm_identity_requires_pinned_engine_and_artifact_loader_success(self):
+        consumer = parity.ROOT / 'tools/phase7/portable/wasm-consumer'
+        identity = fixture_identity('compiler-wasm')
+        for result, message in (
+            (subprocess.CompletedProcess([], 1, '', 'stale artifact'), 'verification failed'),
+            (subprocess.CompletedProcess([], 0, '{}', ''), 'invalid verified'),
+            (subprocess.CompletedProcess([], 0, json.dumps({**identity, 'runtime': 'embed'}), ''), 'invalid verified'),
+            (subprocess.CompletedProcess([], 0, json.dumps({**identity, 'engine': {**identity['engine'], 'version': 'v0'}}), ''), 'pinned Node'),
+        ):
+            with self.subTest(message=message), patch.object(parity.subprocess, 'run', return_value=result), \
+                    contextlib.redirect_stderr(io.StringIO()), self.assertRaisesRegex(SystemExit, message):
+                parity.portable_identity('compiler-wasm', consumer)
+        with patch.object(parity.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, json.dumps(identity), '')) as probe:
+            recorded = parity.portable_identity('compiler-wasm', consumer)
+        self.assertEqual(recorded['artifacts'], identity['artifacts'])
+        self.assertEqual(recorded['transport']['wasm-consumer'], parity.sha256(consumer))
+        self.assertEqual(probe.call_args.args[0], [str(consumer), '--compiler', '--identity'])
+
+    def test_changed_consumer_during_capture_does_not_write_success_metadata(self):
+        before = fixture_identity('transpile-embed')
+        after = {**before, 'consumer_sha256': '1' * 64}
+        with patch.object(parity, 'portable_identity', side_effect=[before, after]), \
+                self.assertRaisesRegex(SystemExit, 'changed during capture'):
+            self.quiet(self.arguments('--consumer', str(self.consumer)))
+        self.assertFalse((self.directory / 'results/meta.json').exists())
 
     def test_consumer_failure_is_preserved_without_native_fallback(self):
         consumer = self.executable("failing-consumer", "#!/usr/bin/env python3\nraise SystemExit(31)\n")
