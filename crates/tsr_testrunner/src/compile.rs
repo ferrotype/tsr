@@ -160,6 +160,15 @@ pub enum CompilationBackend {
 }
 
 impl Compilation {
+    /// Finish a followup compilation, reporting consumer cleanup failures.
+    /// The initial compilation's final drop tears down the consumer process.
+    pub(crate) fn release(self) -> Result<(), String> {
+        match self.backend {
+            CompilationBackend::Native { .. } => Ok(()),
+            CompilationBackend::Portable(session) => session.release(),
+        }
+    }
+
     /// `result.Repeat(testConfig)`: the same inputs compiled again with
     /// `testConfig` applied on top of clones of the options.
     // port: tsc/internal/testutil/harnessutil/harnessutil.go:CompileFilesEx

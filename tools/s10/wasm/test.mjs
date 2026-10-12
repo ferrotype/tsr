@@ -62,6 +62,16 @@ if (mode !== "parser") {
   const badHost = checker.createHost(bytes("/"));
   assert.throws(() => badHost.compile({ target: "not-a-numeric-enum" }), WasmApiError);
   assert.throws(() => badHost.addDirectory(bytes("/consumed")), /disposed/);
+  for (const compilerOptions of [{ incremental: true }, { composite: true }, { composite: true, incremental: false }]) {
+    const configuredHost = checker.createHost(bytes("/"));
+    configuredHost.addFile(bytes("/tsconfig.json"), bytes(JSON.stringify({ compilerOptions, files: ["main.ts"] })), false);
+    configuredHost.addFile(bytes("/main.ts"), bytes("export const answer = 42;"), false);
+    const prepared = configuredHost.prepare();
+    assert.throws(() => prepared.compileConfig(bytes("/tsconfig.json")), error =>
+      error instanceof WasmApiError && /incremental\/watch\/external mapper execution unsupported/.test(error.message));
+    assert.equal(checker.state, "live");
+    assert.equal(new TextDecoder().decode(sibling.typeAtPosition(bytes("/b.ts"), 6)), "number");
+  }
   const serialHost = checker.createHost(bytes("/"));
   const cycle = {}; cycle.self = cycle;
   assert.throws(() => serialHost.compile(cycle), TypeError);

@@ -74,6 +74,79 @@ fn program_session(counters: &Counters, options: CompilerOptions) -> Session {
     )
 }
 
+#[test]
+fn composite_leaf_emits_and_reuses_build_info_with_and_without_no_emit() {
+    fn load(no_emit: bool, build_info: Option<&[u8]>) -> Session {
+        let mut host = tsr_vfs::MemoryBuilder::new(b"/", true);
+        host.insert_loaded(b"/src/globals.d.ts", GLOBALS);
+        host.insert_loaded(b"/src/main.ts", b"export const answer = 42;\n".as_slice());
+        if let Some(text) = build_info {
+            host.insert_loaded(b"/state.tsbuildinfo", text);
+        }
+        Session::load(
+            ProgramOptions {
+                config: tsr_tsoptions::ParsedCommandLine::new(
+                    options(|options| {
+                        options.composite = Tristate::TRUE;
+                        // Composite implies incremental even when the explicit
+                        // incremental flag is false.
+                        options.incremental = Tristate::FALSE;
+                        options.no_emit = if no_emit {
+                            Tristate::TRUE
+                        } else {
+                            Tristate::FALSE
+                        };
+                        options.ts_build_info_file =
+                            JsString::from_bytes(b"/state.tsbuildinfo".as_slice());
+                    }),
+                    vec![
+                        JsString::from_bytes(b"/src/globals.d.ts".as_slice()),
+                        JsString::from_bytes(b"/src/main.ts".as_slice()),
+                    ],
+                ),
+                host: Arc::new(host.finish()),
+                current_directory: JsString::from_bytes(b"/".as_slice()),
+                default_library_path: JsString::from_bytes(b"/lib".as_slice()),
+                skip_module_resolution: false,
+                single_threaded: Tristate::TRUE,
+            },
+            &mut FileCache::new(),
+            &Counters::new(),
+        )
+        .unwrap()
+    }
+
+    for no_emit in [false, true] {
+        let first = load(no_emit, None);
+        let output = first.emit(&EmitOptions::default()).unwrap();
+        assert!(output.diagnostics.is_empty());
+        let names: Vec<_> = output
+            .files
+            .iter()
+            .map(|file| file.name.as_bytes())
+            .collect();
+        let expected: &[&[u8]] = if no_emit {
+            &[b"/state.tsbuildinfo"]
+        } else {
+            &[b"/src/main.js", b"/src/main.d.ts", b"/state.tsbuildinfo"]
+        };
+        assert_eq!(names, expected);
+        let build_info = &output.files.last().unwrap().text;
+        let second = load(no_emit, Some(build_info));
+        assert!(second
+            .emit(&EmitOptions::default())
+            .unwrap()
+            .writes
+            .is_empty());
+        // Without a prior build the same inputs still need build-info output.
+        assert!(!load(no_emit, None)
+            .emit(&EmitOptions::default())
+            .unwrap()
+            .writes
+            .is_empty());
+    }
+}
+
 /// What `CheckedProgram::emit` produces for `session`'s program on a fresh
 /// pool: the result's skip flag and diagnostics, and its `EmittedFiles` with
 /// the bytes the callback received for each (every name is written once).

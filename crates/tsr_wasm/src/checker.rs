@@ -126,7 +126,7 @@ impl PreparedHost {
         let mut diagnostics = cli.errors;
         diagnostics.append(&mut config.errors);
         config.errors = diagnostics;
-        if config.options.incremental.is_true()
+        if config.options.is_incremental()
             || config.options.watch.is_true()
             || config.options.run_external_code.is_true()
             || config

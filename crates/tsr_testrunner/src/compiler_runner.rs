@@ -647,40 +647,49 @@ impl CompilerTest {
                 }
             }
         }
-        let repeat_result = match repeat.as_ref().map(Compilation::result).transpose() {
-            Ok(repeat_result) => repeat_result,
-            Err(failure) => return failure_outcome(&failure),
-        };
-        let repeat_outputs = repeat_result
-            .as_ref()
-            .map(|without_checking| RepeatOutputs {
-                js: without_checking.js.clone(),
-                dts: without_checking.dts.clone(),
-            });
+        let outcome = (|| {
+            let repeat_result = match repeat.as_ref().map(Compilation::result).transpose() {
+                Ok(repeat_result) => repeat_result,
+                Err(failure) => return failure_outcome(&failure),
+            };
+            let repeat_outputs = repeat_result
+                .as_ref()
+                .map(|without_checking| RepeatOutputs {
+                    js: without_checking.js.clone(),
+                    dts: without_checking.dts.clone(),
+                });
 
-        let composed = writers::js_emit_baseline(&JsEmitInput {
-            configured_name: self.configured_name().as_bytes(),
-            header: &header,
-            options,
-            full_emit_paths: harness.full_emit_paths,
-            harness_current_directory: &harness.current_directory,
-            to_be_compiled: &to_be_compiled,
-            other_files: &other_files,
-            result: &result,
-            declaration: declaration.as_ref(),
-            no_check_repeat: repeat_outputs.as_ref(),
-            json_errors: &JsonErrors,
-        });
-        let outcome = match composed {
-            Ok(composed) => baseline::run(
-                roots,
-                &composed.path,
-                &composed.actual,
-                self.baseline_options(),
+            let composed = writers::js_emit_baseline(&JsEmitInput {
+                configured_name: self.configured_name().as_bytes(),
+                header: &header,
+                options,
+                full_emit_paths: harness.full_emit_paths,
+                harness_current_directory: &harness.current_directory,
+                to_be_compiled: &to_be_compiled,
+                other_files: &other_files,
+                result: &result,
+                declaration: declaration.as_ref(),
+                no_check_repeat: repeat_outputs.as_ref(),
+                json_errors: &JsonErrors,
+            });
+            let outcome = match composed {
+                Ok(composed) => baseline::run(
+                    roots,
+                    &composed.path,
+                    &composed.actual,
+                    self.baseline_options(),
+                ),
+                Err(failure) => failure_outcome(&failure),
+            };
+            with_failures(outcome, &failed_checks)
+        })();
+        match repeat.map(Compilation::release).transpose() {
+            Ok(_) => outcome,
+            Err(error) => with_failures(
+                outcome,
+                &[format!("releasing the noCheck compilation failed: {error}")],
             ),
-            Err(failure) => failure_outcome(&failure),
-        };
-        with_failures(outcome, &failed_checks)
+        }
     }
 
     /// `compileDeclarationFiles`: `CompileFilesEx` over the context's
@@ -721,35 +730,48 @@ impl CompilerTest {
             .map_err(|error| {
                 Outcome::fail(format!("the declaration files did not compile: {error}"))
             })?;
-        let mut result = DeclarationCompilationResult {
-            decl_input_files: context.decl_input_files.clone(),
-            decl_other_files: context.decl_other_files.clone(),
-            diagnostics: compiled.diagnostics.len(),
-            error_baseline: Vec::new(),
-        };
-        let mut failed_checks = Vec::new();
-        if !compiled.diagnostics.is_empty() {
-            let files = writers::dts_file_error_inputs(ts_config_files, &result);
-            let inputs: Vec<errors::InputFile<'_>> = files
-                .iter()
-                .map(|file| errors::InputFile {
-                    name: file.unit_name,
-                    content: file.content,
-                })
-                .collect();
-            let rendered = errors::error_baseline(
-                compiled.diagnostic_sources(),
-                &inputs,
-                &compiled.diagnostics,
-                false, /*pretty*/
-            )
-            .map_err(|error| {
-                Outcome::fail(format!("the DtsFileErrors error baseline failed: {error}"))
-            })?;
-            result.error_baseline = rendered.text;
-            failed_checks = rendered.failed_checks;
+        let result = (|| {
+            let mut result = DeclarationCompilationResult {
+                decl_input_files: context.decl_input_files.clone(),
+                decl_other_files: context.decl_other_files.clone(),
+                diagnostics: compiled.diagnostics.len(),
+                error_baseline: Vec::new(),
+            };
+            let mut failed_checks = Vec::new();
+            if !compiled.diagnostics.is_empty() {
+                let files = writers::dts_file_error_inputs(ts_config_files, &result);
+                let inputs: Vec<errors::InputFile<'_>> = files
+                    .iter()
+                    .map(|file| errors::InputFile {
+                        name: file.unit_name,
+                        content: file.content,
+                    })
+                    .collect();
+                let rendered = errors::error_baseline(
+                    compiled.diagnostic_sources(),
+                    &inputs,
+                    &compiled.diagnostics,
+                    false, /*pretty*/
+                )
+                .map_err(|error| {
+                    Outcome::fail(format!("the DtsFileErrors error baseline failed: {error}"))
+                })?;
+                result.error_baseline = rendered.text;
+                failed_checks = rendered.failed_checks;
+            }
+            Ok((result, failed_checks))
+        })();
+        match compiled.release() {
+            Ok(()) => result,
+            Err(error) => {
+                let cleanup = format!("releasing the declaration compilation failed: {error}");
+                let outcome = match result {
+                    Ok((_, failures)) => with_failures(Outcome::Pass, &failures),
+                    Err(outcome) => outcome,
+                };
+                Err(with_failures(outcome, &[cleanup]))
+            }
         }
-        Ok((result, failed_checks))
     }
 
     /// The pin computes the header for `DoSourcemapBaseline`, which does not

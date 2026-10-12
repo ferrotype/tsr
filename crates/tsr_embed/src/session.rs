@@ -203,8 +203,9 @@ pub struct EmittedFile {
 impl Session {
     /// Load through the supplied host. The caller controls cache reuse and its
     /// lifetime. Its weak entries do not retain otherwise unreferenced files.
-    /// `incremental: true` uses the production incremental program and reads
-    /// existing build info from the host; emission can include build-info output.
+    /// `incremental: true` or `composite: true` uses the production incremental
+    /// program and reads existing build info from the host; emission can include
+    /// build-info output.
     pub fn load(
         options: ProgramOptions,
         cache: &mut FileCache,
@@ -255,7 +256,7 @@ impl Session {
         counters: &Counters,
     ) -> Result<Self, tsr_compiler::Error> {
         let session = Self::from_program(program, counters);
-        if session.program.options().incremental.is_true() {
+        if session.program.options().is_incremental() {
             let host: Arc<dyn CompilerHost> =
                 Arc::new(ProgramCompilerHost::new(session.program.clone()));
             let default_reader;

@@ -192,11 +192,29 @@ impl Drop for Client {
 }
 
 pub struct Session {
+    // The last client owner tears down the child. Dropping an unreleased
+    // followup must not perform a fallible RPC or kill a still-shared child.
     client: Arc<Mutex<Client>>,
     id: u64,
     sources: RestoredSources,
 }
 impl Session {
+    /// Release this compilation while retaining the consumer for its siblings.
+    /// Use the same deadline as compiler execution and report cleanup failures.
+    pub(crate) fn release(self) -> Result<(), String> {
+        let mut client = self
+            .client
+            .lock()
+            .map_err(|_| "compiler transport lock poisoned")?;
+        match client.request(
+            CompilerCommand::Release { id: self.id },
+            RESPONSE_TIMEOUT,
+            &mut |_| Err("unexpected release callback".into()),
+        )? {
+            CompilerReply::Released => Ok(()),
+            _ => Err("consumer returned a non-release reply".into()),
+        }
+    }
     pub fn observe(
         &self,
         files: &[Vec<u8>],
@@ -263,19 +281,6 @@ impl Session {
     }
     pub(crate) fn sources(&self) -> &RestoredSources {
         &self.sources
-    }
-}
-impl Drop for Session {
-    fn drop(&mut self) {
-        if let Ok(mut client) = self.client.lock() {
-            if !client.failed {
-                let _ = client.request(
-                    CompilerCommand::Release { id: self.id },
-                    Duration::from_millis(250),
-                    &mut |_| Err("unexpected release callback".into()),
-                );
-            }
-        }
     }
 }
 fn failure(error: String) -> CompileError {
@@ -928,6 +933,129 @@ for line in sys.stdin:
             .unwrap();
         assert_eq!(batches, 1);
     }
+
+    #[test]
+    fn delayed_followup_release_preserves_the_shared_consumer() {
+        let child = FakeChild::new(&COMPILER.replace(
+            "elif command['command']=='release': reply={'result':'released'}",
+            "elif command['command']=='release': time.sleep(0.4); reply={'result':'released'}",
+        ));
+        let testdata = crate::TestData {
+            root: std::path::PathBuf::from("/unused-fixture-path"),
+        };
+        let compiled = compile(inputs(), &testdata, &child.0).unwrap();
+        let repeated = compiled
+            .repeat(&std::collections::BTreeMap::default(), &testdata)
+            .unwrap();
+        repeated.release().unwrap();
+        compiled
+            .portable_session()
+            .unwrap()
+            .assertions(true, false)
+            .unwrap();
+        let repeated = compiled
+            .repeat(&std::collections::BTreeMap::default(), &testdata)
+            .unwrap();
+        // An early exit or unwind can abandon a followup. Its destructor must
+        // leave its siblings usable; the last client owner tears down the child.
+        drop(repeated);
+        compiled
+            .portable_session()
+            .unwrap()
+            .assertions(true, false)
+            .unwrap();
+    }
+
+    #[test]
+    fn followup_release_failure_is_returned_to_the_caller() {
+        let child = FakeChild::new(&COMPILER.replace(
+            "elif command['command']=='release': reply={'result':'released'}",
+            "elif command['command']=='release': reply={'result':'assertions','value':{'union_ordering':None,'parent_pointers':None}}",
+        ));
+        let testdata = crate::TestData {
+            root: std::path::PathBuf::from("/unused-fixture-path"),
+        };
+        let compiled = compile(inputs(), &testdata, &child.0).unwrap();
+        let repeated = compiled
+            .repeat(&std::collections::BTreeMap::default(), &testdata)
+            .unwrap();
+        assert_eq!(
+            repeated.release().unwrap_err(),
+            "consumer returned a non-release reply"
+        );
+    }
+
+    #[test]
+    fn followup_release_failures_are_visible_in_output_reports() {
+        let compiler = COMPILER
+            .replace(
+                "file['name']==list(b'/.src/entry.ts')",
+                "file['name']==command['input']['root_names'][0]",
+            )
+            .replace(
+                "'is_declaration_file':False",
+                "'is_declaration_file':source['name'][-5:]==list(b'.d.ts')",
+            )
+            .replace(
+                "elif command['command']=='release': reply={'result':'released'}",
+                "elif command['command']=='release': reply={'result':'assertions','value':{'union_ordering':None,'parent_pointers':None}}",
+            );
+        for declaration in [false, true] {
+            let child = FakeChild::new(&compiler);
+            let root = child.0.parent().unwrap();
+            let testdata = crate::TestData { root: root.into() };
+            let mut compiled = compile(inputs(), &testdata, &child.0).unwrap();
+            // Give the writer outputs so it reaches the requested followup.
+            // Compiler requests and release still use the real transport.
+            compiled
+                .recorded
+                .push((b"/.src/entry.js".to_vec(), b"controlled JS\n".to_vec()));
+            if declaration {
+                compiled.options.declaration = tsr_core::Tristate::TRUE;
+                compiled.recorded.push((
+                    b"/.src/entry.d.ts".to_vec(),
+                    b"export declare const answer: number;\n".to_vec(),
+                ));
+            }
+            let prepared = crate::compiler_runner::prepare(
+                crate::enumerate::Variant {
+                    suite: "compiler",
+                    file: root.join("entry.ts"),
+                    basename: "entry.ts".into(),
+                    test_name: "entry.ts".into(),
+                    configured_name: "entry.ts".into(),
+                    configuration: None,
+                },
+                b"// @filename: entry.ts\nconst = ;\n",
+            )
+            .unwrap();
+            let test = crate::compiler_runner::CompilerTest {
+                prepared,
+                result: compiled,
+            };
+            let mut report = crate::result::Report::default();
+            test.verify_javascript_output(
+                &crate::baseline::Roots::new(root.join("reference"), root.join("local")),
+                &testdata,
+                &mut report,
+            );
+            assert_eq!(report.lines.len(), 1);
+            assert_eq!(report.lines[0].state, crate::result::State::Fail);
+            assert!(
+                report.lines[0].reason.as_ref().unwrap().contains(&format!(
+                    "releasing the {} compilation failed: consumer returned a non-release reply",
+                    if declaration {
+                        "declaration"
+                    } else {
+                        "noCheck"
+                    },
+                )),
+                "{:?}",
+                report.lines
+            );
+        }
+    }
+
     #[test]
     fn malformed_program_observations_fail_closed() {
         for (needle, replacement) in [
