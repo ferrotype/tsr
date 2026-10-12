@@ -18,6 +18,34 @@ PROBE = None
 
 
 class Isolation(unittest.TestCase):
+    def test_native_watch_encoded_sources(self):
+        if PROBE is None:
+            self.skipTest('supply --probe for live encoded-source watch checks')
+        for encoding, bom in [('utf-8', b'\xef\xbb\xbf'),
+                              ('utf-16-le', b'\xff\xfe'), ('utf-16-be', b'\xfe\xff')]:
+            with self.subTest(encoding=encoding), tempfile.TemporaryDirectory(prefix='phase7-watch-encoding-') as temporary:
+                root = Path(temporary)
+                source = root / 'source'
+                shutil.copytree(HERE / 'fixtures/project', source)
+                path = source / 'index.ts'
+                original = bom + path.read_text().encode(encoding)
+                path.write_bytes(original)
+                output = root / 'capture'
+                result = subprocess.run(
+                    [sys.executable, str(HERE / 'run.py'), 'run', '--project', str(source),
+                     '--edit-file', 'index.ts', '--output', str(output), '--probe', str(PROBE),
+                     '--cycles', '4', '--warmup', '2', '--timeout', '30'],
+                    capture_output=True, text=True, timeout=180)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr +
+                                 '\n' + (output / 'compiler.log').read_text())
+                self.assertEqual(path.read_bytes(), original)
+                record = json.loads((output / 'watch.json').read_text())
+                self.assertEqual(record['status'], 'pass')
+                self.assertEqual(record['source_encoding'], encoding)
+                self.assertIn('testing-mode', record['memory_scope'])
+                copied = (output / 'project/index.ts').read_bytes()
+                self.assertEqual(copied, RUNNER.edited_source(original, 4))
+
     def test_external_link_refused_before_copy(self):
         with tempfile.TemporaryDirectory(prefix='phase7-watch-isolation-') as temporary:
             root = Path(temporary)

@@ -245,7 +245,7 @@ fn run() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     loop {
         match command(&mut input)?.as_str() {
             "cycle" => {
-                let expected = std::fs::read(&edited)?;
+                let expected = tsr_vfs::iovfs::decode_bytes(&std::fs::read(&edited)?);
                 let (old, before) = {
                     let current = observer.current.lock().expect("observation lock");
                     let current = current.as_ref().expect("compiler observation");

@@ -71,6 +71,8 @@ class S10Evidence(unittest.TestCase):
                         if isinstance(dependency, dict) and 'path' in dependency:
                             pending.append((path / dependency['path']).resolve())
             for source in path.rglob('*.rs'):
+                if 'target' in source.relative_to(path).parts:
+                    continue
                 self.assertIn(str(source.relative_to(corpus.ROOT)), set(captured))
 
     @staticmethod

@@ -16,7 +16,7 @@ import (
 
 func TestPhase7ComputedEntityDisplay(t *testing.T) {
 	source := "declare const key: unique symbol;\nclass Symbols { static readonly [key]: unique symbol; }\nconst value = Symbols[key];\n"
-	opts := &core.CompilerOptions{NoLib: core.TSTrue, Module: core.ModuleKindESNext, Target: core.ScriptTargetESNext}
+	opts := &core.CompilerOptions{NoLib: core.TSTrue, Strict: core.TSTrue, Module: core.ModuleKindESNext, Target: core.ScriptTargetESNext}
 	fs := vfstest.FromMap(map[string]string{"/p/main.ts": source}, true)
 	p := compiler.NewProgram(compiler.ProgramOptions{Host: compiler.NewCompilerHost("/p", fs, "/lib", nil, nil, nil), Config: &tsoptions.ParsedCommandLine{ParsedConfig: &tsoptions.ParsedOptions{FileNames: []string{"/p/main.ts"}, CompilerOptions: opts}}, SingleThreaded: core.TSTrue})
 	c, _ := checker.NewChecker(p, nil)

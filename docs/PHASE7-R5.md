@@ -38,7 +38,9 @@ The parser route reuses
 [Go wrapper](../tools/phase7/fuzz/parser_oracle/main.go). The wrapper observes
 the pinned parser and encoder: source metadata and hash, parse/JS/JSDoc
 diagnostics, both node-index traversals and lookup/cache identities, and every
-encoded byte. It implements only the named TS parse/index-before/encode/index-after
+encoded byte. The `--fuzz-related` adapter mode additionally reports recursive
+related diagnostics, including file names, spans, message keys, text and
+arguments. It implements only the named TS parse/index-before/encode/index-after
 schedule. Its [builder](../tools/phase7/fuzz/build_parser.py) exports and checks
 the current pin without editing `upstream/`; the old S06 builder's absent
 factory/codec adapters are not restored or needed.
@@ -56,7 +58,9 @@ directories outside Cargo output are:
 `cases.ndjson` retains the complete paired observations. The saved scanner pair
 and Rust parser are in `r5-protocol-current-build/`; the pinned parser executable
 and its build record are in `r5-parser-current-build/`, under the same dated
-archive root. These are bounded smoke results, not a full-corpus or enforced
+archive root. Those historical parser observations omitted related diagnostics.
+The corrected adapter mode is checked separately; it does not add coverage
+retroactively to that run. These are bounded smoke results, not a full-corpus or enforced
 macOS-memory-limit claim. The [commands](../tools/phase7/fuzz/README.md) rebuild
 both routes from source.
 
@@ -71,7 +75,10 @@ not claim scanner/parser-specific observations, broad module coverage or
 coverage-guided mutation.
 
 Complete stdout and stderr bytes are compared after case-root and CRLF
-normalization. Message bodies, related messages and order remain observable.
+normalization. New CLI runs explicitly select `--pretty true` so the pinned
+writer includes related diagnostics; ANSI formatting and source excerpts are
+compared too. The historical CLI smoke below used `--pretty false` and did not
+observe related diagnostics. Message bodies and order remain observable.
 All emitted paths and bytes must match exactly. Exit statuses are compared;
 crashes and timeouts are findings even if both compilers suffer them. The total
 per-case allowance is split equally across the two children; the run reserves
@@ -79,7 +86,9 @@ a complete pair before starting it. Process groups are killed on completion,
 including descendants. Linux enforces per-process address-space limits through
 `RLIMIT_AS`; this is not aggregate RSS enforcement. macOS memory enforcement
 is explicitly unsupported/informational. The smoke below therefore does not
-witness an enforced memory cap.
+witness an enforced memory cap. Launch and resource-limit setup failures are
+runner errors (exit 2), retained separately from compiler findings and never
+minimized. A runner failure during reduction preserves the original finding.
 
 Findings retain original and minimized files/options, complete normalized
 observations, raw output, emitted bytes and executable identities outside
@@ -390,8 +399,11 @@ The [live-watch probe](../tools/phase7/watch/README.md) uses the production
 command, compiler, OS filesystem, allocator and default native watcher. Its
 passive testing hooks retain the watcher and expose counters; a controlled
 scheduler calls `do_cycle` after actual native callbacks. This does not exercise
-the blocking CLI run loop, and enables the existing incremental testing data.
-Those limitations remain part of the result.
+the blocking CLI run loop. The hooks enable incremental testing mode, which
+stores full source text in file versions and retains the previous snapshot.
+The memory figures are therefore **testing-mode watch memory**, not ordinary
+CLI `--watch` memory. Those limitations remain part of the result; the tracked
+owner/storage plateau and teardown checks still observe their stated counters.
 
 Fifty equivalent edit/rebuild cycles pass on the canonical MUI docs workload,
 the largest frozen Phase 7 program by file count: **16,766 files**. The input
@@ -407,7 +419,7 @@ Numeric file descriptors remain at **four**, with zero difference between
 before-watch and after-close. This is macOS FSEvents: `lsof` counts numeric
 file descriptors, not Mach ports. Linux resource measurements remain pending.
 
-RSS after warmup rises from 5,015,142,400 to 5,033,656,320 bytes (about 18.5 MB),
+Testing-mode watch RSS after warmup rises from 5,015,142,400 to 5,033,656,320 bytes (about 18.5 MB),
 with a fitted slope of 360,631 bytes per cycle. RSS and allocator observations
 remain separate from the exact ownership gates; a retained process high-water
 mark is not a tracked-storage leak or a promise of zero RSS on close.
@@ -419,6 +431,51 @@ The separate fifty-cycle three-file control also passes. Release build,
 clippy with warnings denied, and the isolation controls pass, including a real
 watch config naming external emit/build-info locations; neither those locations
 nor the original fixture changes. Reproduction is in the probe README.
+
+The encoding correction preserves BOM-marked UTF-8/UTF-16 LE/BE during edits
+and compares decoded compiler text on both the controller and probe sides.
+New captures explicitly label their memory scope. The historical capture above
+is unchanged; its RSS is not reinterpreted as a production-mode measurement.
+The focused encoding controls pass, including four real FSEvents edit/rebuild
+cycles for each encoding and the existing output-isolation control. These use
+the tiny fixture and are correctness checks, not a new MUI resource capture.
+
+## Review corrections: fuzz observations and regression witnesses
+
+The CLI and parser fuzz routes now both observe the related missing-brace
+diagnostic for `function f() {\n`. Native and Rust match: the CLI includes the
+explanatory parser note, and the structured parser route reports related
+TS1007 with its filename, span and arguments. These focused observations and
+their executable identities are retained in
+`../ts-rust-benchmarks/2026-10-12/item9-fuzz-related/`. Prior captures keep their
+original arguments and coverage. Replay uses an archived adapter's explicit
+arguments; it does not add related-diagnostic coverage to old observations.
+
+Launch and limit-setup failures retain inputs and partial output in separate
+runner-error directories, stop with exit 2, and never enter minimization as
+compiler findings. A failure while minimizing keeps the original compiler
+finding. An explicitly classified compiler output-limit failure can reproduce
+exactly; unclassified historical execution errors remain execution failures.
+
+The public lifetime runner now executes each listed supporting service case
+in every mode and verifies its exact executed name and exit status. The
+concurrent first-use witnesses retain and compare the actual checker `Arc`s,
+so fixed session identities cannot hide duplicate checker construction. The
+configured wasm test compares whole file lists, the dependency-closure test
+excludes nested Cargo output, the computed-entity Go probe uses the same strict
+options as Rust, and project-reference expectations come directly from the
+native JSON fixture. Strict computed-entity regeneration reproduces the
+existing fixture byte for byte.
+
+The revised lifetime lane passes **16 main cases plus one supplemental-services
+case in each of debug, release, Miri and ASan**, 68 executions total. Sources
+remained stable and independent replay verification passes. Logs and the
+verified receipt are retained at
+`../ts-rust-benchmarks/2026-10-12/item11-lifetime/`.
+The 34 fuzz controls, 19 S10/lifetime controls, three watch-encoding controls,
+focused Rust integration/example tests, affected clippy checks, formatting and
+tracker validation also pass. No full corpus or performance measurement was
+rerun for these corrections.
 
 ## Continuation review
 

@@ -57,10 +57,16 @@ fn configured_check_and_emit_retain_owned_observations() {
             b"/project/out/main.d.ts".to_vec()
         ]
     );
-    for (write, file) in writes.iter().zip(convenience["files"].as_array().unwrap()) {
-        assert_eq!(write["name"], file["name"]);
-        assert_eq!(write["text"], file["text"]);
-    }
+    let observations = |files: &[Value]| {
+        files
+            .iter()
+            .map(|file| (file["name"].clone(), file["text"].clone()))
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(
+        observations(writes),
+        observations(convenience["files"].as_array().unwrap())
+    );
     drop(session);
     assert_eq!(serde_json::from_slice::<Value>(&owned).unwrap(), snapshot);
 }

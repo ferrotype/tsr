@@ -52,7 +52,10 @@ the narrow [`parser_oracle/main.go`](parser_oracle/main.go) Go wrapper. It calls
 the pinned parser and encoder directly, comparing parse/JS/JSDoc diagnostics,
 source metadata, node-index order and lookup/cache observations, and encoded
 source bytes. Its fixed schedule is parse, index-before, encode, index-after
-for `/s06/fixture.ts` in TS mode. It uses the same input/output limits and
+for `/s06/fixture.ts` in TS mode. The explicit `--fuzz-related` adapter flag extends diagnostic
+records with file names and recursively ordered related diagnostics (including
+message keys, text, arguments and spans); these fields are validated and compared
+exactly. Ordinary S06 request records remain unchanged. It uses the same input/output limits and
 manifested replay as the scanner. No factory/codec test cases are claimed.
 
 ```sh
@@ -84,7 +87,9 @@ limits can stop that sequence early.
 
 Each pair uses new temporary compiler directories with identical input bytes
 and CLI arguments. Complete stdout/stderr bytes are compared after replacing
-only the temporary case-root path and CRLF line endings. Message text, related
+only the temporary case-root path and CRLF line endings. The named CLI schedule
+uses `--pretty true`: the pinned plain writer omits related information. ANSI
+formatting and source excerpts are also compared exactly. Message text, related
 messages, ordering, and non-diagnostic output remain part of the comparison.
 Every emitted relative path and file byte digest must match exactly; missing
 outputs fail. Exit statuses are compared; signals, unexpected statuses outside
@@ -97,7 +102,13 @@ lingering descendants. The implementation requires POSIX. Linux enforces a
 per-process `RLIMIT_AS` address-space limit inherited by descendants; this is
 not an aggregate RSS limit. macOS memory enforcement is explicitly unsupported
 and reported as informational in stdout and `run.json`; it is never described
-as an enforced memory limit. Failed limit setup is a runner error. No peak-RSS
+as an enforced memory limit. Launch and limit-setup failures stop the run as runner errors (exit 2), retained
+in `cases.ndjson`, `run.json` and diagnostic `runner-error-*` directories, with no finding archive or minimization. A
+runner error during minimization stops reduction and keeps the original compiler
+finding. Compiler timeouts, crashes, protocol failures and output-limit failures
+remain findings. Output-limit findings carry an explicit compiler-failure marker;
+replay can reproduce that class with identical retained bytes and limit message.
+Legacy unclassified execution errors remain refused as reproductions. No peak-RSS
 or coverage measurement is claimed. The budget controls compiler/minimizer work;
 startup, hashing, process cleanup and writing retained artifacts add overhead.
 

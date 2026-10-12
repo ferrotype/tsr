@@ -75,8 +75,8 @@ def verify(case, candidate_rust=None):
         if manifest.get('protocol_limits') != metadata.get('protocol_limits') or manifest.get('protocol_limits') != protocol.LIMITS:
             raise ValueError('saved protocol limits differ from the named target')
         protocol.validate_input(target, {name: (case / name).read_bytes() for name in manifest['inputs']})
-        if manifest['arguments']:
-            raise ValueError('named protocol target takes no executable arguments')
+        if manifest['arguments'] not in ([], protocol.arguments_for(target)):
+            raise ValueError('unexpected named protocol target arguments')
     for field in ('arguments', 'binaries', 'case_seconds', 'pin'):
         if manifest[field] != metadata[field]:
             raise ValueError(f'case manifest {field} differs from run.json')
@@ -125,20 +125,23 @@ def verify(case, candidate_rust=None):
     return metadata, manifest, binaries, saved
 
 
-OBSERVATION_FIELDS = ('exit', 'timeout', 'stdout_hex', 'stderr_hex', 'emitted')
+OBSERVATION_FIELDS = ('exit', 'timeout', 'stdout_hex', 'stderr_hex', 'emitted',
+                      'execution_error', 'runner_error', 'compiler_failure')
 
 
 def observation_differences(saved, current):
     """Name changed observations; both archived and current bytes stay saved."""
     return {runtime: [field for field in OBSERVATION_FIELDS
-                      if current.observations[runtime][field] != saved['observations'][runtime][field]]
+                      if current.observations[runtime].get(field) != saved['observations'][runtime].get(field)]
             for runtime in ('go', 'rust')
-            if any(current.observations[runtime][field] != saved['observations'][runtime][field]
+            if any(current.observations[runtime].get(field) != saved['observations'][runtime].get(field)
                    for field in OBSERVATION_FIELDS)}
 
 
 def classify(saved, current):
-    if any(item.get('execution_error') for item in current.observations.values()):
+    if any(item.get('runner_error') or (item.get('execution_error')
+            and item.get('compiler_failure') != 'output-limit')
+           for item in current.observations.values()):
         return 'execution-failure'
     if not current.failures:
         return 'resolved'

@@ -260,12 +260,13 @@ fn concurrent_first_queries_share_a_checker_identity() {
             .map(|_| {
                 scope.spawn(|| {
                     barrier.wait();
-                    session.operation().unwrap().owner().identity().id()
+                    Arc::clone(session.checker().unwrap())
                 })
             })
             .collect();
         let ids: Vec<_> = handles.into_iter().map(|h| h.join().unwrap()).collect();
-        assert!(ids.iter().all(|id| *id == ids[0]));
+        assert!(ids.iter().all(|owner| Arc::ptr_eq(owner, &ids[0])));
+        assert!(Arc::ptr_eq(session.checker().unwrap(), &ids[0]));
     });
     drop(session);
     assert_eq!(counters.snapshot(), Counts::default());

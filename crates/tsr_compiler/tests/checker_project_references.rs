@@ -294,34 +294,25 @@ fn a_referenced_output_is_named_by_its_source() {
 
 #[test]
 fn an_importer_that_is_a_referenced_output_orders_paths_from_its_source() {
-    // Native answers `() => import("./a").Foo` for b.d.ts: the pin sorts the
-    // module's paths from the importer's source directory (ref/src), so the
-    // import "./a" is reused before "../out/a". Specifier computation itself
-    // retains the output's imports, options and default resolution mode.
-    let (owner, program) = load(&[
-        (b"/p/tsconfig.json", ROOT_CONFIG),
-        (b"/p/ref/tsconfig.json", REF_CONFIG),
-        (b"/p/ref/src/a.ts", A_SOURCE),
-        (b"/p/ref/out/a.d.ts", A_OUTPUT),
-        (
-            b"/p/ref/src/b.ts",
-            b"import { make } from \"./a\";\nimport {} from \"../out/a\";\nexport const w = make;\n",
-        ),
-        (
-            b"/p/ref/out/b.d.ts",
-            b"import { make } from \"./a\";\nimport {} from \"../out/a\";\nexport declare const w: typeof make;\n",
-        ),
-        (
-            b"/p/main.ts",
-            b"import { w } from \"./ref/src/b\";\nexport const v = w;\n",
-        ),
-    ]);
-    assert_eq!(
-        display(&owner, &program, b"/p/main.ts", 1).unwrap(),
-        "() => import(\"./ref/src/a\").Foo"
-    );
-    assert_eq!(
-        display(&owner, &program, b"/p/ref/out/b.d.ts", 2).unwrap(),
-        "() => import(\"./a\").Foo"
-    );
+    let native: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/project_reference_native.json")).unwrap();
+    let files: Vec<_> = native["files"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(name, text)| (name.as_bytes(), text.as_str().unwrap().as_bytes()))
+        .collect();
+    let (owner, program) = load(&files);
+    for query in native["queries"].as_array().unwrap() {
+        assert_eq!(
+            display(
+                &owner,
+                &program,
+                query["file"].as_str().unwrap().as_bytes(),
+                usize::try_from(query["statement"].as_u64().unwrap()).unwrap()
+            )
+            .unwrap(),
+            query["display"].as_str().unwrap()
+        );
+    }
 }

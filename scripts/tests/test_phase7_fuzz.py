@@ -28,7 +28,7 @@ if mode in ('switch', 'alternating'):
 root = pathlib.Path.cwd()
 if pathlib.Path(BANNER_FILE).exists():
     print(pathlib.Path(BANNER_FILE).read_text())
-assert sys.argv[1:] == ['--project', 'tsconfig.json', '--pretty', 'false', '--checkers', '1']
+assert sys.argv[1:] == ['--project', 'tsconfig.json', '--pretty', 'true', '--checkers', '1']
 source = (root / 'main.ts').read_bytes()
 config = json.loads((root / 'tsconfig.json').read_text())
 assert config['compilerOptions']['noEmitOnError'] is False
@@ -45,6 +45,10 @@ if mode == 'crash':
 if mode == 'diagnostic' or (mode == 'conditional' and b'TRIGGER' in source):
     print(str(root / 'main.ts') + '(1,1): error TS2322: Changed diagnostic.')
     print('  The complete related message is preserved.')
+    sys.exit(2)
+if mode in ('related-a', 'related-b'):
+    print('main.ts(1,1): error TS1: Same primary diagnostic.')
+    print('Related diagnostic ' + mode)
     sys.exit(2)
 if mode == 'stderr':
     print('unexpected compiler warning', file=sys.stderr)
@@ -98,6 +102,7 @@ class DifferentialControls(unittest.TestCase):
         self.assertIn('stdout_hex', result.failures)
         self.assertIn(b'The complete related message', bytes.fromhex(result.observations['rust']['stdout_hex']))
         self.assertIn('stderr_hex', self.pair('stderr').failures)
+        self.assertEqual(self.pair('related-a', go_mode='related-b').failures, ['stdout_hex'])
         # Absolute per-case directories and CRLF may differ; all messages remain.
         self.assertEqual(self.pair('path', go_mode='path').failures, [])
 
@@ -125,6 +130,54 @@ class DifferentialControls(unittest.TestCase):
         self.assertTrue(heartbeat)
         time.sleep(0.15)
         self.assertEqual(self.heartbeat_file.read_bytes(), heartbeat)
+
+    def test_launch_and_limit_setup_errors_are_runner_errors_without_findings(self):
+        source = self.root / 'input.ts'
+        source.write_bytes(b'let x = 1;')
+        go = self.executable('go', 'same')
+        rust = self.root / 'rust'
+        rust.write_text('#!/does/not/exist\n')
+        rust.chmod(0o755)
+        for target in ('cli', 'scanner', 'parser'):
+            output = self.root / ('launch-' + target)
+            status = fuzz.main(['--rust', str(rust), '--go', str(go), '--target', target,
+                                '--output', str(output), '--replay', str(source),
+                                '--budget-seconds', '20', '--case-seconds', '6'])
+            self.assertEqual(status, 2)
+            metadata = json.loads((output / 'run.json').read_text())
+            self.assertEqual(metadata['stop_reason'], 'runner-error')
+            self.assertEqual(metadata['executions'], 0)
+            self.assertEqual(metadata['failures'], [])
+            self.assertEqual(list(output.glob('failure-*')), [])
+            self.assertIn('FileNotFoundError', metadata['runner_errors'][0]['errors']['rust'])
+        rust = self.executable('rust', 'same')
+        with mock.patch.object(fuzz, '_child_limits', side_effect=OSError('limit setup refused')):
+            result = fuzz.compare_case(source.read_bytes(), {'go': go, 'rust': rust}, 6,
+                                       {**self.memory, 'enforced': True})
+        self.assertEqual(set(fuzz.runner_errors(result)), {'go', 'rust'})
+        with self.assertRaisesRegex(ValueError, 'cannot be minimized'):
+            fuzz.minimize(source.read_bytes(), result, lambda _: result, 2, time.monotonic() + 5)
+
+    def test_minimization_runner_failure_keeps_original_finding_and_raw_error(self):
+        binaries = {'go': self.executable('go', 'same'), 'rust': self.executable('rust', 'missing')}
+        source = self.root / 'input.ts'
+        source.write_bytes(b'TRIGGER padding')
+        original = fuzz.compare_case(source.read_bytes(), binaries, 6, self.memory)
+        failed = fuzz.Pair({'go': {'exit': None, 'timeout': False, 'runner_error': 'setup failed',
+                                   'execution_error': 'setup failed'}},
+                           {'go': {'stdout': b'raw', 'stderr': b'error', 'emitted': {}}},
+                           ['go-execution-failure'])
+        output = self.root / 'minimizer-error'
+        with mock.patch.object(fuzz, 'compare_case', side_effect=[original, failed]):
+            status = fuzz.main(['--rust', str(binaries['rust']), '--go', str(binaries['go']),
+                                '--output', str(output), '--replay', str(source), '--minimize-trials', '2'])
+        self.assertEqual(status, 2)
+        metadata = json.loads((output / 'run.json').read_text())
+        self.assertEqual((metadata['executions'], len(metadata['failures']), metadata['minimize_executions']), (1, 1, 1))
+        self.assertEqual(set(metadata['failures'][0]['manifests']), {'original'})
+        self.assertTrue((output / 'failure-000000/original/manifest.json').is_file())
+        self.assertFalse((output / 'failure-000000/minimized').exists())
+        self.assertEqual((output / 'runner-error-minimization/go/stdout').read_bytes(), b'raw')
 
     def test_minimizer_retains_a_reproducing_trigger(self):
         binaries = {'go': self.executable('tsgo', 'same'),
@@ -446,6 +499,10 @@ class ScannerControls(unittest.TestCase):
         self.assertIn('rust-execution-failure', result.failures)
         self.assertLessEqual(len(result.artifacts['rust']['stdout']), 1024)
         self.assertIn('retained prefix', result.observations['rust']['execution_error'])
+        saved = {'failures': result.failures, 'observations': result.observations}
+        self.assertEqual(replay.classify(saved, result), 'reproduced')
+        result.observations['rust'].pop('compiler_failure')
+        self.assertEqual(replay.classify(saved, result), 'execution-failure')
 
     def test_scanner_archive_replay_retains_manifest_request_and_original(self):
         source = self.root / 'source.ts'
@@ -489,7 +546,7 @@ class ScannerControls(unittest.TestCase):
 PARSER_FAKE = r"""
 import json, pathlib, sys
 mode = MODE
-assert sys.argv[1:] == []
+assert sys.argv[1:] == ['--fuzz-related']
 raw = sys.stdin.buffer.read()
 root = pathlib.Path.cwd()
 assert raw == (root / 'request.ndjson').read_bytes()
@@ -522,7 +579,10 @@ else:
     observe('parse', 'diagnostic', {'collection': 'parse', 'index': 0, 'code': 1127,
             'category': 1, 'pos': 0, 'end': 1, 'key_hex': b'Invalid_character'.hex(),
             'text_hex': (b'changed diagnostic' if mode == 'diagnostic' else b'').hex(),
-            'args_hex': [b'\xff'.hex()]})
+            'args_hex': [b'\xff'.hex()], 'file_hex': None, 'related': [
+                {'code': 1005, 'category': 1, 'pos': 0, 'end': 0, 'file_hex': None,
+                 'key_hex': '61', 'text_hex': '62' if mode == 'related' else '61',
+                 'args_hex': [], 'related': False if mode == 'malformed-related' else []}]})
     if mode != 'missing-stage':
         finish('parse')
     for stage in ('node_index_before', 'encode_source_file', 'node_index_after'):
@@ -584,14 +644,14 @@ class ParserControls(unittest.TestCase):
                          {'offset': 0, 'hex': '41'})
 
     def test_parser_diagnostic_index_and_encoded_byte_changes_are_findings(self):
-        for mode in ('diagnostic', 'index', 'encoded'):
+        for mode in ('diagnostic', 'related', 'index', 'encoded'):
             with self.subTest(mode=mode):
                 result = self.pair(mode)
                 self.assertEqual(result.failures, ['stdout_hex'])
                 self.assertNotEqual(result.artifacts['go']['stdout'], result.artifacts['rust']['stdout'])
 
     def test_identical_missing_or_truncated_parser_frames_cannot_pass(self):
-        for mode in ('missing-end', 'missing-stage', 'missing-node', 'missing-chunk', 'truncated', 'trailing'):
+        for mode in ('missing-end', 'missing-stage', 'missing-node', 'missing-chunk', 'truncated', 'trailing', 'malformed-related'):
             with self.subTest(mode=mode):
                 result = self.pair(mode, go_mode=mode)
                 self.assertEqual(result.failures, ['go-protocol-failure', 'rust-protocol-failure'])
@@ -617,7 +677,7 @@ class ParserControls(unittest.TestCase):
         metadata, manifest, _, _ = replay.verify(case)
         self.assertEqual(manifest['target'], 'parser')
         self.assertEqual(manifest['inputs'], ['main.ts', 'request.ndjson'])
-        self.assertEqual(manifest['arguments'], [])
+        self.assertEqual(manifest['arguments'], ['--fuzz-related'])
         self.assertEqual(metadata['protocol_limits'], protocol.LIMITS)
         before = fuzz.tree_files(archive)
         status, report, output = self.replay(case)

@@ -10,6 +10,34 @@ import subprocess
 import sys
 import time
 
+
+def source_encoding(raw):
+    if raw.startswith(b'\xff\xfe'):
+        return 'utf-16-le'
+    if raw.startswith(b'\xfe\xff'):
+        return 'utf-16-be'
+    return 'utf-8'
+
+
+def compiler_text(raw):
+    """Pinned file decoding: preserve raw UTF-8, replace invalid UTF-16 units."""
+    encoding = source_encoding(raw)
+    if encoding != 'utf-8':
+        # The pin ignores an incomplete final UTF-16 unit.
+        units = raw[2:len(raw) - (len(raw) % 2)]
+        return units.decode(encoding, errors='replace').encode('utf-8')
+    return raw[3:] if raw.startswith(b'\xef\xbb\xbf') else raw
+
+
+def edited_source(original, generation):
+    """Keep the original byte encoding and any ignored trailing UTF-16 byte."""
+    encoding = source_encoding(original)
+    suffix = f'\n// phase7-watch-equivalent-edit: {generation:08d}\n'.encode(encoding)
+    if encoding != 'utf-8' and len(original) % 2:
+        return original[:-1] + suffix + original[-1:]
+    return original + suffix
+
+
 def digest(path):
     result = hashlib.sha256()
     with path.open('rb') as source:
@@ -160,9 +188,9 @@ def capture(args):
     edit.chmod(edit.stat().st_mode | 0o200)
 
     def apply(generation):
-        text = original + f'\n// phase7-watch-equivalent-edit: {generation:08d}\n'.encode()
+        text = edited_source(original, generation)
         edit.write_bytes(text)
-        return hashlib.sha256(text).hexdigest()
+        return hashlib.sha256(compiler_text(text)).hexdigest()
 
     metadata = {'schema': 1, 'status': 'prepared', 'original_project': str(project),
                 'isolated_project': str(copied), 'config': str(config_relative),
@@ -171,11 +199,14 @@ def capture(args):
                 'descriptor_plateau_slack': args.descriptor_slack,
                 'copy_mode': args.copy_mode,
                 'expected_program_files': args.expected_program_files,
+                'source_encoding': source_encoding(original),
+                'source_observation': 'decoded compiler text bytes',
                 'scope': 'production command/compiler/OsSystem/native backend; controlled cycle scheduler via passive testing hooks',
+                'memory_scope': 'testing-mode watch; full-text versions and previous snapshot retained by compiler testing hooks',
                 'source_inventory': before, 'samples': [],
                 'rss_is_not_a_leak_or_teardown_gate': True}
     (output / 'prepared.json').write_text(json.dumps(metadata, indent=2) + '\n')
-    apply(0)
+    initial_source_hash = apply(0)
     if args.action == 'prepare':
         print(output / 'prepared.json')
         return 0
@@ -193,7 +224,7 @@ def capture(args):
             ready = reports.next('ready')
             if ready.get('native_error'):
                 raise ValueError(f'native backend error: {ready["native_error"]}')
-            if ready['source_sha256'] != digest(edit) or ready['program_files'] == 0:
+            if ready['source_sha256'] != initial_source_hash or ready['program_files'] == 0:
                 raise ValueError('initial actual compiler source observation differs')
             if args.expected_program_files is not None and ready['program_files'] != args.expected_program_files:
                 raise ValueError(f'expected {args.expected_program_files} program files, observed {ready["program_files"]}')

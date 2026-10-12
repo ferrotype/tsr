@@ -71,6 +71,10 @@ def manifest(root=ROOT):
         missing = sorted(set(actual) - set(cases))
         stale = sorted(set(cases) - set(actual))
         raise ValueError(f'lifetime inventory differs from source; missing: {missing}; stale: {stale}')
+    for target, supporting in value.get('supporting_cases', {}).items():
+        actual = source_cases(root, dict(value, test=target))
+        if not supporting or supporting != sorted(set(supporting)) or not set(supporting) <= set(actual):
+            raise ValueError('invalid supporting lifetime inventory: ' + target)
     return value
 
 
@@ -121,6 +125,18 @@ def capture(directory):
         with path.open('wb') as log:
             result = subprocess.run(command, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
         outcomes[mode] = {'command': command, 'exit_code': result.returncode, 'log_sha256': file_digest(path)}
+        supporting = {}
+        for target, cases in spec.get('supporting_cases', {}).items():
+            supporting[target] = {}
+            for case in cases:
+                command = [*prefix, '--locked', '--manifest-path', spec['consumer'], '--test', target,
+                           *options, '--', case, '--exact', '--test-threads=1']
+                path = directory / (mode + '.' + target + '.' + case + '.log')
+                with path.open('wb') as log:
+                    result = subprocess.run(command, cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT)
+                supporting[target][case] = {'command': command, 'exit_code': result.returncode,
+                                            'log_sha256': file_digest(path)}
+        outcomes[mode]['supporting'] = supporting
         p4.atomic(directory / 'progress.json', outcomes)
     record = {'version': 1, 'sources': before, 'source_stable': before == sources(), 'rustc': rustc,
               'nightly': nightly, 'host': host, 'spec': spec, 'modes': outcomes}
@@ -144,6 +160,20 @@ def verify(directory):
         try:
             validate_output(path.read_bytes(), spec['cases'], mode)
             outcomes[mode] = row['exit_code'] == 0
+            supporting = row.get('supporting', {})
+            if set(supporting) != set(spec.get('supporting_cases', {})):
+                raise ValueError('incomplete supporting target inventory')
+            for target, cases in spec.get('supporting_cases', {}).items():
+                if set(supporting[target]) != set(cases):
+                    raise ValueError('incomplete supporting case inventory')
+                for case in cases:
+                    receipt = supporting[target][case]
+                    log = directory / (mode + '.' + target + '.' + case + '.log')
+                    if file_digest(log) != receipt['log_sha256']:
+                        raise ValueError('supporting ownership log changed')
+                    validate_named_output(log.read_bytes(), [case], mode,
+                                          scope='external embedding supporting consumer')
+                    outcomes[mode] &= receipt['exit_code'] == 0
         except ValueError:
             outcomes[mode] = False
     return {'metrics': {'lifetime_checks': all(outcomes.values())}, 'modes': outcomes,

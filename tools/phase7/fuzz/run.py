@@ -34,7 +34,7 @@ interface Boolean {} interface Function {} interface CallableFunction {}
 interface NewableFunction {} interface IArguments {} interface Number {}
 interface Object {} interface RegExp {} interface String {}
 '''
-ARGS = ['--project', 'tsconfig.json', '--pretty', 'false', '--checkers', '1']
+ARGS = ['--project', 'tsconfig.json', '--pretty', 'true', '--checkers', '1']
 
 
 @dataclass
@@ -87,6 +87,7 @@ def run_child(binary, cwd, timeout, memory, arguments=None, *, stdin_bytes=None,
                                      if memory['enforced'] or max_output_bytes is not None else None)
         except (OSError, subprocess.SubprocessError) as error:
             return {'exit': None, 'timeout': False, 'wall_seconds': time.monotonic() - started,
+                    'runner_error': f'{type(error).__name__}: {error}',
                     'execution_error': f'{type(error).__name__}: {error}'}, b'', b''
         timed_out = False
         try:
@@ -103,6 +104,7 @@ def run_child(binary, cwd, timeout, memory, arguments=None, *, stdin_bytes=None,
         channels = [stream.read() if max_output_bytes is None else stream.read(max_output_bytes + 1)
                     for stream in (stdout, stderr)]
         if max_output_bytes is not None and any(len(data) > max_output_bytes for data in channels):
+            result['compiler_failure'] = 'output-limit'
             result['execution_error'] = f'captured channel exceeds {max_output_bytes} bytes; retained prefix only'
             channels = [data[:max_output_bytes] for data in channels]
         return result, *channels
@@ -187,6 +189,17 @@ def mutate(source, rng):
     return source[:start] + rng.choice([b'', b'\xff', b'\n', b'"', b'/*', b'}', b'\x00']) + source[end:]
 
 
+class RunnerError(RuntimeError):
+    def __init__(self, source, result, trials):
+        self.source, self.result, self.trials = source, result, trials
+        super().__init__('runner failure during minimization: ' + json.dumps(runner_errors(result)))
+
+
+def runner_errors(result):
+    return {runtime: item['runner_error'] for runtime, item in result.observations.items()
+            if item.get('runner_error')}
+
+
 def failure_signature(result):
     return (result.failures, [(item['exit'], item['timeout'], item.get('execution_error'))
                               for item in result.observations.values()])
@@ -198,6 +211,8 @@ def minimize(source, original, evaluate, max_trials, deadline):
     Every accepted candidate has been compiled by both children. The original
     result remains saved even if the limit prevents further reduction.
     """
+    if runner_errors(original):
+        raise ValueError('runner errors cannot be minimized as compiler findings')
     best, result, trials, chunks = source, original, 0, 2
     while best and trials < max_trials and time.monotonic() < deadline:
         width = max(1, math.ceil(len(best) / chunks))
@@ -211,6 +226,8 @@ def minimize(source, original, evaluate, max_trials, deadline):
             except TimeoutError:
                 return best, result, trials
             trials += 1
+            if runner_errors(observed):
+                raise RunnerError(candidate, observed, trials)
             if failure_signature(observed) == failure_signature(original):
                 best, result, reduced = candidate, observed, True
                 chunks = max(2, chunks - 1)
@@ -297,12 +314,12 @@ def main(argv=None):
         from tools.phase7.fuzz import protocol
     metadata = {'schema': 1, 'seed': args.seed, 'iterations_requested': args.iterations,
                 'budget_seconds': args.budget_seconds, 'case_seconds': args.case_seconds,
-                'target': args.target, 'arguments': ARGS if protocol is None else [],
+                'target': args.target, 'arguments': ARGS if protocol is None else protocol.arguments_for(args.target),
                 'binaries': {key: identity(path) for key, path in binaries.items()},
                 'pin': json.loads((ROOT / 'data/upstream.json').read_text())['pin'],
                 'memory': memory, 'coverage': 'not collected (blind byte/token mutation)',
                 'corpus': [{'path': name, 'sha256': sha256(data)} for name, data in corpus],
-                'executions': 0, 'failures': [], 'minimize_executions': 0, 'stop_reason': 'iterations'}
+                'executions': 0, 'failures': [], 'runner_errors': [], 'minimize_executions': 0, 'stop_reason': 'iterations'}
     if protocol is not None:
         metadata['protocol_limits'] = protocol.LIMITS
         if args.replay and args.replay.stat().st_size > protocol.MAX_SOURCE:
@@ -335,34 +352,46 @@ def main(argv=None):
                 except TimeoutError:
                     metadata['stop_reason'] = 'budget'
                     break
-                metadata['executions'] += 1
                 row = {'index': index, 'origin': origin, 'input_sha256': sha256(source),
                        'failures': result.failures, 'observations': result.observations}
                 log.write(json.dumps(row) + '\n')
                 log.flush()
+                if runner_errors(result):
+                    save_case(output / f'runner-error-{index:06d}', source, result, files=files_for(source))
+                    metadata['runner_errors'].append({'index': index, 'errors': runner_errors(result)})
+                    metadata['stop_reason'] = 'runner-error'
+                    break
+                metadata['executions'] += 1
                 if result.failures:
                     finding = output / f'failure-{index:06d}'
                     original_manifest = save_case(finding / 'original', source, result,
                                                   files=files_for(source), context=metadata)
+                    entry = {'index': index, 'directory': finding.name, 'failures': result.failures,
+                             'minimize_trials': 0, 'manifests': {'original': original_manifest}}
+                    metadata['failures'].append(entry)
                     minimal, reduced, trials = minimize(source, result, evaluate,
                                                         args.minimize_trials, deadline)
                     minimized_manifest = save_case(finding / 'minimized', minimal, reduced,
                                                    files=files_for(minimal), context=metadata)
                     metadata['minimize_executions'] += trials
-                    metadata['failures'].append({'index': index, 'directory': finding.name,
-                                                 'failures': result.failures, 'minimize_trials': trials,
-                                                 'manifests': {'original': original_manifest,
-                                                               'minimized': minimized_manifest}})
+                    entry['minimize_trials'] = trials
+                    entry['manifests']['minimized'] = minimized_manifest
                     if len(metadata['failures']) >= args.max_failures:
                         metadata['stop_reason'] = 'max-failures'
                         break
+    except RunnerError as error:
+        save_case(output / 'runner-error-minimization', error.source, error.result, files=files_for(error.source))
+        metadata['minimize_executions'] += error.trials
+        metadata['runner_errors'].append({'error': str(error)})
+        metadata['stop_reason'] = 'runner-error'
     finally:
         metadata['wall_seconds'] = time.monotonic() - started
         metadata['budget_exhausted'] = time.monotonic() >= deadline
         (output / 'run.json').write_text(json.dumps(metadata, indent=2) + '\n')
     print(json.dumps({'executions': metadata['executions'], 'failures': len(metadata['failures']),
+                      'runner_errors': len(metadata['runner_errors']),
                       'output': str(output), 'memory': memory}))
-    return 1 if metadata['failures'] else (0 if metadata['executions'] else 2)
+    return 2 if metadata['runner_errors'] else 1 if metadata['failures'] else (0 if metadata['executions'] else 2)
 
 
 if __name__ == '__main__':

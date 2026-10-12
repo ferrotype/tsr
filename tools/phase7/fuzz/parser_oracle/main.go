@@ -147,6 +147,24 @@ func (s *session) table(stage string, table *encoder.NodeIndexTable) {
 	s.observe(stage, "absent_lookup", object{"index": table.GetIndex(absent)})
 }
 
+func diagnosticValue(d *ast.Diagnostic) object {
+	args := make([]string, len(d.MessageArgs()))
+	for i, arg := range d.MessageArgs() {
+		args[i] = hex.EncodeToString([]byte(arg))
+	}
+	related := make([]object, len(d.RelatedInformation()))
+	for i, item := range d.RelatedInformation() {
+		related[i] = diagnosticValue(item)
+	}
+	var file any
+	if d.File() != nil {
+		file = hex.EncodeToString([]byte(d.File().FileName()))
+	}
+	return object{"code": d.Code(), "category": d.Category(), "pos": d.Pos(), "end": d.End(),
+		"file_hex": file, "key_hex": hex.EncodeToString([]byte(d.MessageKey())),
+		"text_hex": hex.EncodeToString([]byte(d.MessageText())), "args_hex": args, "related": related}
+}
+
 func execute(s *session, r request, source []byte) {
 	var file *ast.SourceFile
 	if !s.stage("parse", func() error {
@@ -164,13 +182,9 @@ func execute(s *session, r request, source []byte) {
 			items []*ast.Diagnostic
 		}{{"parse", file.Diagnostics()}, {"js", file.JSDiagnostics()}, {"jsdoc", file.JSDocDiagnostics()}} {
 			for index, diagnostic := range collection.items {
-				args := make([]string, len(diagnostic.MessageArgs()))
-				for index, arg := range diagnostic.MessageArgs() {
-					args[index] = hex.EncodeToString([]byte(arg))
-				}
-				s.observe("parse", "diagnostic", object{"collection": collection.name, "index": index,
-					"code": diagnostic.Code(), "category": diagnostic.Category(), "pos": diagnostic.Pos(), "end": diagnostic.End(),
-					"key_hex": hex.EncodeToString([]byte(diagnostic.MessageKey())), "text_hex": hex.EncodeToString([]byte(diagnostic.MessageText())), "args_hex": args})
+				value := diagnosticValue(diagnostic)
+				value["collection"], value["index"] = collection.name, index
+				s.observe("parse", "diagnostic", value)
 			}
 		}
 		return nil
@@ -213,6 +227,9 @@ func execute(s *session, r request, source []byte) {
 }
 
 func run() error {
+	if !slices.Equal(os.Args[1:], []string{"--fuzz-related"}) {
+		return fmt.Errorf("expected --fuzz-related")
+	}
 	input := bufio.NewReaderSize(os.Stdin, 32768)
 	raw, err := input.ReadSlice('\n')
 	if err != nil || len(raw) > 16384 {

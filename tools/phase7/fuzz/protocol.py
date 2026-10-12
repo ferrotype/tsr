@@ -5,6 +5,7 @@ fallback occurs here. The entire validated ordered stream is compared exactly.
 """
 from __future__ import annotations
 
+import copy
 import io
 import math
 from pathlib import Path
@@ -52,7 +53,32 @@ def validate_input(target, files):
     return request
 
 
-def validate_output(target, request, data, runtime):
+def validate_diagnostic(value, *, top=False):
+    fields = {'code', 'category', 'pos', 'end', 'file_hex', 'key_hex', 'text_hex', 'args_hex', 'related'}
+    if top:
+        fields |= {'collection', 'index'}
+    if type(value) is not dict or set(value) != fields:
+        raise ValueError('invalid fuzz diagnostic fields')
+    for name in ('code', 'category', 'pos', 'end'):
+        if type(value[name]) is not int:
+            raise ValueError('invalid fuzz diagnostic integer')
+    for name in ('file_hex', 'key_hex', 'text_hex'):
+        if name == 'file_hex' and value[name] is None:
+            continue
+        s06_protocol.hex_bytes(value[name], name)
+    if type(value['args_hex']) is not list or type(value['related']) is not list:
+        raise ValueError('invalid fuzz diagnostic arrays')
+    for arg in value['args_hex']:
+        s06_protocol.hex_bytes(arg, 'argument')
+    for related in value['related']:
+        validate_diagnostic(related)
+
+
+def arguments_for(target):
+    return ["--fuzz-related"] if target == "parser" else []
+
+
+def validate_output(target, request, data, runtime, *, related=True):
     """Reuse framing/schema validators; keep every raw diagnostic and panic."""
     if not data or not data.endswith(b'\n'):
         raise ValueError('missing or truncated adapter stream')
@@ -77,7 +103,13 @@ def validate_output(target, request, data, runtime):
                 state.observation(record)
                 library_failure |= record['status'] == 'panic'
         else:
-            state.accept(record)
+            validated = record
+            if related and record.get('tag') == 'observation' and record.get('kind') == 'diagnostic':
+                validate_diagnostic(record['value'], top=True)
+                validated = copy.deepcopy(record)
+                del validated['value']['related']
+                del validated['value']['file_hex']
+            state.accept(validated)
             ended = state.ended
             library_failure |= record.get('tag') == 'stage' and record.get('outcome') != 'ok'
         canonical.extend(s05_cases.canonical(record) + b'\n')
@@ -91,9 +123,9 @@ def compare_case(target, source, binaries, timeout, memory, deadline=math.inf, *
         raise TimeoutError('insufficient budget for a complete paired case')
     files = input_files(target, source) if files is None else files
     request = validate_input(target, files)
-    arguments = [] if arguments is None else arguments
-    if arguments:
-        raise ValueError('named protocol targets take no executable arguments')
+    arguments = arguments_for(target) if arguments is None else arguments
+    if arguments not in ([], arguments_for(target)):
+        raise ValueError('unexpected named protocol arguments')
     observations, artifacts, failures = {}, {}, []
     case_deadline = min(deadline, time.monotonic() + timeout)
     with tempfile.TemporaryDirectory(prefix='phase7-fuzz-') as temporary:
@@ -117,7 +149,7 @@ def compare_case(target, source, binaries, timeout, memory, deadline=math.inf, *
                 failures.append(runtime + '-crash')
             else:
                 try:
-                    comparable, library_failure = validate_output(target, request, stdout, runtime)
+                    comparable, library_failure = validate_output(target, request, stdout, runtime, related=bool(arguments))
                     if library_failure:
                         failures.append(runtime + '-library-failure')
                 except (ValueError, TypeError, KeyError, UnicodeError) as error:

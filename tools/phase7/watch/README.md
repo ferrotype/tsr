@@ -22,7 +22,11 @@ executed and compiler output is disabled. `.git` is excluded. The source
 inventory is compared again after a successful run. Concurrent original-project
 changes invalidate the capture without implying the runner caused them.
 
-Each edit appends the same-width comment with a generation number. The source's
+Each edit appends the same-width comment with a generation number, preserving
+UTF-8 (with or without BOM) or BOM-marked UTF-16 LE/BE encoding. For UTF-16, an
+incomplete final byte stays at the end where the pinned file decoder ignores it.
+The controller and probe compare decoded compiler text, not raw encoded file
+bytes; arbitrary non-BOM UTF-8 bytes stay unchanged. The source's
 semantic work and file roster stay equivalent; source bytes and source identity
 change. The probe requires real native filesystem callbacks, observes the new
 bytes through the actual compiler program, and checks that the superseded edited
@@ -33,7 +37,10 @@ The standalone tooling workspace source-includes the production CLI's
 `OsSystem`, process support, local-time support and counting mimalloc allocator.
 It calls public `tsr_execute::command_line` with a passive ownership observer and
 the actual default `FSWatchBackend`. The observer makes the command return a
-watcher and enables the existing incremental testing mode. The probe controls
+watcher and enables the existing incremental testing mode. That mode uses full
+source texts as versions and retains the previous snapshot, so all memory
+observations here are **testing-mode watch memory**, not ordinary CLI `--watch`
+memory. The probe controls
 `do_cycle` timing after real native callbacks; it does not exercise the CLI's
 blocking `WatchManager::run_loop` scheduler. No events are injected or mocked.
 Native backend errors/timeouts and returned compiler failures remain failures.
@@ -47,7 +54,8 @@ bookkeeping and general allocator bytes. Native descriptor counts are measured
 by `/proc/PID/fd` on Linux or numeric `lsof` descriptors on macOS, with a default
 steady-state spread bound of two. The before-watch and after-close descriptor
 difference is retained separately; it is not equated to the arena teardown gate.
-RSS comes from `ps` and is reported as samples and a fitted trend separately.
+Testing-mode watch RSS comes from `ps` and is reported as samples and a fitted
+trend separately. New captures carry an explicit `memory_scope` label.
 The macOS descriptor measurement counts numeric file descriptors, not Mach
 ports or every native backend resource.
 Allocator high-water RSS never becomes a leak assertion or zero-byte teardown
@@ -105,7 +113,8 @@ measurement.
 
 Run isolation controls with `python3 -B tools/phase7/watch/test_isolation.py
 --probe /absolute/executable`. They check external-link refusal, copied internal
-links and independent inodes for ordinary/APFS copies, and a short live watch
+links and independent inodes for ordinary/APFS copies, UTF-8 BOM and UTF-16 LE/BE
+edit/rebuild cycles, and a short live watch
 whose config points emission/build-info paths outside the copy. The external
 directory and original fixture must remain unchanged.
 

@@ -58,11 +58,18 @@ class LifetimeControls(unittest.TestCase):
         ])
         self.assertTrue(all('::' not in case for case in spec['cases']))
 
+    def test_supporting_inventory_rejects_unlisted_source_case(self):
+        self.spec['supporting_cases'] = {'services': ['mapped_sources']}
+        (self.root / 'consumer/tests/services.rs').write_text('#[test]\nfn different_case() {}\n')
+        self.save_spec()
+        with self.assertRaisesRegex(ValueError, 'supporting lifetime inventory'):
+            lifetime.manifest(self.root)
+
     def test_source_identity_excludes_nested_build_outputs_but_keeps_consumer_code(self):
         source = self.root / 'tools/s10/consumer/src/main.rs'
         source.parent.mkdir(parents=True)
         source.write_text('fn main() {}')
-        output = self.root / 'tools/s10/consumer/target/debug/consumer'
+        output = self.root / 'tools/s10/consumer/target/debug/build/generated.rs'
         output.parent.mkdir(parents=True)
         output.write_bytes(b'build output')
         with patch.object(corpus, 'ROOT', self.root), \
@@ -177,6 +184,23 @@ class LifetimeControls(unittest.TestCase):
             (directory / 'capture.json').write_text(json.dumps(record))
             with self.assertRaisesRegex(ValueError, 'incomplete ownership mode inventory'):
                 lifetime.verify(directory)
+
+    def test_supporting_case_missing_log_or_failed_execution_cannot_pass(self):
+        self.spec['supporting_cases'] = {'services': ['mapped_sources']}
+        directory, record = self.receipt()
+        with patch.object(lifetime, 'manifest', return_value=self.spec), \
+             patch.object(lifetime, 'sources', return_value=record['sources']):
+            self.assertFalse(lifetime.verify(directory)['metrics']['lifetime_checks'])
+            for mode, row in record['modes'].items():
+                log = directory / (mode + '.services.mapped_sources.log')
+                log.write_bytes(output(['mapped_sources']))
+                row['supporting'] = {'services': {'mapped_sources': {
+                    'exit_code': 0, 'log_sha256': lifetime.file_digest(log)}}}
+            (directory / 'capture.json').write_text(json.dumps(record))
+            self.assertTrue(lifetime.verify(directory)['metrics']['lifetime_checks'])
+            record['modes']['miri']['supporting']['services']['mapped_sources']['exit_code'] = 1
+            (directory / 'capture.json').write_text(json.dumps(record))
+            self.assertFalse(lifetime.verify(directory)['metrics']['lifetime_checks'])
 
     def test_cli_requires_output_and_failed_measured_checks_exit_nonzero(self):
         with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
