@@ -219,58 +219,66 @@ impl<'a, 'p> Navigator<'a, 'p> {
     // port: tsc/internal/astnav/tokens.go:getNodeVisitor
     pub fn visit_child_slots_and_jsdoc(&mut self, id: NodeId) -> Result<Vec<HookVisit>, Error> {
         let mut out = Vec::new();
+        self.for_each_child_slot_and_jsdoc(id, |visit| out.push(visit))?;
+        Ok(out)
+    }
+
+    fn for_each_child_slot_and_jsdoc(
+        &mut self,
+        id: NodeId,
+        mut visit: impl FnMut(HookVisit),
+    ) -> Result<(), Error> {
         // Every child's parent is `id`, so only a single-comment JSDoc node
         // has the comment child the visitor leaves out; the children of any
         // other node are listed without reading them.
         let filter_comments =
             utilities_middle::is_js_doc_single_comment_node(self.view, &self.node(id)?)?;
         for doc in self.jsdoc_of(id)? {
-            self.push_node_hook(&mut out, Some(doc), filter_comments)?;
+            self.push_node_hook(&mut visit, Some(doc), filter_comments)?;
         }
         let slots = self.node(id)?.child_slots();
         for (role, slot) in slots {
             match slot {
-                ChildSlot::Node(node) => self.push_node_hook(&mut out, node, filter_comments)?,
+                ChildSlot::Node(node) => self.push_node_hook(&mut visit, node, filter_comments)?,
                 ChildSlot::List(list) => {
                     if (role != ChildRole::Modifiers || list.is_some())
                         && !utilities_middle::is_js_doc_single_comment_node_list(self.view, list)?
                     {
-                        out.push(HookVisit::List(list));
+                        visit(HookVisit::List(list));
                     }
                 }
                 ChildSlot::Nodes(nodes) => {
                     for node in self.view.node_slice(nodes)?.iter() {
-                        self.push_node_hook(&mut out, node, filter_comments)?;
+                        self.push_node_hook(&mut visit, node, filter_comments)?;
                     }
                 }
             }
         }
-        Ok(out)
+        Ok(())
     }
 
     fn push_node_hook(
         &self,
-        out: &mut Vec<HookVisit>,
+        visit: &mut impl FnMut(HookVisit),
         node: Option<NodeId>,
         filter_comments: bool,
     ) -> Result<(), Error> {
         if !(filter_comments
             && utilities_middle::is_js_doc_single_comment_node_comment(self.view, node)?)
         {
-            out.push(HookVisit::Node(node));
+            visit(HookVisit::Node(node));
         }
         Ok(())
     }
 
     fn visits(&mut self, id: NodeId) -> Result<Vec<Visit>, Error> {
-        Ok(self
-            .visit_child_slots_and_jsdoc(id)?
-            .into_iter()
-            .filter_map(|visit| match visit {
-                HookVisit::Node(node) => node.map(Visit::Node),
-                HookVisit::List(list) => list.map(Visit::List),
-            })
-            .collect())
+        let mut out = Vec::new();
+        self.for_each_child_slot_and_jsdoc(id, |visit| match visit {
+            HookVisit::Node(Some(node)) => out.push(Visit::Node(node)),
+            HookVisit::List(Some(list)) => out.push(Visit::List(list)),
+            HookVisit::Node(None) | HookVisit::List(None) => {}
+        })?;
+        Ok(out)
     }
 
     /// Upstream's traversal as other packages use it: the hook calls for a
@@ -339,11 +347,15 @@ impl<'a, 'p> Navigator<'a, 'p> {
     }
 
     // port: tsc/internal/astnav/tokens.go:getPosition
-    fn position_of(&mut self, node: NodeId, allow_leading_trivia: bool) -> Result<i64, Error> {
+    fn position_of(
+        &mut self,
+        node: &NodeRead<'_>,
+        allow_leading_trivia: bool,
+    ) -> Result<i64, Error> {
         if allow_leading_trivia {
-            return self.pos(node);
+            return Ok(i64::from(node.pos()));
         }
-        self.get_start_of_node(node, true)
+        self.get_start_of_node(node.id(), true)
     }
 
     // port: tsc/internal/astnav/tokens.go:shouldSkipChild
@@ -1027,12 +1039,9 @@ impl TokenAt<'_> {
     fn test_node(
         &mut self,
         navigator: &mut Navigator<'_, '_>,
-        id: NodeId,
+        node: &NodeRead<'_>,
     ) -> Result<Ordering, Error> {
-        let (kind, end, flags) = {
-            let node = navigator.node(id)?;
-            (node.kind(), i64::from(node.end()), node.flags())
-        };
+        let (kind, end, flags) = (node.kind(), i64::from(node.end()), node.flags());
         if kind != K::EndOfFile
             && end == self.position
             && self.include_preceding.is_some()
@@ -1043,7 +1052,7 @@ impl TokenAt<'_> {
                     return Ok(EQUAL_TO);
                 }
             }
-            self.prev_subtree = Some(id);
+            self.prev_subtree = Some(node.id());
         }
         // A node contains the position when `position < end`. At the end of the
         // file the end is inclusive, for the end-of-file token and for JSDoc
@@ -1055,14 +1064,15 @@ impl TokenAt<'_> {
         {
             return Ok(LESS_THAN);
         }
-        if navigator.position_of(id, self.allow_leading_trivia)? > self.position {
+        if navigator.position_of(node, self.allow_leading_trivia)? > self.position {
             return Ok(GREATER_THAN);
         }
         Ok(EQUAL_TO)
     }
 
     fn visit_node(&mut self, navigator: &mut Navigator<'_, '_>, id: NodeId) -> Result<(), Error> {
-        if navigator.reparsed(id)? {
+        let node = navigator.node(id)?;
+        if node.flags() & node_flags::REPARSED != 0 {
             return Ok(());
         }
         if self.node_after_left.is_none() {
@@ -1071,13 +1081,13 @@ impl TokenAt<'_> {
         if self.next.is_some() {
             return Ok(());
         }
-        match self.test_node(navigator, id)? {
+        match self.test_node(navigator, &node)? {
             LESS_THAN => {
                 // The left boundary cannot move into or past JSDoc: the token
                 // after it may be built by the scanner, and its position has to
                 // include all its leading trivia.
-                if !utilities::is_js_doc_kind(navigator.node(id)?.kind()) {
-                    self.left = navigator.end(id)?;
+                if !utilities::is_js_doc_kind(node.kind()) {
+                    self.left = i64::from(node.end());
                 }
                 self.node_after_left = None;
             }
@@ -1122,13 +1132,13 @@ impl TokenAt<'_> {
             self.node_after_left = None;
         } else if list_pos <= self.position {
             let (mut index, mut matched) = binary_search_unique(nodes.len(), |middle| {
-                let node = nodes[middle];
-                if navigator.reparsed(node)? {
+                let node = navigator.node(nodes[middle])?;
+                if node.flags() & node_flags::REPARSED != 0 {
                     return Ok(EQUAL_TO);
                 }
-                let compared = self.test_node(navigator, node)?;
+                let compared = self.test_node(navigator, &node)?;
                 if compared == LESS_THAN {
-                    self.left = navigator.end(node)?;
+                    self.left = i64::from(node.end());
                     self.node_after_left = None;
                     for &after in &nodes[middle + 1..] {
                         if !navigator.reparsed(after)? {
@@ -1150,9 +1160,10 @@ impl TokenAt<'_> {
                 }
                 searched = kept;
                 (index, matched) = binary_search_unique(searched.len(), |middle| {
-                    let compared = self.test_node(navigator, searched[middle])?;
+                    let node = navigator.node(searched[middle])?;
+                    let compared = self.test_node(navigator, &node)?;
                     if compared == LESS_THAN {
-                        self.left = navigator.end(searched[middle])?;
+                        self.left = i64::from(node.end());
                         self.node_after_left = searched.get(middle + 1).copied();
                     }
                     Ok(compared)

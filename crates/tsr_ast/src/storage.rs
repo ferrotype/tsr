@@ -26,6 +26,10 @@ std::thread_local! {
 pub struct AstBuilder {
     pub(crate) storage: StorageBuilder<StoredNode>,
     pub(crate) hooks: Option<Arc<dyn FactoryHooks>>,
+    /// Most transforms read one bound input file repeatedly. Cache only a
+    /// completed exclusive binding; an unbound or compatibility owner may
+    /// still publish a binding later. The builder retains the syntax itself.
+    pub(crate) factory_binding: std::sync::OnceLock<Arc<crate::BindResult>>,
     frame: AuxId,
     // Constructors validate payload edges and backing ranges before insertion.
     // Unrestricted syntax mutation can only invalidate this proof, never restore it.
@@ -71,6 +75,7 @@ impl AstBuilder {
         Self {
             storage,
             hooks,
+            factory_binding: std::sync::OnceLock::new(),
             frame,
             construction_edges_valid,
         }

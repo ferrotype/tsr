@@ -5,7 +5,9 @@
 //! port: tsc/internal/api/session.go
 use super::checker_responses::literal_value_json;
 use super::diagnostics::DiagnosticKind;
-use super::handles::{resolve_node_handle, touching_property_name, CheckerSetup, Committed};
+use super::handles::{
+    resolve_node_handle, touching_property_name, CheckerSetup, Committed, NodeHandleResolver,
+};
 use super::responses::base64_standard;
 use super::{client_error, ApiSession, SessionError, SessionResult};
 use crate::proto::{
@@ -207,8 +209,9 @@ impl ApiSession {
                 Response::json(self.with_checker(p.snapshot, &p.project, |setup, op| {
                     let mut results: Vec<Option<Box<SymbolResponse>>> =
                         Vec::with_capacity(p.locations.len());
+                    let mut resolver = NodeHandleResolver::new(setup.program);
                     for location in &p.locations {
-                        let node = resolve_node_handle(setup.program, location)?;
+                        let node = resolver.resolve(location)?;
                         results.push(
                             match op.get_symbol_at_location(node).map_err(checker_error)? {
                                 Some(symbol) => Some(Box::new(setup.symbol_response(op, symbol)?)),

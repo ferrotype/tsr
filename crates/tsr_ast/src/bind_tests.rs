@@ -876,6 +876,7 @@ fn factory_reads_exclusively_bound_core_without_walking_its_parents() {
     let mut factory = AstBuilder::new(SourceText::default(), &counters);
     factory.retain_completed(&completed);
     drop(completed);
+    assert!(factory.factory_binding.get().is_none());
 
     crate::storage::SOURCE_LOOKUP_STEPS.with(|steps| steps.set(0));
     for _ in 0..2 {
@@ -898,11 +899,92 @@ fn factory_reads_exclusively_bound_core_without_walking_its_parents() {
         crate::storage::SOURCE_LOOKUP_STEPS.with(std::cell::Cell::get),
         0
     );
+    assert_eq!(factory.factory_binding.get().unwrap().source(), root);
     let invalid = NodeId::from_parts(leaf.arena(), u32::MAX).unwrap();
     assert!(matches!(
         factory.factory_view(invalid),
         Err(Error::InvalidSlot)
     ));
+}
+
+#[test]
+fn factory_binding_cache_keeps_other_owners_late_bindings_and_lazy_nodes_visible() {
+    let counters = Counters::new();
+    let baseline = counters.snapshot();
+    {
+        let (parsed, source, child) = make_parsed(&counters, b"/cached.ts");
+        let mut lazy = None;
+        let completed = parsed
+            .bind_and_publish(|binding| {
+                binding.set_node_flags(child, node_flags::UNREACHABLE)?;
+                let roots = binding
+                    .parsed_view()
+                    .source_jsdoc(source, child, |transaction| {
+                        let id =
+                            transaction.new_identifier(JsString::from_bytes(b"lazy".as_slice()));
+                        transaction.node_mut(id)?.set_parent(Some(child));
+                        Ok(vec![id])
+                    })?;
+                lazy = Some(roots[0]);
+                binding.set_node_flags(roots[0], node_flags::AMBIENT)?;
+                Ok(())
+            })
+            .unwrap();
+        let (other, _, other_child) = make_parsed(&counters, b"/other.ts");
+        let other = other
+            .bind_and_publish(|binding| binding.set_node_flags(other_child, node_flags::AMBIENT))
+            .unwrap();
+        let (late, late_source, late_child) = make_parsed(&counters, b"/late.ts");
+        let late = late.publish_unbound();
+        let (_foreign, _, foreign_child) = make_parsed(&counters, b"/foreign.ts");
+        let mut factory = AstBuilder::new(SourceText::default(), &counters);
+        factory.retain_completed(&completed);
+        factory.retain_completed(&other);
+        factory.retain_file(late.clone());
+
+        // A read before binding must not memoize the absence of a result.
+        assert_eq!(Factory::node(&factory, late_child).flags(), 0);
+        assert!(factory.factory_binding.get().is_none());
+        assert_eq!(
+            Factory::node(&factory, child).flags(),
+            node_flags::UNREACHABLE
+        );
+        assert_eq!(factory.factory_binding.get().unwrap().source(), source);
+        late.bind_with(late_source, |binding| {
+            binding.set_node_flags(late_child, node_flags::SYNTHESIZED)
+        })
+        .unwrap();
+        drop((completed, other, late));
+
+        for _ in 0..2 {
+            assert_eq!(
+                Factory::node(&factory, child).flags(),
+                node_flags::UNREACHABLE
+            );
+            assert_eq!(
+                Factory::node(&factory, other_child).flags(),
+                node_flags::AMBIENT
+            );
+            assert_eq!(
+                Factory::node(&factory, late_child).flags(),
+                node_flags::SYNTHESIZED
+            );
+            assert_eq!(
+                Factory::node(&factory, lazy.unwrap()).flags(),
+                node_flags::AMBIENT
+            );
+        }
+        assert!(matches!(
+            factory.factory_view(foreign_child),
+            Err(Error::WrongOwner)
+        ));
+        let invalid = NodeId::from_parts(child.arena(), u32::MAX).unwrap();
+        assert!(matches!(
+            factory.factory_view(invalid),
+            Err(Error::InvalidSlot)
+        ));
+    }
+    assert_eq!(counters.snapshot(), baseline);
 }
 
 #[test]

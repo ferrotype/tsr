@@ -49,6 +49,11 @@ impl CheckerSetup<'_> {
             .iter()
             .flatten()
             .collect::<Vec<_>>();
+        let value_declaration_index = value_declaration.and_then(|value| {
+            declarations
+                .iter()
+                .position(|declaration| *declaration == value)
+        });
         let mut response = SymbolResponse {
             id,
             project,
@@ -66,7 +71,12 @@ impl CheckerSetup<'_> {
                 .push(node_handle(operation, declaration)?);
         }
         if let Some(declaration) = value_declaration {
-            response.value_declaration = node_handle(operation, declaration)?;
+            // No checker work intervenes between these immutable node reads.
+            // A declaration already encoded above has the same wire handle.
+            response.value_declaration = match value_declaration_index {
+                Some(index) => response.declarations[index].clone(),
+                None => node_handle(operation, declaration)?,
+            };
         }
         if let Some(parent) = parent {
             response.parent = self.symbol_handle_of(operation, parent)?;

@@ -76,18 +76,29 @@ impl AstBuilder {
             return Ok(parsed);
         }
         let owner = parsed.for_node_owner(id)?;
+        if let Some(binding) = self.factory_binding.get() {
+            if binding.reads_core_directly(id) {
+                return Ok(AstView(owner.0, Some(binding)));
+            }
+        }
         if owner.0.id() == self.id() {
             return Ok(parsed);
         }
         if let Some(root) = owner.file_info().root {
             if owner.node(root)?.kind() == crate::SyntaxKind::SourceFile {
-                if let Some(binding) = owner.source_file(root)?.state_ref().binding.result() {
+                if let Some(binding) = owner.source_file(root)?.state_ref().binding.shared() {
                     if binding.reads_core_directly(id) {
                         // The exclusive binder wrote these core records in
                         // place. Selecting their published binding also keeps
                         // SourceFile metadata visible, without walking parents
                         // on every transform read. Lazy records and owners
                         // bound after publication still take the checked path.
+                        // Binding publication is terminal. A single cached
+                        // result avoids repeating root/metadata/source routing
+                        // on every read without a map or a lock per lookup.
+                        // Other owners keep the normal selection path.
+                        self.factory_binding
+                            .get_or_init(|| std::sync::Arc::clone(binding));
                         return Ok(AstView(owner.0, Some(binding)));
                     }
                 }
