@@ -68,19 +68,21 @@ fn completed_symbol_type_hits_preserve_native_ids_and_specialized_misses() {
     let (_counters, _generation, _identity, owner) = owner();
     let mut operation = owner.operation().unwrap();
     let state = operation.state_mut();
-    for checks in [
-        0,
-        cf::DEFERRED_TYPE,
-        cf::INSTANTIATED,
-        cf::MAPPED,
-        cf::REVERSE_MAPPED,
+    for (flags, checks) in [
+        (symbol_flags::PROPERTY, 0),
+        (symbol_flags::PROPERTY, cf::DEFERRED_TYPE),
+        (symbol_flags::PROPERTY, cf::INSTANTIATED),
+        (symbol_flags::PROPERTY, cf::MAPPED),
+        (symbol_flags::PROPERTY, cf::REVERSE_MAPPED),
+        // Specialized dispatch can apply without ordinary value flags. A
+        // PROPERTY on every fixture would mask a missing check_flags guard.
+        (0, cf::DEFERRED_TYPE),
+        (0, cf::INSTANTIATED),
+        (0, cf::MAPPED),
+        (0, cf::REVERSE_MAPPED),
     ] {
         let symbol = state
-            .new_symbol_ex(
-                symbol_flags::PROPERTY,
-                JsString::from_bytes(b"p".as_slice()),
-                checks,
-            )
+            .new_symbol_ex(flags, JsString::from_bytes(b"p".as_slice()), checks)
             .unwrap();
         // Observer-only seeding must not assign the lazy comparison ID. A
         // completed type can exist even when the specialized source links are
@@ -98,13 +100,14 @@ fn completed_symbol_type_hits_preserve_native_ids_and_specialized_misses() {
         );
         assert_ne!(
             tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap()),
-            0
+            0,
+            "completed type must observe native comparison ID: flags={flags}, checks={checks}"
         );
         assert_eq!(state.types.len(), types);
         state.value_symbol_links.probe_entry(symbol).resolved_type = None;
         assert!(
             state.get_type_of_symbol(symbol).is_err(),
-            "uncached specialized symbol {checks}"
+            "uncached specialized symbol: flags={flags}, checks={checks}"
         );
     }
     let type_only = state
