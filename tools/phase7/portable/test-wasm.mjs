@@ -200,10 +200,11 @@ test("transpile identity verifies the production ABI and binds actual engine and
     assert.equal(identity.build_sha256, digest(recordBytes));
     assert.equal(identity.artifacts["checker_bg.wasm"], digest(wasm));
     const child = spawnSync(fileURLToPath(new URL("./wasm-consumer", import.meta.url)), ["--identity"], {
-      encoding: "utf8", env: { ...process.env, TSR_WASM_ARTIFACT_DIR: directory },
+      encoding: "utf8", env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=4096", TSR_WASM_ARTIFACT_DIR: directory },
     });
     assert.equal(child.status, 0, child.stderr);
     assert.deepEqual(JSON.parse(child.stdout).engine.flags, ["--stack-size=4096"]);
+        assert.equal(JSON.parse(child.stdout).engine.node_options, "--max-old-space-size=4096");
     writeFileSync(resolve(directory, "bindings.mjs"), "changed after build");
     await assert.rejects(loadProcessor(directory, true), /artifact bytes differ/);
   } finally { rmSync(directory, { recursive: true, force: true }); }

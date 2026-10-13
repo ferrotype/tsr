@@ -123,7 +123,7 @@ pub struct Inputs {
 /// recorded outputs, the diagnostics `compileFilesWithHost` settles on, the
 /// resolution trace and everything the writers read.
 pub struct Compilation {
-    /// The post-emit program (`createProgram`'s, incremental when asked).
+    /// The native program pair or external consumer session retained for queries.
     pub backend: CompilationBackend,
     /// `Program.Emit`'s raw result in its backend's representation.
     pub emit: CompilationEmit,
@@ -398,6 +398,16 @@ pub fn compile_files(
     )
 }
 
+/// Compile prepared fixture inputs through the selected external consumer.
+/// The consumer owns compiler execution and content-mapper requests.
+pub fn compile_files_ex_with_consumer(
+    inputs: Inputs,
+    testdata: &TestData,
+    consumer: &Path,
+) -> Result<Compilation, CompileError> {
+    crate::portable_compiler::compile(inputs, testdata, consumer)
+}
+
 /// `CompileFilesEx`: program file names (inputs minus `.json` and
 /// `.tsbuildinfo`, plus `/.lib/<libFiles>`), the `/.lib` folder when an
 /// input mentions it, absolute `outDir`/`project`/`rootDir`/
@@ -408,14 +418,6 @@ pub fn compile_files(
 /// pin's deferred closes run.
 // port: tsc/internal/testutil/harnessutil/harnessutil.go:CompileFilesEx
 // port: tsc/internal/testutil/harnessutil/harnessutil.go:createCompilerHost
-pub fn compile_files_ex_with_consumer(
-    inputs: Inputs,
-    testdata: &TestData,
-    consumer: &Path,
-) -> Result<Compilation, CompileError> {
-    crate::portable_compiler::compile(inputs, testdata, consumer)
-}
-
 pub fn compile_files_ex(inputs: Inputs, testdata: &TestData) -> Result<Compilation, CompileError> {
     compile_prepared_native(prepare(inputs, testdata)?)
 }

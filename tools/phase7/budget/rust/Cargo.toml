@@ -3,6 +3,7 @@ name = "phase7_rust_budget"
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.96"
+license = "Apache-2.0"
 publish = false
 
 [workspace]

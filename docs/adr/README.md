@@ -6,7 +6,7 @@ One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` o
 |---|---|---|
 | [0001](0001-independent-repository-with-upstream-pinned-as-a-submodule.md) | Independent repository with upstream pinned as a submodule | Accepted |
 | [0002](0002-native-targets-and-the-glibc-floor.md) | Native targets and the glibc floor | Accepted |
-| [0003](0003-memory--webassembly-and-embedding-are-all-required.md) | Memory, WebAssembly and embedding are all required | Accepted |
+| [0003](0003-memory--webassembly-and-embedding-are-all-required.md) | Memory, WebAssembly and embedding are all required | Amended |
 | [0004](0004-the-owner-approves-baseline-divergences.md) | The owner approves baseline divergences | Amended (ADR 0023) |
 | [0005](0005-sequencing-by-dependency-slices-and-parity-gates--with-no-ca.md) | Sequencing by dependency slices and parity gates, with no calendar or staffing model | Accepted |
 | [0006](0006-node-ownership--arenas--lazy-file-storage--bundles-and-check.md) | Node ownership: arenas, lazy file storage, bundles and checked identities | Accepted |

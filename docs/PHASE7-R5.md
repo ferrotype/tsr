@@ -99,7 +99,7 @@ acceptance, approval or fixture promotion occurs. A zero-completed-pair run
 exits nonzero. [Usage and replay](../tools/phase7/fuzz/README.md) describe the
 options and the timing/artifact overhead excluded from the work budget.
 
-The twenty CLI/archive [fake-child controls](../scripts/tests/test_phase7_fuzz.py) pass
+The 22 CLI/archive [fake-child controls](../scripts/tests/test_phase7_fuzz.py) pass
 locally. They exercise missing outputs, changed emit bytes,
 complete diagnostic/stderr differences, equivalent crashes, timeout cleanup
 with a descendant heartbeat, a minimizer retaining a real reproducing trigger,
@@ -318,7 +318,7 @@ source and applicability limits.
 | WebAssembly stack | [S10 historical results](S10-results.md) record two default-Node stress traps and completion with `--stack-size=4096`, separate from the 16 MiB wasm linear stack. | The [R3 record](PHASE7-R3.md) records actual full check/emit results for six deep families: five pass at the tested depths, while 5,000 parentheses exhaust the Rust parser stack. A 500-parenthesis control passes; the limit stays visible. |
 | Watch storage plateau | `tools/phase4/tsctests/tests/ownership.rs:214` drives 50 real command-line watch cycles through a mock backend, retains early files, checks plateau after cycle two, releases superseded roots and asserts empty tracked counters after close. | The fifty-cycle real MUI docs result below establishes a tracked plateau and close-to-zero counters. RSS is reported separately. |
 | Native watch descriptors | `crates/tsr_fswatch/src/linux/tests.rs:253` checks worker/descriptor release after shutdown; `:504` checks failed-worker descriptor retirement. [Phase 4 acceptance](PHASE4-acceptance.md) requires host-specific watcher receipts. | Measure native descriptor use and release on the owner's largest project on each applicable host; small shutdown fixtures do not establish scaling limits. |
-| E3 ownership and instrumentation | [S09-5](S09-5.md) describes `scripts/s08_ownership.py`, exact S04/S06/S07/S09 inventories and its historical debug/release/Miri/ASan closure. [S10](S10-results.md) records six historical external-consumer lifetime cases. The current `tools/s10/lifetime-cases.json` names all sixteen public integration tests; `scripts/s10_lifetime.py` requires exact source/manifest agreement and executed-name agreement in all four modes. | The [R4 applicability table](PHASE7-R4.md#public-ownership-applicability) maps the public contracts. The fourteen-case receipt plus the two-case follow-up and mapped/supplemental service case pass all four modes. Counters measure tracked storage, not whole-process heap or RSS; the real watch result is below. |
+| E3 ownership and instrumentation | [S09-5](S09-5.md) describes the historical, now-removed `scripts/s08_ownership.py`, exact S04/S06/S07/S09 inventories and its historical debug/release/Miri/ASan closure. [S10](S10-results.md) records six historical external-consumer lifetime cases. The current `tools/s10/lifetime-cases.json` names all sixteen public integration tests; `scripts/s10_lifetime.py` requires exact source/manifest agreement and executed-name agreement in all four modes. | The [R4 applicability table](PHASE7-R4.md#public-ownership-applicability) maps the public contracts. The fourteen-case receipt plus the two-case follow-up and mapped/supplemental service case pass all four modes. Counters measure tracked storage, not whole-process heap or RSS; the real watch result is below. |
 
 The lifetime harness requires an explicit output outside `target`, refuses
 existing capture directories, rejects filtered/ignored/missing tests and
@@ -476,6 +476,50 @@ The 34 fuzz controls, 19 S10/lifetime controls, three watch-encoding controls,
 focused Rust integration/example tests, affected clippy checks, formatting and
 tracker validation also pass. No full corpus or performance measurement was
 rerun for these corrections.
+
+## Review follow-up and ordinary watch measurement, 2026-10-13
+
+The fuzz protocol now refuses every non-object JSON frame before examining its
+fields, so malformed adapter output is a retained protocol finding rather than
+an uncaught `AttributeError`. Failure during minimization preserves both the
+global and per-finding executed-trial counts. The 35 focused fuzz tests cover
+non-object frames in beginning, middle and ending positions through actual
+adapter processes and archival. Seven watch controls cover encoding, completion
+acknowledgement, process failure and rejection of sources outside the copy.
+
+The new [ordinary watch runner](../tools/phase7/watch/production.py) executes
+the release `tsrust --watch` binary without testing hooks. On macOS it completed
+50 equivalent edit/rebuild cycles on the canonical MUI docs project, with five
+warmup cycles, a constant 16,766-file roster and one expected TS2304 per cycle.
+A fixed-width unresolved name changes each generation; the actual diagnostic
+must name that generation before its ordinary watch-completion message. Emit,
+build-info writes and external content-mapper execution are disabled, as in the
+separate ownership probe. Inputs are an isolated APFS copy. Its original source
+inventory was unchanged after completion.
+
+Post-warmup production RSS started at **5,098,045,440 bytes**, ended at
+**4,825,186,304 bytes**, and peaked among cycle samples at **5,100,371,968 bytes**.
+Numeric descriptor counts did not vary. RSS is sampled immediately after each
+completion, not forced-GC live allocation or a whole-run peak measurement.
+The negative fitted slope is an observation, not a proof of bounded retention.
+SIGINT shutdown returned zero and the process was reaped. Process exit does not
+replace the separate testing-mode owner/storage teardown assertions above.
+
+The capture, compiler output and source inventory are retained at
+`../ts-rust-benchmarks/2026-10-13/production-watch-mui-docs-50/`.
+`production-watch-build/` alongside it contains Cargo's selected executable,
+build output, version and artifact hash. The tiny three-file control is in
+`production-watch-tiny-01/`. Both runs completed successfully. This fills the
+ordinary production-watch memory observation on macOS; Linux resource behavior
+and the wider R5 outstanding scope remain separate obligations.
+
+The same follow-up corrects portable runtime identities, explicit incremental
+selection in the compiler test consumer and retained-result failure semantics.
+Both embed and wasm composite comparisons pass nine subtests. The production
+wasm regression preserves full snapshots and cached row/header bytes after
+returned errors. CI now scans the private budget workspace's dependencies and
+executes its allocator/loader controls. The combined focused Python checks pass
+84 tests and 95 subtests; no full corpus or timed compiler benchmark was rerun.
 
 ## Continuation review
 

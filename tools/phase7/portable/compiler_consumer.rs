@@ -130,7 +130,12 @@ fn load(
             .map_err(debug)?,
     );
     let reader = FixtureBuildInfoReader(tsr_embed::build_info_reader(program.clone()));
-    Session::from_program_with_build_info_reader(program, Some(&reader), counters).map_err(debug)
+    // Match the pinned test harness, which tests the explicit incremental flag.
+    if program.options().incremental.is_true() {
+        Session::from_program_with_build_info_reader(program, Some(&reader), counters).map_err(debug)
+    } else {
+        Ok(Session::from_program(program, counters))
+    }
 }
 fn diagnostics(session: &Session, suggestions: bool) -> Result<Vec<Diagnostic>, String> {
     let mut result = Vec::new();

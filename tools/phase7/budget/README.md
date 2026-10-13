@@ -268,3 +268,9 @@ ratios without launching a compiler or reading the original project. They
 authenticate frozen archives, saved helper/manifests and immutable artifacts.
 Capture output is rejected inside the source workload or frozen archives,
 including symlink aliases.
+
+Build manifests must record the source revision used to build their artifacts.
+Older retained artifacts without a revision must be rebuilt before recording a
+qualified performance or size result. Do not fill a missing revision from the
+current checkout or infer one from artifact timestamps; historical captures
+retain their original provenance limits.

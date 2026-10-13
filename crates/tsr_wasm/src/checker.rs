@@ -245,6 +245,7 @@ impl WasmSession {
     /// Check all loaded files and retain the sorted diagnostic objects. No
     /// diagnostic JSON or output digest is constructed during this operation.
     /// Checks and emit share the same compiler pool and checker identities.
+    /// A returned error preserves prior retained results and cached snapshots.
     pub fn check(&mut self) -> Result<(), JsValue> {
         self.retained_diagnostics = Some(self.collect_diagnostics().map_err(error)?);
         self.retained_observation = None;
@@ -254,6 +255,7 @@ impl WasmSession {
     /// Retain a production emit and its callback writes without serialization.
     /// `request` has the same format as `emit`. A later call replaces the prior
     /// retained emit; `.free()` drops all retained source and output owners.
+    /// A returned error preserves prior retained results and cached snapshots.
     pub fn emit_retained(&mut self, request: &str) -> Result<(), JsValue> {
         self.retained_emit = Some(self.emit_output(request)?);
         self.retained_observation = None;
@@ -273,7 +275,7 @@ impl WasmSession {
 
     /// Freeze retained metadata and diagnostic source indices without copying
     /// all source texts or serializing output rows. Counts are decimal strings.
-    /// Subsequent row methods share this snapshot until another check or emit.
+    /// Subsequent row methods share this snapshot until another successful check or emit.
     pub fn retained_snapshot_header(&mut self) -> Result<Vec<u8>, JsValue> {
         crate::snapshot::header(self.freeze_observation()?).map_err(error)
     }

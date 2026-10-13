@@ -6,7 +6,10 @@ use tsr_arena::{Counters, Counts};
 use tsr_checker::{CheckerRequest, Error};
 use tsr_compiler::{CheckedProgram, WriteFileData};
 use tsr_core::{CompilerOptions, ModuleKind, ScriptTarget, Tristate};
-use tsr_embed::{EmitOnly, EmitOptions, EmitOutput, FileCache, ProgramOptions, Session};
+use tsr_embed::{
+    DiagnosticKind, EmitOnly, EmitOptions, EmitOutput, FileCache, ProgramOptions, Session,
+    SessionRequest,
+};
 use tsr_jsstring::JsString;
 
 /// `noLib` keeps the program self-contained; these are the global types the
@@ -76,7 +79,7 @@ fn program_session(counters: &Counters, options: CompilerOptions) -> Session {
 
 #[test]
 fn composite_leaf_emits_and_reuses_build_info_with_and_without_no_emit() {
-    fn load(no_emit: bool, build_info: Option<&[u8]>) -> Session {
+    fn load(no_emit: bool, build_info: Option<&[u8]>, incremental: Tristate) -> Session {
         let mut host = tsr_vfs::MemoryBuilder::new(b"/", true);
         host.insert_loaded(b"/src/globals.d.ts", GLOBALS);
         host.insert_loaded(b"/src/main.ts", b"export const answer = 42;\n".as_slice());
@@ -88,9 +91,7 @@ fn composite_leaf_emits_and_reuses_build_info_with_and_without_no_emit() {
                 config: tsr_tsoptions::ParsedCommandLine::new(
                     options(|options| {
                         options.composite = Tristate::TRUE;
-                        // Composite implies incremental even when the explicit
-                        // incremental flag is false.
-                        options.incremental = Tristate::FALSE;
+                        options.incremental = incremental;
                         options.no_emit = if no_emit {
                             Tristate::TRUE
                         } else {
@@ -117,7 +118,17 @@ fn composite_leaf_emits_and_reuses_build_info_with_and_without_no_emit() {
     }
 
     for no_emit in [false, true] {
-        let first = load(no_emit, None);
+        let first = load(no_emit, None, Tristate::UNKNOWN);
+        assert!(first
+            .diagnostics(&SessionRequest::default(), DiagnosticKind::Program, None)
+            .unwrap()
+            .is_empty());
+        let invalid = load(no_emit, None, Tristate::FALSE);
+        assert!(invalid
+            .diagnostics(&SessionRequest::default(), DiagnosticKind::Program, None)
+            .unwrap()
+            .iter()
+            .any(|d| d.code == 6379));
         let output = first.emit(&EmitOptions::default()).unwrap();
         assert!(output.diagnostics.is_empty());
         let names: Vec<_> = output
@@ -132,14 +143,14 @@ fn composite_leaf_emits_and_reuses_build_info_with_and_without_no_emit() {
         };
         assert_eq!(names, expected);
         let build_info = &output.files.last().unwrap().text;
-        let second = load(no_emit, Some(build_info));
+        let second = load(no_emit, Some(build_info), Tristate::UNKNOWN);
         assert!(second
             .emit(&EmitOptions::default())
             .unwrap()
             .writes
             .is_empty());
         // Without a prior build the same inputs still need build-info output.
-        assert!(!load(no_emit, None)
+        assert!(!load(no_emit, None, Tristate::UNKNOWN)
             .emit(&EmitOptions::default())
             .unwrap()
             .writes

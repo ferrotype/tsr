@@ -90,6 +90,8 @@ def validate_output(target, request, data, runtime, *, related=True):
         if len(line) > (s05_protocol.MAX_RECORD if target == 'scanner' else s06_protocol.MAX_RESPONSE_BYTES):
             raise ValueError('oversized adapter frame')
         record = strict_json_loads(line)
+        if not isinstance(record, dict):
+            raise ValueError('adapter frame must be an object')
         if target == 'scanner':
             if ended:
                 raise ValueError('trailing adapter frame')

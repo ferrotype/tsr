@@ -64,6 +64,12 @@ jobs:
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check advisories licenses bans sources
+      - name: Budget consumer dependency policy
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: tools/phase7/budget/rust/Cargo.toml
+          command: check advisories licenses bans sources
+          arguments: --config deny.toml
       - name: Ledger and markers
         run: cargo xtask validate
       - name: Packaged assets and publication policy
@@ -156,6 +162,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ steps.node.outputs.version }}
+      - name: Budget allocator and artifact loader controls
+        run: |
+          cargo test --locked --manifest-path tools/phase7/budget/rust/Cargo.toml --target-dir target --features allocation-metrics allocator::
+          node --test tools/phase7/budget/test-production-wasm.mjs tools/phase7/budget/go/test-instance.mjs tools/phase7/budget/go/test-wasm.mjs
       - name: LSP and API generated code and pinned codec comparison
         run: |
           cargo xtask gen lsproto --check
@@ -257,7 +267,7 @@ jobs:
           echo "node=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
           echo "bindgen=$(python3 -c "import json;print(json.load(open('tools/s10/toolchains.json'))['wasm_bindgen'])")" >> "$GITHUB_OUTPUT"
           echo "playwright=$(python3 -c "import json;print(json.load(open('tools/phase7/portable/browser/toolchains.json'))['playwright'])")" >> "$GITHUB_OUTPUT"
-          echo "browser-os=$(python3 -c 'import platform; print(platform.platform(terse=True))')" >> "$GITHUB_OUTPUT"
+          echo "browser-os=$(python3 -c 'import platform; print(platform.freedesktop_os_release()["ID"] + "-" + platform.freedesktop_os_release()["VERSION_ID"])')" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         if: matrix.runtime == 'wasm'
         with:
@@ -265,7 +275,7 @@ jobs:
       - name: Cache the pinned browser binaries and npm downloads
         if: matrix.runtime == 'wasm'
         id: browser-cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
@@ -295,8 +305,17 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/phase7-browser" --ignore-scripts --no-audit --no-fund "playwright@${{ steps.portable-pins.outputs.playwright }}"
       - name: Download browser binaries on a cache miss
+        id: browser-download
         if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' && steps.browser-cache.outputs.cache-hit != 'true' }}
         run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install chromium firefox webkit
+      - name: Save successfully provisioned browser binaries
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.browser-download.outcome == 'success' && steps.browser-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+            ${{ env.NPM_CONFIG_CACHE }}
+          key: ${{ steps.browser-cache.outputs.cache-primary-key }}
       - name: Install browser OS dependencies on the runner
         if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
         run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install-deps chromium firefox webkit

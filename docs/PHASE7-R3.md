@@ -273,7 +273,7 @@ program loading, retained checking, retained emit and owned observations.
 Checking uses the same compiler pool as emit: config, program, syntactic,
 global and per-file semantic diagnostics, plus declarations when enabled,
 followed by production sort/deduplication. Tests verify checker identity across
-check/emit, owned result lifetime and error behavior. All 17 `tsr_wasm` tests
+check/emit, owned result lifetime and error behavior. All 12 `tsr_wasm` tests
 and all-target clippy with warnings denied pass. Its original convenience
 methods retain their output representation. MemoryHost also forwards explicit
 unavailable-file metadata; a requested missing payload fails instead of
@@ -426,12 +426,16 @@ Remaining work before production budget acceptance:
   replace the failed input. The browser's required expression-chain case
   already passes in all three engines.
 
-Production artifact size receipts now bind the ordinary public consumers,
+The initial production artifact size receipts bind the ordinary public consumers,
 archived build manifests and actual body/glue hashes. Native bodies are
 28,896,848 Rust bytes versus 20,017,170 stripped Go bytes (ratio 1.443603);
 wasm bodies are 26,276,385 Rust bytes versus 34,213,731 Go bytes (ratio 0.768007).
 Wasm glue is separate: Rust bindings 27,301 bytes; Go runtime shim 16,992 bytes.
 Receipts are `r34-budget-native-size-02` and `r34-budget-wasm-size-01`.
+These are historical: native stripping was not comparable and wasm glue omitted
+JavaScript adapters. The [2026-10-13 R4 correction](PHASE7-R4.md) supersedes
+their size claims with rebuilt, revision-bound artifacts and complete glue
+accounting; it leaves the historical observations intact.
 The readonly reader validates archived metadata and immutable body/glue bytes
 without spawning Node or depending on later helper/source contents. The first
 native attempt is retained as incomplete after sandboxed host metadata access

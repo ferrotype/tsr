@@ -1,0 +1,127 @@
+{
+  "workload": "wasm-size",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "macos aarch64, 18 CPUs"
+  },
+  "recorded_at": "2026-10-13T03:55:42.082020+00:00",
+  "ratios": {
+    "artifact_bytes": 0.7674707250246943
+  },
+  "samples": {
+    "go": {
+      "artifact_bytes": [34237689]
+    },
+    "rust": {
+      "artifact_bytes": [26276424]
+    }
+  },
+  "metadata": {
+    "runtime": "wasm",
+    "scope": {
+      "common": "production parse/config/load/check/optional emit; one checker; builtin libraries",
+      "native": "standalone public tsr_embed consumer versus pinned Go production consumer",
+      "wasm": "public production tsr_wasm checker versus pinned Go production consumer",
+      "extra_rust_wasm_surface": "single-file module/declaration transpile and public AST/value operations",
+      "excluded": "test-only compiler acceptance wasm, test walker, allocator instrumentation",
+      "ratio": "Rust body bytes / Go body bytes; runtime glue reported separately"
+    },
+    "artifact_bytes": {
+      "go": {
+        "body": 34237689,
+        "glue": 22276,
+        "total": 34259965
+      },
+      "rust": {
+        "body": 26276424,
+        "glue": 58519,
+        "total": 26334943
+      }
+    },
+    "artifacts": {
+      "go": {
+        "manifest": {
+          "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/build.json",
+          "bytes": 3670,
+          "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"
+        },
+        "runtime": "wasm",
+        "engine": "go",
+        "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+        "eligibility_reasons": [],
+        "dirty": true,
+        "go_gc_policy": "runtime.GC after prepare/prepare_end and checkpoint; source-digest bound",
+        "helpers": [{"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/wasm-consumer", "bytes": 77, "sha256": "a1ad95f8ca4caa89ca8c7194239411845c560702d27e04041089f9fb809a57ee"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/wasm.mjs", "bytes": 5284, "sha256": "087794ebf49127f83f8c5a3923e8c10fbfb3a4460cd00ee513ec050f0ff2841d"}],
+        "executable": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/wasm-consumer",
+        "node": {
+          "path": "/Users/cristian/.nvm/versions/node/v24.20.0/bin/node",
+          "bytes": 121911744,
+          "sha256": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a"
+        },
+        "node_version": "v24.20.0",
+        "gc_policy": "v8_after_prepare_and_at_checkpoint",
+        "node_arguments": ["--expose-gc", "--stack-size=4096"],
+        "files": [{"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/build.json", "bytes": 3670, "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"}, {"path": "/Users/cristian/git/ts-rust/data/upstream.json", "bytes": 266, "sha256": "8b5663aa92e846a46690016e8ba979cfb2fc1122d5180c37d9957613ffd47fbe"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/operation.go", "bytes": 12002, "sha256": "305dafbebc041fe450d78e6e203be120942cc6bebfafae397020e610e23d4074"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/stream.go", "bytes": 12221, "sha256": "ce74c5d8e21b995334966b2c4cef420b3c6911a452875cf74214a6acbc83ccff"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/budget-go.wasm", "bytes": 34237689, "sha256": "34e097b55bea02ea30549324439aafc4460816540822ff13a5995c67486ef339"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/wasm_exec.cjs", "bytes": 16992, "sha256": "0c949f4996f9a89698e4b5c586de32249c3b69b7baadb64d220073cc04acba14"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/wasm-consumer", "bytes": 77, "sha256": "a1ad95f8ca4caa89ca8c7194239411845c560702d27e04041089f9fb809a57ee"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/wasm.mjs", "bytes": 5284, "sha256": "087794ebf49127f83f8c5a3923e8c10fbfb3a4460cd00ee513ec050f0ff2841d"}, {"path": "/Users/cristian/git/ts-rust/upstream/package.json", "bytes": 1838, "sha256": "f2901f896a6fa3aff21c2b103a3037ac4dcef92c6be2be3bce8ed4132f52c53c"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/toolchains.json", "bytes": 1544, "sha256": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"}, {"path": "/Users/cristian/.nvm/versions/node/v24.20.0/bin/node", "bytes": 121911744, "sha256": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a"}],
+        "environment": {
+          "TSR_GO_WASM_ARTIFACT_DIR": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02",
+          "GOGC": "100",
+          "GOMEMLIMIT": null,
+          "GOEXPERIMENT": null,
+          "NODE_OPTIONS": null
+        },
+        "production_eligible": true,
+        "contract_sources": [{"path": "/Users/cristian/git/ts-rust/data/upstream.json", "bytes": 266, "sha256": "8b5663aa92e846a46690016e8ba979cfb2fc1122d5180c37d9957613ffd47fbe"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/operation.go", "bytes": 12002, "sha256": "305dafbebc041fe450d78e6e203be120942cc6bebfafae397020e610e23d4074"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/stream.go", "bytes": 12221, "sha256": "ce74c5d8e21b995334966b2c4cef420b3c6911a452875cf74214a6acbc83ccff"}, {"path": "/Users/cristian/git/ts-rust/upstream/package.json", "bytes": 1838, "sha256": "f2901f896a6fa3aff21c2b103a3037ac4dcef92c6be2be3bce8ed4132f52c53c"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/toolchains.json", "bytes": 1544, "sha256": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"}]
+      },
+      "rust": {
+        "manifest": {
+          "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-wasm-size-current-01/build.json",
+          "bytes": 242327,
+          "sha256": "41069143c143471fcae5a223f2b92850faeb1c58cdb7c38f6bc5986442d912c1"
+        },
+        "runtime": "wasm",
+        "engine": "rust",
+        "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+        "eligibility_reasons": [],
+        "dirty": true,
+        "helpers": [{"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/production-wasm-consumer", "bytes": 88, "sha256": "ed2ca1071ce5d5d540674e2dac377ab4a6485fd1c7a62a3b0de5a2a1c2c222a1"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/production-wasm.mjs", "bytes": 19727, "sha256": "557994c5bf0c3f11683d75e0796ab37c859891cd67d1acd1e17ec4497b81ea6e"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/wasm/instance.mjs", "bytes": 10466, "sha256": "06a62cda2fa0c1fe372f5ad96ad843febba3e749c39492d93f83a795037c9d0a"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/wasm/imports.mjs", "bytes": 848, "sha256": "4d5f31d5cda73fc0ad13ecdb7da17ed79a57d7fd50c292b2c3efd9f7e6c196e1"}],
+        "executable": "/Users/cristian/git/ts-rust/tools/phase7/budget/production-wasm-consumer",
+        "node": {
+          "path": "/Users/cristian/.nvm/versions/node/v24.20.0/bin/node",
+          "bytes": 121911744,
+          "sha256": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a"
+        },
+        "node_version": "v24.20.0",
+        "gc_policy": "v8_after_prepare_and_at_checkpoint",
+        "node_arguments": ["--expose-gc", "--stack-size=4096"],
+        "files": [{"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-wasm-size-current-01/build.json", "bytes": 242327, "sha256": "41069143c143471fcae5a223f2b92850faeb1c58cdb7c38f6bc5986442d912c1"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-wasm-size-current-01/checker_bg.wasm", "bytes": 26276424, "sha256": "02e40ba01f02992ae03f7764182ae21f8cd07a976df6e666015ea952f6a7602b"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-wasm-size-current-01/bindings.mjs", "bytes": 27478, "sha256": "e212dbdf805839d15a760cde220250d7a9a912657afc1c0f9749f7a2cf8f6fdc"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/production-wasm-consumer", "bytes": 88, "sha256": "ed2ca1071ce5d5d540674e2dac377ab4a6485fd1c7a62a3b0de5a2a1c2c222a1"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/production-wasm.mjs", "bytes": 19727, "sha256": "557994c5bf0c3f11683d75e0796ab37c859891cd67d1acd1e17ec4497b81ea6e"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/wasm/instance.mjs", "bytes": 10466, "sha256": "06a62cda2fa0c1fe372f5ad96ad843febba3e749c39492d93f83a795037c9d0a"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/wasm/imports.mjs", "bytes": 848, "sha256": "4d5f31d5cda73fc0ad13ecdb7da17ed79a57d7fd50c292b2c3efd9f7e6c196e1"}, {"path": "/Users/cristian/git/ts-rust/upstream/package.json", "bytes": 1838, "sha256": "f2901f896a6fa3aff21c2b103a3037ac4dcef92c6be2be3bce8ed4132f52c53c"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/toolchains.json", "bytes": 1544, "sha256": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"}, {"path": "/Users/cristian/.nvm/versions/node/v24.20.0/bin/node", "bytes": 121911744, "sha256": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a"}],
+        "environment": {
+          "TSR_WASM_ARTIFACT_DIR": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-wasm-size-current-01",
+          "GOMEMLIMIT": null,
+          "GOEXPERIMENT": null,
+          "NODE_OPTIONS": null
+        },
+        "production_eligible": true,
+        "contract_sources": [{"path": "/Users/cristian/git/ts-rust/upstream/package.json", "bytes": 1838, "sha256": "f2901f896a6fa3aff21c2b103a3037ac4dcef92c6be2be3bce8ed4132f52c53c"}, {"path": "/Users/cristian/git/ts-rust/tools/s10/toolchains.json", "bytes": 1544, "sha256": "0be87c5938f7f96569d2a4ed226c0575145d021b3f1680309d8f748d6df67a7d"}]
+      }
+    },
+    "saved_manifests": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/wasm-size-current-01/go-build.json",
+        "bytes": 3670,
+        "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/wasm-size-current-01/rust-build.json",
+        "bytes": 242327,
+        "sha256": "41069143c143471fcae5a223f2b92850faeb1c58cdb7c38f6bc5986442d912c1"
+      }
+    },
+    "production_eligible": true,
+    "eligibility_reasons": [],
+    "redactions": ["environment.PATH omitted from published metadata; capture retains its recorded launch policy"]
+  }
+}

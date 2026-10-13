@@ -184,7 +184,14 @@ def portable_identity(suite, consumer):
     validate the wasm, bindings and ABI and report the actual Node runtime.
     """
     if suite.endswith("-embed"):
-        return {"version": 1, "runtime": "embed", "consumer_sha256": sha256(consumer)}
+        completed = subprocess.run([str(consumer), "--identity"], cwd=ROOT, capture_output=True, text=True, timeout=60)
+        try:
+            identity = json.loads(completed.stdout)
+        except ValueError:
+            identity = None
+        if completed.returncode or identity != {"version": 1, "runtime": "embed"}:
+            sys.exit(f"{suite} requires an embed consumer identity")
+        return {**identity, "consumer_sha256": sha256(consumer)}
     family = suite.rsplit("-", 1)[0]
     portable = ROOT / "tools/phase7/portable"
     names = ["wasm-consumer", "wasm-identity.mjs"]
@@ -232,6 +239,7 @@ def validate_portable_identity(suite, identity):
         valid = (identity.get("family") == family and digest(identity.get("build_sha256"))
                  and isinstance(engine, dict) and digest(engine.get("sha256"))
                  and isinstance(engine.get("version"), str) and isinstance(engine.get("flags"), list)
+                 and "node_options" in engine and (engine["node_options"] is None or isinstance(engine["node_options"], str))
                  and isinstance(artifacts, dict) and set(artifacts) == {family.replace("transpile", "checker") + "_bg.wasm", "bindings.mjs"}
                  and all(digest(value) for value in artifacts.values())
                  and isinstance(transport, dict) and "wasm-consumer" in transport

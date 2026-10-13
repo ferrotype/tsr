@@ -124,10 +124,11 @@ test("identity verifies wasm and ABI; a self-consistent record cannot authorize 
         assert.equal(identity.build_sha256, digest(recordBytes));
         assert.equal(identity.artifacts["compiler_bg.wasm"], digest(wasm));
         const child = spawnSync("tools/phase7/portable/wasm-consumer", ["--compiler", "--identity"], {
-          encoding: "utf8", env: { ...process.env, TSR_WASM_COMPILER_ARTIFACT_DIR: directory },
+          encoding: "utf8", env: { ...process.env, NODE_OPTIONS: "--max-old-space-size=4096", TSR_WASM_COMPILER_ARTIFACT_DIR: directory },
         });
         assert.equal(child.status, 0, child.stderr);
         assert.deepEqual(JSON.parse(child.stdout).engine.flags, ["--stack-size=4096"]);
+        assert.equal(JSON.parse(child.stdout).engine.node_options, "--max-old-space-size=4096");
       } else {
         await assert.rejects(loadCompilerProcessor(directory, undefined, true), /unreviewed compiler wasm imports/);
         await assert.rejects(loadCompilerProcessor(directory, () => ""), /unreviewed compiler wasm imports/);

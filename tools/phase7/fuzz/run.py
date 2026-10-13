@@ -382,6 +382,7 @@ def main(argv=None):
     except RunnerError as error:
         save_case(output / 'runner-error-minimization', error.source, error.result, files=files_for(error.source))
         metadata['minimize_executions'] += error.trials
+        entry['minimize_trials'] = error.trials
         metadata['runner_errors'].append({'error': str(error)})
         metadata['stop_reason'] = 'runner-error'
     finally:

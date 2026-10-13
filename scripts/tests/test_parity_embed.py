@@ -26,7 +26,7 @@ def fixture_identity(suite):
         return {'version': 1, 'runtime': 'embed', 'consumer_sha256': '0' * 64}
     family = suite.rsplit('-', 1)[0]
     return {'version': 1, 'runtime': 'wasm', 'family': family,
-            'engine': {'version': 'v24.20.0', 'flags': ['--stack-size=4096'], 'sha256': '1' * 64},
+            'engine': {'version': 'v24.20.0', 'flags': ['--stack-size=4096'], 'node_options': None, 'sha256': '1' * 64},
             'build_sha256': '2' * 64,
             'artifacts': {('compiler' if family == 'compiler' else 'checker') + '_bg.wasm': '3' * 64,
                           'bindings.mjs': '4' * 64},
@@ -67,6 +67,8 @@ class EmbedParityTests(unittest.TestCase):
 
     def executable(self, name, source):
         path = self.directory / name
+        if source.startswith("#!/usr/bin/env python3\n"):
+            source = source.replace("#!/usr/bin/env python3\n", '#!/usr/bin/env python3\nimport sys, json\nif sys.argv[1:] == ["--identity"]:\n    print(json.dumps({"version": 1, "runtime": "embed"})); sys.exit(0)\n', 1)
         path.write_text(source)
         path.chmod(path.stat().st_mode | stat.S_IEXEC)
         return path
@@ -159,6 +161,23 @@ class EmbedParityTests(unittest.TestCase):
                 self.quiet(["accept", "transpile-embed", "--results", str(wasm)])
         self.assertTrue((self.directory / "expectations/transpile-embed.json").exists())
         self.assertTrue((self.directory / "expectations/transpile-wasm.json").exists())
+
+    def test_wasm_consumer_cannot_be_graded_as_embed(self):
+        identity = fixture_identity('compiler-wasm')
+        with patch.object(parity.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, json.dumps(identity), '')):
+            for suite in ('compiler-embed', 'transpile-embed'):
+                with self.subTest(suite=suite), self.assertRaisesRegex(SystemExit, 'embed consumer identity'):
+                    parity.portable_identity(suite, self.consumer)
+
+    def test_node_options_are_required_and_preserved(self):
+        identity = fixture_identity('compiler-wasm')
+        consumer = parity.ROOT / 'tools/phase7/portable/wasm-consumer'
+        identity['engine']['node_options'] = '--max-old-space-size=4096'
+        with patch.object(parity.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, json.dumps(identity), '')):
+            self.assertEqual(parity.portable_identity('compiler-wasm', consumer)['engine']['node_options'], '--max-old-space-size=4096')
+        del identity['engine']['node_options']
+        with self.assertRaisesRegex(SystemExit, 'invalid verified'):
+            parity.validate_portable_identity('compiler-wasm', identity)
 
     def test_native_consumer_cannot_be_graded_as_wasm(self):
         for suite in ('compiler-wasm', 'transpile-wasm'):

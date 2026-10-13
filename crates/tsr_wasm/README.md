@@ -74,7 +74,8 @@ semantic diagnostics and applicable declaration diagnostics for each file.
 Checking and emission use the same compiler checker pool.
 `emit_retained(request)` retains a production emit and every callback write;
 its request format is the same as the existing `emit` method. Repeating either
-operation replaces its previous retained result.
+successful operation replaces its previous retained result. A returned error
+preserves the previous successful diagnostics, emit, and cached snapshot.
 
 `retained_snapshot()` returns owned JSON bytes after a successful check. It
 reports roots, raw options JSON, source name/path/text records, compiler checker
@@ -93,5 +94,5 @@ and `write_count`. `retained_source(index)` and `retained_write(index)` return
 one original row as owned JSON bytes. The zero-based indices use unsigned
 32-bit wasm parameters. Metadata retains source identities rather than clones
 of every loaded text; each row copies only its own bytes. Repeated requests
-reuse the frozen metadata until another `check` or `emit_retained` invalidates
-it. These methods perform no extra diagnostic, emit or type/symbol queries.
+reuse the frozen metadata until another successful `check` or `emit_retained`
+invalidates it. These methods perform no extra diagnostic, emit or type/symbol queries.

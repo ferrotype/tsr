@@ -123,3 +123,40 @@ capture, use the entire provisioned case as `--project`, and pass its frozen
 roster as `--expected-program-files`. For `mui-docs`, the config is
 `docs/tsconfig.json`, `docs/next.config.ts` is explicitly included, and the
 frozen roster has 16,766 files. A different observed roster refuses a pass.
+
+## Ordinary production watch memory
+
+`production.py` launches the ordinary prebuilt `tsrust --watch` executable,
+without ownership observers, testing mode, retained probe snapshots or manual
+cycle scheduling. It uses the same isolated-copy rules above and disables emit,
+build-info and external mapper execution. Keep the Cargo build log and selected
+`compiler-artifact.executable` beside the capture; the runner records its hash.
+
+```sh
+python3 tools/phase7/watch/production.py \
+  --project /absolute/provisioned/workspace \
+  --config relative/project/tsconfig.json \
+  --edit-file relative/project/src/included.ts \
+  --compiler /absolute/retained/tsrust \
+  --cycles 50 --warmup 5 --copy-mode clone \
+  --output /absolute/evidence/production-watch-new
+```
+
+Each edit appends one fixed-width, uniquely named unresolved identifier. Its
+TS2304 must appear before that cycle's ordinary watch-completion message. This
+confirms the compiler checked the actual new generation without adding test
+hooks. Every generation has the same diagnostic work, with a different name;
+the diagnostic count and ordered `--listFiles` roster must stay constant.
+Sources outside the copied project are rejected except for compiled-in
+`bundled:///libs/` sources. Use a project whose config/dependencies are contained
+in the provisioned root; this runner is not an OS sandbox for configuration
+reads. File encoding and incomplete final UTF-16 units are preserved.
+
+RSS and descriptor counts are sampled immediately after each completed cycle.
+The output records the post-warmup trend and descriptor spread, rather than
+turning allocator high-water behavior into a leak gate. SIGINT requests ordinary
+shutdown; the process group is cleaned up even on errors. Process termination
+does not establish an in-process owner-counter baseline: the separate testing
+probe above establishes that obligation. Both measurements are needed, and
+neither replaces the other. Retain raw compiler output and `watch.json` outside
+`target`; failures retain partial observations and never report completion.

@@ -166,7 +166,11 @@ python3 scripts/parity.py check transpile-embed --results /tmp/tsr-r4-transpile-
 
 `--runner PATH` selects a prebuilt runner. It does not bypass consumer
 selection; pair it with `--consumer PATH` to use an already built native
-consumer. A wasm run always requires an explicit `--consumer` and never builds
+consumer. Embed captures require its `--identity` response to identify the
+embed runtime before hashing the executable. Wasm captures verify the launcher
+and transport, artifact bytes and ABI, and record the actual Node executable,
+version, command-line flags and inherited `NODE_OPTIONS`. The identities must
+agree before and after capture. A wasm run always requires an explicit `--consumer` and never builds
 the native consumer. Set `TSR_WASM_BINDGEN` to the CLI matching the version in
 `tools/s10/toolchains.json`, then build and run:
 
@@ -177,7 +181,10 @@ python3 scripts/parity.py check transpile-wasm --results /tmp/tsr-r3-transpile-w
 ```
 
 The native compiler route uses the same independent executable in persistent
-`--compiler` mode. For a bounded capture with a prebuilt runner and consumer:
+`--compiler` mode. Its backend selection matches the pinned test harness:
+only explicit `incremental: true` selects the incremental wrapper. Public
+`tsr_embed::Session` continues to honor composite configuration as incremental.
+For a bounded capture with a prebuilt runner and consumer:
 
 ```sh
 python3 scripts/parity.py run compiler-embed --runner target/debug/tsr-testrunner --consumer tools/s10/rust-consumer/target/debug/s10_rust_consumer --jobs 1 --id compiler/2dArrays.ts --output /tmp/tsr-r4-compiler-embed

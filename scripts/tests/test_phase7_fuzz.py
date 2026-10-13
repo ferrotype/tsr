@@ -168,12 +168,13 @@ class DifferentialControls(unittest.TestCase):
                            {'go': {'stdout': b'raw', 'stderr': b'error', 'emitted': {}}},
                            ['go-execution-failure'])
         output = self.root / 'minimizer-error'
-        with mock.patch.object(fuzz, 'compare_case', side_effect=[original, failed]):
+        with mock.patch.object(fuzz, 'compare_case', side_effect=[original, original, failed]):
             status = fuzz.main(['--rust', str(binaries['rust']), '--go', str(binaries['go']),
                                 '--output', str(output), '--replay', str(source), '--minimize-trials', '2'])
         self.assertEqual(status, 2)
         metadata = json.loads((output / 'run.json').read_text())
-        self.assertEqual((metadata['executions'], len(metadata['failures']), metadata['minimize_executions']), (1, 1, 1))
+        self.assertEqual((metadata['executions'], len(metadata['failures']), metadata['minimize_executions']), (1, 1, 2))
+        self.assertEqual(metadata['failures'][0]['minimize_trials'], 2)
         self.assertEqual(set(metadata['failures'][0]['manifests']), {'original'})
         self.assertTrue((output / 'failure-000000/original/manifest.json').is_file())
         self.assertFalse((output / 'failure-000000/minimized').exists())
@@ -608,6 +609,10 @@ if mode == 'trailing':
     records.append(records[-1])
 for record in records:
     record.update(id=request['id'], version=1)
+if mode.startswith('nonobject-'):
+    _, kind, position = mode.split('-')
+    value = {'null': None, 'array': [], 'string': 'bad', 'number': 3, 'boolean': False}[kind]
+    records[{'begin': 0, 'middle': 1, 'end': -1}[position]] = value
 wire = b'\n'.join(json.dumps(record).encode() for record in records) + b'\n'
 if mode == 'truncated':
     wire = wire[:-1]
@@ -656,6 +661,27 @@ class ParserControls(unittest.TestCase):
                 result = self.pair(mode, go_mode=mode)
                 self.assertEqual(result.failures, ['go-protocol-failure', 'rust-protocol-failure'])
                 self.assertTrue(result.observations['rust']['protocol_error'])
+
+    def test_nonobject_parser_frames_are_retained_protocol_findings(self):
+        for kind in ('null', 'array', 'string', 'number', 'boolean'):
+            for position in ('begin', 'middle', 'end'):
+                mode = f'nonobject-{kind}-{position}'
+                with self.subTest(kind=kind, position=position):
+                    result = self.pair(mode, go_mode=mode)
+                    self.assertEqual(result.failures, ['go-protocol-failure', 'rust-protocol-failure'])
+                    self.assertIn('frame must be an object', result.observations['rust']['protocol_error'])
+                    self.assertEqual(bytes.fromhex(result.observations['rust']['stdout_hex']),
+                                     result.artifacts['rust']['stdout'])
+        source = self.root / 'source.ts'
+        source.write_bytes(b'let x = 0;')
+        binaries = {runtime: self.executable(runtime, 'nonobject-null-begin') for runtime in ('go', 'rust')}
+        output = self.root / 'nonobject-run'
+        status = fuzz.main(['--target', 'parser', '--rust', str(binaries['rust']), '--go', str(binaries['go']),
+                            '--output', str(output), '--replay', str(source), '--minimize-trials', '0'])
+        self.assertEqual(status, 1)
+        metadata = json.loads((output / 'run.json').read_text())
+        self.assertEqual(metadata['failures'][0]['failures'], ['go-protocol-failure', 'rust-protocol-failure'])
+        self.assertTrue((output / 'failure-000000/original/rust/stdout').read_bytes().startswith(b'null\n'))
 
     def test_equal_parser_panics_are_findings(self):
         result = self.pair('panic', go_mode='panic')

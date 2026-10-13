@@ -95,7 +95,22 @@ if (mode !== "parser") {
   }
   assert.throws(() => emitting.emit({ files: ["/src/a.ts"] }), TypeError);
   assert.equal(decode(emitting.emit().files[0].text), "export const value = 1;\n");
+  emitting.check();
+  emitting.emitRetained();
+  const retained = emitting.retainedSnapshot();
+  const header = emitting.retainedSnapshotHeader();
+  const source = emitting.retainedSource(0);
+  const write = emitting.retainedWrite(0);
+  assert.throws(() => emitting.emitRetained({ files: [bytes("/missing.ts")] }), WasmApiError);
+  assert.deepEqual(emitting.retainedSnapshot(), retained);
+  assert.deepEqual(emitting.retainedSnapshotHeader(), header);
+  assert.deepEqual(emitting.retainedSource(0), source);
+  assert.deepEqual(emitting.retainedWrite(0), write);
   emitting.retire();
+  assert.throws(() => emitting.check(), WasmApiError);
+  assert.throws(() => emitting.emitRetained(), WasmApiError);
+  assert.deepEqual(emitting.retainedSnapshotHeader(), header);
+  assert.deepEqual(emitting.retainedWrite(0), write);
   assert.throws(() => emitting.emit(), WasmApiError);
   assert.equal(checker.state, "live");
   emitting.dispose();

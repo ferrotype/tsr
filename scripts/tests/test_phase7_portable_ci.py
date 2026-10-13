@@ -83,6 +83,19 @@ class PortableCIControls(unittest.TestCase):
         self.assertIn('merge-multiple: true', check)
         self.assertIn('--results results/"$suite"/*', check)
 
+    def test_budget_private_workspace_policy_and_explicit_controls(self):
+        lint = job(self.text, 'lint')
+        self.assertIn('manifest-path: tools/phase7/budget/rust/Cargo.toml', lint)
+        self.assertIn('command: check advisories licenses bans sources', lint)
+        self.assertIn('arguments: --config deny.toml', lint)
+        scripts = job(self.text, 'script-tests')
+        allocator = next(line for line in scripts.splitlines() if 'cargo test' in line and 'tools/phase7/budget/rust/Cargo.toml' in line)
+        self.assertIn('--features allocation-metrics', allocator)
+        self.assertIn('allocator::', allocator)
+        self.assertIn('--target-dir target', allocator)
+        for loader in ('test-production-wasm.mjs', 'go/test-instance.mjs', 'go/test-wasm.mjs'):
+            self.assertIn('tools/phase7/budget/' + loader, scripts)
+
     def test_actual_portable_shard_merge_requires_exact_full_coverage(self):
         variants = [f'compiler/case-{i:02d}.ts' for i in range(33)]
         with tempfile.TemporaryDirectory() as directory:
@@ -146,13 +159,22 @@ class PortableCIControls(unittest.TestCase):
         self.assertIn('echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/phase7-browser-npm" >> "$GITHUB_ENV"', self.build)
         self.assertLess(self.build.index('Set runner-local browser cache paths'), self.build.index('id: browser-cache'))
         cache = self.build.split('id: browser-cache', 1)[1].split('      - name:', 1)[0]
-        self.assertIn('uses: actions/cache@v4', cache)
+        self.assertIn('uses: actions/cache/restore@v4', cache)
+        self.assertIn('platform.freedesktop_os_release()', self.build)
+        self.assertNotIn('platform.platform(', self.build)
         self.assertIn('${{ env.PLAYWRIGHT_BROWSERS_PATH }}', cache)
         self.assertIn('${{ env.NPM_CONFIG_CACHE }}', cache)
         for identity in ('runner.os', 'runner.arch', 'steps.portable-pins.outputs.browser-os', 'steps.portable-pins.outputs.playwright',
                          'tools/phase7/portable/browser/toolchains.json', 'upstream/package.json'):
             self.assertIn(identity, cache)
         self.assertNotIn('restore-keys', cache)
+        saved = self.build.split('      - name: Save successfully provisioned browser binaries', 1)[1].split('      - name:', 1)[0]
+        self.assertIn('uses: actions/cache/save@v4', saved)
+        self.assertIn("steps.browser-download.outcome == 'success'", saved)
+        self.assertIn('!cancelled()', saved)
+        self.assertIn('steps.browser-cache.outputs.cache-primary-key', saved)
+        self.assertLess(self.build.index('Save successfully provisioned browser binaries'), self.build.index('Run the three-engine browser smoke'))
+
         binary_install = self.build.split('      - name: Download browser binaries on a cache miss', 1)[1].split('      - name:', 1)[0]
         self.assertIn("steps.browser-cache.outputs.cache-hit != 'true'", binary_install)
         self.assertIn('install chromium firefox webkit', binary_install)

@@ -97,6 +97,10 @@ fn compiler_stdio() -> Result<(), String> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arguments = std::env::args().skip(1).collect::<Vec<_>>();
+    if arguments == ["--identity"] {
+        println!("{{\"version\":1,\"runtime\":\"embed\"}}");
+        return Ok(());
+    }
     if arguments == ["--compiler"] {
         return std::thread::Builder::new()
             .stack_size(tsr_core::workgroup::RESERVED_STACK)

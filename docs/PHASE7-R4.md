@@ -297,6 +297,13 @@ that implements that transition. The original suites still test those mechanisms
 | Compiler operations and emit share the correct pool and release its owners | S09 `compiler_pool` release, wrong-owner and panic effects | shared compiler diagnostics/query test, compiler-scope panic test, emit metadata/final-drop tests |
 | Concurrent first requests share initialization; reentry fails before waiting; native panic preserves payload and retires both pools | Exposed S09 `generation`/`pool` effects | concurrent-first-query, reentry, native-unwind and compiler-scope-panic tests |
 
+The current [R5 ownership correction](PHASE7-R5.md) records 16 main cases
+plus one supplemental-services case in each of debug, release, Miri and ASan
+(68 executions). Concurrent first-use checks compare retained checker `Arc`s;
+fixed session identities alone do not establish unique checker construction.
+The original fourteen-case receipt below retains its historical scope and is
+superseded by that stronger current receipt.
+
 The original fourteen-case receipt maps completely as follows. Names refer to
 [the external test target](../tools/s10/rust-consumer/tests/lifetime.rs).
 
@@ -366,7 +373,7 @@ observations match throughout.
 | --- | ---: | ---: | ---: | ---: |
 | Execute request through acknowledgement | 0.888 s | 1.769 s | 1.9913 | 1.0 |
 | Process peak before observation | 668,450,816 B | 702,726,144 B | 1.0513 | 0.70 |
-| Linked consumer bytes, both stripped (corrected 2026-10-12) | 20,017,168 B | 25,920,720 B | 1.2949 | 1.0 |
+| Linked consumer bytes, both stripped (rebuilt 2026-10-13) | 20,033,856 B | 25,920,720 B | 1.2938 | 1.0 |
 
 Elapsed excludes preparation, checkpoint GC and later observation. The 95%
 ratio interval is 1.9236–2.0390; Go/Rust relative MAD is 1.61%/1.54%. Every pair
@@ -389,6 +396,34 @@ Rust still uses fat LTO, one codegen unit and mimalloc. No code was rebuilt, no
 timing was rerun and the original timing artifacts remain unchanged. There is
 no allocator instrumentation in these executables. Native size replay now
 rejects captures without the matching stripping step.
+
+The 2026-10-12 size receipt above is historical: its build manifests lacked
+artifact revisions, so its recorded `a69cdeb6` came from recording-time HEAD
+and cannot be reproduced through the current revision-aware reader. Its saved
+binary sizes remain observations of those files, not a current-source result.
+
+On 2026-10-13 both Go consumers and the ordinary native Rust consumer were
+rebuilt with artifact-associated revisions and source hashes. The new native
+record is
+`status/perf/embed-size/2026-10-13T04-00-27.981604+00-00-1de638d1.json`, with
+capture `../ts-rust-benchmarks/2026-10-13/native-size-current-03/`.
+The build manifests identify working sources based on `1de638d1`, explicitly
+retain `dirty: true`, and bind the exact source hashes and saved executables.
+This is not a claim that the artifacts came from a clean `1de638d1` checkout.
+Both bodies are normalized with the same LLVM stripping policy. The ratio is
+**1.293846**, still above 1.0. Read-only replay succeeds without reconstructing
+missing provenance or running a timing benchmark.
+
+Production checker wasm was also rebuilt. Its corrected size record is
+`status/perf/wasm-size/2026-10-13T03-55-42.082020+00-00-1de638d1.json`, with
+capture `../ts-rust-benchmarks/2026-10-13/wasm-size-current-01/`.
+Go/Rust bodies are **34,237,689 / 26,276,424 bytes** (ratio **0.767471**).
+Go/Rust complete deployments are **34,259,965 / 26,334,943 bytes**, including
+runtime shims, bindings and every required JavaScript adapter. Go's adapter
+compiled into its module counts in the body; Rust's JavaScript adapters count
+in glue. The body metric does not claim identical adapter placement or export
+surfaces. Historical captures remain unchanged; no elapsed or memory result
+was refreshed by these size-only captures.
 
 The separate native allocation path uses the same Rust sources, release
 profile and allocator, with allocation instrumentation added. It authenticates
