@@ -111,6 +111,23 @@ fn configured_name(file_name: &[u8], configuration_name: &str) -> String {
 // port: tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runTest
 // port: tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runKind
 pub fn run_transpile_test(variant: &Variant, content: &[u8], roots: &Roots, report: &mut Report) {
+    run_transpile_test_with(
+        variant,
+        content,
+        roots,
+        report,
+        &mut transpile::native_transpile,
+    );
+}
+
+/// The unchanged native schedule and baseline comparison over another backend.
+pub fn run_transpile_test_with(
+    variant: &Variant,
+    content: &[u8],
+    roots: &Roots,
+    report: &mut Report,
+    backend: &mut transpile::Backend<'_>,
+) {
     let id = variant.id();
     let file_name = path_bytes(&variant.file);
     let base_name = tsr_tspath::base_name(&file_name);
@@ -167,7 +184,7 @@ pub fn run_transpile_test(variant: &Variant, content: &[u8], roots: &Roots, repo
             continue;
         }
         let run = catch_unwind(AssertUnwindSafe(|| {
-            transpile::run_one(&configuration, declaration)
+            transpile::run_one_with(&configuration, declaration, backend)
         }));
         let outcome = match run {
             // `baseline.Run(t, "transpile/"+baselineName, result, baseline.Options{})`.

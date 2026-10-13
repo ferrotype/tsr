@@ -50,8 +50,30 @@ fn validate(request: &Value) -> Result<(), String> {
     }
     Ok(())
 }
-fn diagnostic(s: &Session, collection: &str, index: usize, d: &Diagnostic) {
-    s.observe("parse","diagnostic",json!({"collection":collection,"index":index,"code":d.code,"category":d.category,"pos":d.loc.pos(),"end":d.loc.end(),"key_hex":hex(d.message_key.as_bytes()),"text_hex":hex(d.message_text.as_bytes()),"args_hex":d.message_args.iter().map(|s|hex(s.as_bytes())).collect::<Vec<_>>()}));
+fn diagnostic_value(view: AstView<'_>, d: &Diagnostic) -> Value {
+    json!({"code":d.code,"category":d.category,"pos":d.loc.pos(),"end":d.loc.end(),
+        "file_hex":d.file.map(|id|hex(view.source_file(id).expect("diagnostic file owner").file_name())),
+        "key_hex":hex(d.message_key.as_bytes()),"text_hex":hex(d.message_text.as_bytes()),
+        "args_hex":d.message_args.iter().map(|s|hex(s.as_bytes())).collect::<Vec<_>>(),
+        "related":d.related_information.iter().map(|d|diagnostic_value(view,d)).collect::<Vec<_>>()})
+}
+fn diagnostic(
+    s: &Session,
+    view: AstView<'_>,
+    collection: &str,
+    index: usize,
+    d: &Diagnostic,
+    fuzz: bool,
+) {
+    let value = if fuzz {
+        let mut value = diagnostic_value(view, d);
+        value["collection"] = json!(collection);
+        value["index"] = json!(index);
+        value
+    } else {
+        json!({"collection":collection,"index":index,"code":d.code,"category":d.category,"pos":d.loc.pos(),"end":d.loc.end(),"key_hex":hex(d.message_key.as_bytes()),"text_hex":hex(d.message_text.as_bytes()),"args_hex":d.message_args.iter().map(|s|hex(s.as_bytes())).collect::<Vec<_>>()})
+    };
+    s.observe("parse", "diagnostic", value);
 }
 fn table(s: &Session, stage: &str, view: AstView<'_>, table: &NodeIndexCache) {
     let indices: BTreeMap<_, _> = table
@@ -85,7 +107,7 @@ fn parse(s: &Session, r: &Value) {
   let root=file.root();let view=file.view();let node=view.node(root).expect("parsed root owner");let sf=view.source_file(root).expect("parsed source metadata");
   s.observe("parse","source_file",json!({"kind":node.kind().raw(),"pos":node.pos(),"end":node.end(),"flags":node.flags(),"node_count":sf.node_count,"text_count":sf.text_count,"identifier_count":sf.identifier_count,"script_kind":sf.script_kind.0,"language_variant":sf.language_variant.0,"declaration_file":sf.is_declaration_file,"hash":tsr_encoder::source_file_hash(&sf)}));
   for (name,diagnostics) in [("parse",&sf.diagnostics),("js",&sf.js_diagnostics),("jsdoc",&sf.jsdoc_diagnostics)] {
-   for (index,d) in diagnostics.iter().enumerate(){diagnostic(s,name,index,d);}
+   for (index,d) in diagnostics.iter().enumerate(){diagnostic(s,view,name,index,d,std::env::args().any(|arg| arg == "--fuzz-related"));}
   }
   drop(sf);drop(node);parsed=Some(file);Ok(())
  }) {return}

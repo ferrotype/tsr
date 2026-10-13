@@ -149,7 +149,13 @@ fn generate_with_preferences(
         mode,
         preference,
     };
-    let module_paths = generation.sorted_paths(host.get_module_specifier_paths(file, target)?);
+    // The pin orders paths from the referenced source's directory, but computes
+    // specifiers/preferences from the actual importing declaration output.
+    let ordering_file = host.get_source_of_project_reference_if_output_included(file);
+    let module_paths = generation.sorted_paths(
+        host.get_module_specifier_paths(ordering_file, target)?,
+        ordering_file,
+    );
     generation.compute(&module_paths)
 }
 
@@ -180,7 +186,7 @@ impl Generation<'_> {
         clippy::naive_bytecount,
         reason = "Count separators in module paths with the standard library; a byte-counting dependency is not justified here"
     )]
-    fn sorted_paths(&self, paths: Vec<ModulePath>) -> Vec<ModulePath> {
+    fn sorted_paths(&self, paths: Vec<ModulePath>, importing_file: &[u8]) -> Vec<ModulePath> {
         // Source first collects by exact spelling. An overwrite keeps the last
         // ModulePath for that spelling; tie ordering is explicit at this pin.
         let mut remaining = crate::types::Map::default();
@@ -214,7 +220,7 @@ impl Generation<'_> {
                 })
         };
         let mut result = Vec::with_capacity(remaining.len());
-        let mut directory = path::directory(self.file);
+        let mut directory = path::directory(importing_file);
         loop {
             let prefix = if directory.ends_with(b"/") {
                 directory.clone()
@@ -534,8 +540,10 @@ impl crate::Operation<'_> {
                 for_auto_import: false,
             },
         };
-        let paths =
-            generation.sorted_paths(host.get_module_specifier_paths(importing_file, target)?);
+        let paths = generation.sorted_paths(
+            host.get_module_specifier_paths(importing_file, target)?,
+            importing_file,
+        );
         for candidate in &paths {
             let name = generation.node_module_specifier(candidate)?;
             if !name.is_empty() {

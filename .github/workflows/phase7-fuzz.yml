@@ -1,0 +1,124 @@
+# Opt-in bounded correctness fuzzing; no performance measurements.
+name: phase7-fuzz
+
+on:
+  workflow_dispatch:
+    inputs:
+      seed:
+        description: Deterministic integer RNG seed
+        type: string
+        default: '42'
+      budget-seconds:
+        description: Total compiler and minimizer work budget
+        type: choice
+        default: '120'
+        options: ['60', '120', '300']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: phase7-fuzz-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  GOTOOLCHAIN: local
+  FUZZ_SEED: ${{ inputs.seed }}
+  FUZZ_BUDGET: ${{ inputs.budget-seconds }}
+
+jobs:
+  fuzz:
+    name: bounded ${{ matrix.target }} differential fuzzing
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [scanner, parser, cli]
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      FUZZ_TARGET: ${{ matrix.target }}
+    steps:
+      - name: Set runner-local output paths
+        run: |
+          echo "FUZZ_OUTPUT=$RUNNER_TEMP/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/$FUZZ_TARGET/results" >> "$GITHUB_ENV"
+          echo "FUZZ_BUILD=$RUNNER_TEMP/phase7-fuzz-${{ github.run_id }}-${{ github.run_attempt }}/$FUZZ_TARGET/binaries" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Verify the oracle source pin
+        run: |
+          expected_pin=$(python3 -c 'import json; print(json.load(open("data/upstream.json"))["pin"])')
+          test "$(git -C upstream rev-parse HEAD)" = "$expected_pin"
+      - name: Install the pinned Rust toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: rui314/setup-mold@v1
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: phase7-fuzz
+      - name: Read the Go pin
+        id: go
+        run: echo "version=$(python3 -c "import tomllib;print(tomllib.load(open('data/s04/toolchains.toml','rb'))['go'].removeprefix('go'))")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-go@v6
+        with:
+          go-version: ${{ steps.go.outputs.version }}
+          cache-dependency-path: upstream/tsc/go.sum
+      - name: Runner failure-detection controls
+        run: python3 -m unittest scripts.tests.test_phase7_fuzz
+      - name: Build and preserve the explicit compiler or adapter pair
+        run: |
+          mkdir -p "$FUZZ_BUILD"
+          case "$FUZZ_TARGET" in
+            scanner)
+              cargo build --locked --release -p tsr_scanner --example s05
+              PYTHONPATH=scripts python3 -c 'import os, pathlib, shutil; from s05_build import build_oracle; binary, _ = build_oracle(); shutil.copy2(binary, pathlib.Path(os.environ["FUZZ_BUILD"]) / "go")'
+              cp target/release/examples/s05 "$FUZZ_BUILD/rust"
+              ;;
+            parser)
+              cargo build --locked --release -p tsr_parser --example s06
+              python3 tools/phase7/fuzz/build_parser.py --output "$FUZZ_BUILD/parser"
+              cp "$FUZZ_BUILD/parser/parser-go" "$FUZZ_BUILD/go"
+              cp target/release/examples/s06 "$FUZZ_BUILD/rust"
+              ;;
+            cli)
+              # Only ordinary release builds; this runs no benchmark scenarios.
+              python3 tools/phase7/bench/capture.py build
+              cp target/phase7/bin/tsgo "$FUZZ_BUILD/go"
+              cp target/phase7/bin/tsrust "$FUZZ_BUILD/rust"
+              ;;
+            *) exit 2 ;;
+          esac
+      - name: Run the bounded fuzz target
+        timeout-minutes: 8
+        run: |
+          python3 tools/phase7/fuzz/run.py --target "$FUZZ_TARGET" \
+            --rust "$FUZZ_BUILD/rust" --go "$FUZZ_BUILD/go" \
+            --output "$FUZZ_OUTPUT" --seed "$FUZZ_SEED" \
+            --iterations 10000 --budget-seconds "$FUZZ_BUDGET" \
+            --case-seconds 5 --memory-mb 2048 \
+            --minimize-trials 30 --max-failures 50
+      - name: Summarize the retained run
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ['FUZZ_OUTPUT']) / 'run.json'
+          if path.is_file():
+              data = json.loads(path.read_text())
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
+                  summary.write(f"Completed pairs: {data['executions']}; findings: {len(data['failures'])}; "
+                                f"stop: {data['stop_reason']}; seed: {data['seed']}.\n\n")
+                  summary.write(f"Memory: {data['memory']}. Coverage: {data['coverage']}.\n")
+          PY
+      - name: Upload inputs, observations and original/minimized findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase7-fuzz-${{ matrix.target }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.FUZZ_OUTPUT }}
+            ${{ env.FUZZ_BUILD }}
+          retention-days: 90
+          if-no-files-found: warn

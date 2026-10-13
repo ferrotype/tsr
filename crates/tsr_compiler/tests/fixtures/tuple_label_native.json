@@ -1,0 +1,14 @@
+[
+  {
+    "display": "[{ x: number; }, [string], z?: boolean | undefined]",
+    "source": "type Args\u003cT extends (...args: any) =\u003e any\u003e = T extends (...args: infer P) =\u003e any ? P : never;\ndeclare function f({x}: {x: number}, [y]: [string], z?: boolean): void;\ntype Result = Args\u003ctypeof f\u003e;\n"
+  },
+  {
+    "display": "[number, ...any[]]",
+    "source": "type Args\u003cT extends (...args: any) =\u003e any\u003e = T extends (...args: infer P) =\u003e any ? P : never;\ndeclare function f(...[first, ...tail]: [number, ...string[]]): void;\ntype Result = Args\u003ctypeof f\u003e;\n"
+  },
+  {
+    "display": "[first: number, second?: string | undefined]",
+    "source": "type Args\u003cT extends (...args: any) =\u003e any\u003e = T extends (...args: infer P) =\u003e any ? P : never;\ndeclare function f(first: number, second?: string): void;\ntype Result = Args\u003ctypeof f\u003e;\n"
+  }
+]

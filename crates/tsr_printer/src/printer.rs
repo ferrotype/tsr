@@ -22,6 +22,9 @@
 
 #[path = "printer_comments.rs"]
 mod comments;
+#[cfg(any(target_arch = "wasm32", test))]
+#[path = "printer_expression_stack.rs"]
+mod expression_stack;
 #[path = "printer_expressions.rs"]
 mod expressions;
 #[path = "printer_source_maps.rs"]
@@ -61,6 +64,9 @@ use tsr_scanner::token_to_string;
 /// `PrinterOptions`.
 #[derive(Clone, Debug, Default)]
 pub struct PrinterOptions {
+    /// Exercises the wasm driver against the native recursive driver in unit tests.
+    #[cfg(test)]
+    pub(crate) iterative_expressions: bool,
     pub remove_comments: bool,
     pub new_line: NewLineKind,
     pub omit_trailing_semicolon: bool,
@@ -3583,14 +3589,24 @@ impl<'a, 'c> Session<'a, 'c> {
 
     // port: tsc/internal/printer/printer.go:Printer.emitExpression
     fn emit_expression(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.emit_expression_worker(node, precedence)
-        })
+        #[cfg(target_arch = "wasm32")]
+        return self.emit_expression_iterative(node, precedence);
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            #[cfg(test)]
+            if self.printer.options.iterative_expressions {
+                return self.emit_expression_iterative(node, precedence);
+            }
+            stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
+                self.emit_expression_worker(node, precedence)
+            })
+        }
     }
 
     /// One expression frame: the occurrence of `node` it prints is the next
     /// spine node of a `parenthesizeExpressionForNoAsi` rewrite when that
     /// rewrite expects it.
+    #[cfg(not(target_arch = "wasm32"))]
     fn emit_expression_worker(&mut self, node: NodeId, precedence: i32) -> Result<(), Error> {
         let operand = self.take_spine_occurrence(node);
         self.expression_depth += 1;
@@ -3599,6 +3615,7 @@ impl<'a, 'c> Session<'a, 'c> {
         result
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
     fn emit_expression_occurrence(
         &mut self,
         operand: statements::Operand,

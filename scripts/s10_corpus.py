@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Capture/replay the frozen E2 schedule through external Rust or bare wasm.
 
+The native adapter is historical S10 coverage through the internal walker,
+not Phase 7 public-API acceptance. See parity.py's transpile-embed suite.
+
 Never rebuild implicitly. Validate all inputs before launching a child. Preserve
 raw requests/results and native authority; smoke runs never emit gate metrics.
 """
@@ -36,7 +39,9 @@ def sources():
     # ownership helpers and measurement inputs. The ledger is tested against
     # this manifest; unrelated project/API/formatter tools are not dependencies.
     paths = {path for pattern in source_patterns() for path in ROOT.glob(pattern)
-             if path.is_file() and '__pycache__' not in path.parts and path.name != '.DS_Store'}
+             if path.is_file()
+             and not {'target', '__pycache__', '.git'}.intersection(path.relative_to(ROOT).parts)
+             and path.name != '.DS_Store'}
     return {str(path.relative_to(ROOT)): file_digest(path) for path in sorted(paths)}
 
 
@@ -128,7 +133,7 @@ def capture(args):
     if build['sources'] != before:
         raise ValueError('embedding binary was built from different sources; run s10_build first')
     if args.runtime == 'rust':
-        if file_digest(ROOT / 'target/release/s10_rust_consumer') != build['binary_sha256']:
+        if file_digest(ROOT / 'target/release/legacy-rust-consumer') != build['binary_sha256']:
             raise ValueError('external consumer executable changed')
     else:
         for name, item in build['artifacts'].items():
@@ -138,7 +143,7 @@ def capture(args):
     artifacts = args.output / 'artifacts'
     artifacts.mkdir()
     if args.runtime == 'rust':
-        shutil.copy2(ROOT / 'target/release/s10_rust_consumer', artifacts / 'consumer')
+        shutil.copy2(ROOT / 'target/release/legacy-rust-consumer', artifacts / 'consumer')
         shutil.copy2(build_path, artifacts / 'build.json')
         command = [str((artifacts / 'consumer').resolve())]
     else:

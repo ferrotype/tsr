@@ -3959,7 +3959,8 @@ package = "internal/pprof"
 crate = "tsr_pprof"
 phase = 7
 kind = "source"
-status = "planned"
+# Owner 2026-10-11, ADR 0024: pprof compatibility out of scope; native profiling documented.
+status = "out-of-scope"
 rust = []
 pin = "1f70213d4922b434345f639b441681e470c7cfc1"
 source_hash = "bae9085cf6c929abfcfba62b0559dfa4b437a057a8c9d8f66a48806eecffb7ec"

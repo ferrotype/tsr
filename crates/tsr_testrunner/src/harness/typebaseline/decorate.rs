@@ -1,6 +1,50 @@
 //! Raw Corsa type/symbol baseline decoration. No legacy Strada fixups.
+use super::walker::rows::{Display, Row as Observation};
 use super::{Result, Row};
 pub const NL: &[u8] = b"\r\n";
+
+/// Baseline envelope for an observed type or symbol; never runs a query.
+pub(super) fn observation_row(row: Observation) -> Result<Row> {
+    let display = match row.display {
+        Display::Type { text } => text,
+        Display::Symbol {
+            name,
+            declarations,
+            declaration_count,
+        } => {
+            if declarations.len() != declaration_count.min(5) {
+                return Err("symbol observation has incomplete declaration positions".into());
+            }
+            let mut display = b"Symbol(".to_vec();
+            display.extend_from_slice(&tsr_ast::escape_all_internal_symbol_names(&name));
+            for declaration in declarations {
+                let base = tsr_tspath::base_name(&declaration.file);
+                display.extend_from_slice(b", Decl(");
+                display.extend_from_slice(base);
+                display.extend_from_slice(b", ");
+                if base.starts_with(b"lib.") && base.ends_with(b".d.ts") {
+                    display.extend_from_slice(b"--, --)");
+                } else {
+                    display.extend_from_slice(
+                        format!("{}, {})", declaration.line, declaration.character).as_bytes(),
+                    );
+                }
+            }
+            if declaration_count > 5 {
+                display.extend_from_slice(
+                    format!(" ... and {} more", declaration_count - 5).as_bytes(),
+                );
+            }
+            display.push(b')');
+            display
+        }
+    };
+    Ok(Row {
+        line: row.line,
+        source_text: row.source_text,
+        display,
+    })
+}
 
 fn code_lines(bytes: &[u8]) -> Vec<&[u8]> {
     // Go's regexp alternation matches CR before the optional-CR/LF branch.

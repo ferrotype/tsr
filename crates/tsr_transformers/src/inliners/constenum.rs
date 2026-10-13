@@ -10,6 +10,8 @@ const NIL: &str = "runtime error: invalid memory address or nil pointer derefere
 /// `ConstEnumInliningTransformer`: the state the visit reads.
 struct ConstEnumInliningTransformer<'a> {
     opts: TransformOptions<'a>,
+    #[cfg(test)]
+    iterative_spines: bool,
 }
 
 /// Under isolated modules the pin fails the construction (`debug.Fail`); the
@@ -30,7 +32,11 @@ pub fn new_const_enum_inlining_transformer<'a>(
             opt.failure.clone(),
         ));
     }
-    let tx = Rc::new(ConstEnumInliningTransformer { opts: opt.clone() });
+    let tx = Rc::new(ConstEnumInliningTransformer {
+        opts: opt.clone(),
+        #[cfg(test)]
+        iterative_spines: false,
+    });
     Some(Transformer::new(
         move |visitor: &mut NodeVisitor<'_>, node: Option<NodeId>| tx.visit(visitor, node),
         Some(emit_context),
@@ -46,7 +52,21 @@ impl ConstEnumInliningTransformer<'_> {
             return node;
         }
         let id = node.expect(NIL);
-        match visitor.factory().node(id).kind().known() {
+        let kind = visitor.factory().node(id).kind().known();
+        #[cfg(any(target_arch = "wasm32", test))]
+        if self.use_iterative_spines()
+            && matches!(
+                kind,
+                Some(
+                    K::BinaryExpression
+                        | K::ParenthesizedExpression
+                        | K::PartiallyEmittedExpression
+                )
+            )
+        {
+            return crate::expression_spine::visit_expression_spine(failure, visitor, id);
+        }
+        match kind {
             Some(K::PropertyAccessExpression | K::ElementAccessExpression) => {
                 let parse = self.opts.context.parse_node(visitor.factory(), id);
                 let Some(parse) = parse else {
@@ -140,3 +160,21 @@ fn safe_multi_line_comment(mut text: &[u8]) -> JsString {
     b.push(b' ');
     JsString::from_bytes(b)
 }
+
+#[cfg(any(target_arch = "wasm32", test))]
+impl ConstEnumInliningTransformer<'_> {
+    fn use_iterative_spines(&self) -> bool {
+        #[cfg(test)]
+        {
+            cfg!(target_arch = "wasm32") || self.iterative_spines
+        }
+        #[cfg(not(test))]
+        {
+            true
+        }
+    }
+}
+
+#[cfg(test)]
+#[path = "constenum_stack_tests.rs"]
+mod stack_tests;

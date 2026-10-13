@@ -1,0 +1,56 @@
+[
+  {
+    "code": 2307,
+    "pos": 20,
+    "end": 32,
+    "args": [
+      "@scope/pkg"
+    ],
+    "chain": [
+      {
+        "code": 6278,
+        "pos": 20,
+        "end": 32,
+        "args": [
+          "/p/node_modules/@scope/pkg/index.d.ts",
+          "@scope/pkg"
+        ],
+        "chain": [],
+        "repopulate": {
+          "Kind": 2,
+          "ModuleReference": "@scope/pkg",
+          "Mode": 99,
+          "PackageName": ""
+        }
+      }
+    ],
+    "repopulate": null
+  },
+  {
+    "code": 2307,
+    "pos": 20,
+    "end": 32,
+    "args": [
+      "@scope/pkg"
+    ],
+    "chain": [
+      {
+        "code": 6278,
+        "pos": 20,
+        "end": 32,
+        "args": [
+          "/p/node_modules/@types/scope__pkg/index.d.ts",
+          "@types/scope__pkg"
+        ],
+        "chain": [],
+        "repopulate": {
+          "Kind": 2,
+          "ModuleReference": "@scope/pkg",
+          "Mode": 99,
+          "PackageName": ""
+        }
+      }
+    ],
+    "repopulate": null
+  }
+]

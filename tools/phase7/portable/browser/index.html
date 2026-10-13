@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<title>tsr WebAssembly browser smoke</title>
+<h1>tsr WebAssembly browser smoke</h1>
+<p>Production parse, check, emit and single-file transpile, with bounded nested input and an actual malformed-filename trap.</p>
+<button id="run">Run smoke</button>
+<pre id="result">Ready</pre>
+<script type="module">
+import { runSmoke } from "/smoke.mjs";
+globalThis.runSmoke = runSmoke;
+document.querySelector("#run").addEventListener("click", async () => {
+  const result = document.querySelector("#result");
+  result.textContent = "Running";
+  try { result.textContent = JSON.stringify(await runSmoke(), null, 2); }
+  catch (error) { result.textContent = String(error.stack ?? error); }
+});
+</script>
+</html>

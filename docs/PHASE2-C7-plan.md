@@ -664,7 +664,8 @@ Linux host capture are the owner's.
    S07 chain order, `e3`, the `checker` recordings and the Linux host capture.
 7. **Exit recording and Phase 7.** Confirmed: `c7_complete` is computed only
    from the recorded runs, and C7 hands over the report without starting
-   Phase 7's four-week acceptance.
+   Phase 7's four-week dogfood period. Weekly performance collections are
+   postponed indefinitely by owner decision 2026-10-11.
 8. **Test-only paths out of the capture and run fingerprints.** Accepted:
    C7.7 narrows the corpus capture's and the `checker` run's source sets, so
    a test or fixture change stales only the contract receipts that run it.

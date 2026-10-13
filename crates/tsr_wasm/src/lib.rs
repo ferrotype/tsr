@@ -18,7 +18,15 @@ fn api_error(value: impl std::fmt::Display) -> JsValue {
 #[cfg(feature = "checker")]
 mod checker;
 #[cfg(feature = "checker")]
-pub use checker::{MemoryHost, WasmSession};
+pub use checker::{MemoryHost, PreparedHost, WasmSession};
+
+#[cfg(feature = "checker")]
+mod snapshot;
+
+#[cfg(feature = "checker")]
+mod transpile;
+#[cfg(feature = "checker")]
+pub use transpile::{transpile_declaration, transpile_module};
 
 fn options(file_name: &[u8], jsx: bool, force: bool) -> SourceFileParseOptions {
     SourceFileParseOptions {

@@ -123,22 +123,9 @@ impl ProgramCheckerHost {
         let program = self.program();
         let cwd = program.current_directory();
         let case_sensitive = self.use_case_sensitive_file_names();
-        // The only caller, tsr_checker's GetModuleSpecifiersForFileWithInfo port,
-        // passes the module's own file and the importer's own name. The pin names
-        // both by their source when they are included project-reference outputs
-        // (GetModuleSpecifiersWithInfo and GetModuleSpecifiersForFileWithInfo).
-        // The module is renamed here. The importer's source also chooses the
-        // directory that tsr_checker's proximity sort starts from, and that sort
-        // reads the importer's own name, so an output importer is refused.
-        let importer_path = path::to_path(importer, cwd, case_sensitive);
-        if program
-            .source_of_project_reference_if_output_included(importer_path.as_bytes(), importer)
-            != importer
-        {
-            return Err(Error::Unsupported(
-                "module specifiers for an importer that is a project-reference output",
-            ));
-        }
+        // The caller supplies the importer used for path collection/sorting:
+        // its original referenced source for normal generation, its new file
+        // location for a move. Specifier computation keeps the actual source.
         let target_path = path::to_path(target, cwd, case_sensitive);
         let target =
             program.source_of_project_reference_if_output_included(target_path.as_bytes(), target);

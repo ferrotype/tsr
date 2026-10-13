@@ -1,0 +1,8 @@
+#!/bin/sh
+# The test-only compiler and production transpile artifacts are selected
+# explicitly and never fall back to each other or to a native consumer.
+if [ "$#" -ge 1 ] && [ "$1" = "--compiler" ]; then
+    shift
+    exec node --stack-size=4096 "$(dirname "$0")/compiler-wasm.mjs" "$@"
+fi
+exec node --stack-size=4096 "$(dirname "$0")/wasm.mjs" "$@"

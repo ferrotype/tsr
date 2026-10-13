@@ -1,0 +1,23 @@
+{
+  "files": {
+    "/p/main.ts": "import { w } from \"./ref/src/b\";\nexport const v = w;\n",
+    "/p/ref/out/a.d.ts": "export interface Foo {\n    x: number;\n}\nexport declare function make(): Foo;\n",
+    "/p/ref/out/b.d.ts": "import { make } from \"./a\";\nimport {} from \"../out/a\";\nexport declare const w: typeof make;\n",
+    "/p/ref/src/a.ts": "export interface Foo { x: number }\nexport declare function make(): Foo;\n",
+    "/p/ref/src/b.ts": "import { make } from \"./a\";\nimport {} from \"../out/a\";\nexport const w = make;\n",
+    "/p/ref/tsconfig.json": "{\"compilerOptions\":{\"composite\":true,\"outDir\":\"out\",\"rootDir\":\"src\",\"module\":\"esnext\",\"noLib\":true}}",
+    "/p/tsconfig.json": "{\"compilerOptions\":{\"module\":\"esnext\",\"declaration\":true,\"noLib\":true},\"files\":[\"main.ts\"],\"references\":[{\"path\":\"./ref\"}]}"
+  },
+  "queries": [
+    {
+      "display": "() =\u003e import(\"./ref/src/a\").Foo",
+      "file": "/p/main.ts",
+      "statement": 1
+    },
+    {
+      "display": "() =\u003e import(\"./a\").Foo",
+      "file": "/p/ref/out/b.d.ts",
+      "statement": 2
+    }
+  ]
+}

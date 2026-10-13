@@ -1,6 +1,6 @@
 # ADR 0003: Memory, WebAssembly and embedding are all required
 
-Status: Accepted (2026-09-05)
+Status: Amended (2026-10-11; accepted 2026-09-05)
 Plan: sections 2, 5 and 9
 
 ## Context
@@ -9,7 +9,25 @@ The rewrite's case rests on three benefits Go cannot give this project: lower me
 
 ## Decision
 
-The spike must pass bounded experiments for all three (E5 to E8) before the rest of the plan starts. Parser-level measurements do not establish whole-checker performance or whole-compiler WebAssembly support, so the exit criteria for cut-over additionally require: a WebAssembly library that runs the compiler, conformance and transpile corpus through an in-memory host and matches the oracle's baselines without native processes or filesystem access; a separate Rust consumer that links the embedding crate and runs the same comparisons in process, including ownership, malformed-input, cancellation and panic-invalidation tests; and size, latency and retained-memory budgets fixed for named workloads before Phase 7 and met for four consecutive weekly runs. Neither deliverable may be deferred past cut-over.
+The spike must pass bounded experiments for all three (E5 to E8) before the rest of the plan starts. Parser-level measurements do not establish whole-checker performance or whole-compiler WebAssembly support. The original cut-over decision required the production WebAssembly library to run every corpus and the named budgets to pass four consecutive weekly runs. The two amendments below replace those corpus-routing and repetition requirements. In-process embedding comparisons, ownership, malformed-input, cancellation and panic-invalidation tests remain required, as do the declared production size, latency and retained-memory budgets.
+
+## Amendment, owner decision 2026-10-11
+
+Weekly performance runs and the four-consecutive-run requirement above are
+postponed indefinitely. They are not active closure requirements while deferred;
+resumption requires an explicit owner request. The budgets, comparable-work
+and measurement-validity rules, required deliverables, and the separate
+four-week dogfood requirement remain unchanged. See Phase 7 plan decision 4.
+
+## Compiler corpus amendment, owner decision 2026-10-11
+
+Compiler/conformance acceptance may use the test-only WebAssembly consumer of
+public `tsr_embed`, sharing the native external consumer's executor, walker and
+query order. Production `tsr_wasm` remains required for transpile acceptance,
+browser smoke, and production size and performance budgets. The test-only
+compiler consumer does not certify those production budgets. Both corpus
+routes use an in-memory host without native processes or filesystem access.
+See [Phase 7 architecture item 4](../PHASE7-plan.md).
 
 ## Consequences
 

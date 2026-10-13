@@ -14,7 +14,7 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 
 [features]
 default = ["checker"]
-checker = ["dep:tsr_checker", "dep:tsr_compiler"]
+checker = ["dep:tsr_checker", "dep:tsr_compiler", "dep:tsr_transpile", "dep:tsr_incremental", "dep:tsr_contentmapper", "dep:tsr_ipc", "dep:tsr_locale", "dep:tsr_nodebuilder", "dep:tsr_module", "dep:tsr_bundled"]
 
 [dependencies]
 tsr_arena = { version = "0.4.0", path = "../tsr_arena" }
@@ -25,6 +25,14 @@ tsr_parser = { version = "0.4.0", path = "../tsr_parser" }
 tsr_encoder = { version = "0.4.0", path = "../tsr_encoder" }
 tsr_checker = { version = "0.4.0", path = "../tsr_checker", optional = true }
 tsr_compiler = { version = "0.4.0", path = "../tsr_compiler", optional = true }
+tsr_transpile = { version = "0.4.0", path = "../tsr_transpile", optional = true }
+tsr_incremental = { version = "0.4.0", path = "../tsr_incremental", optional = true }
+tsr_contentmapper = { version = "0.4.0", path = "../tsr_contentmapper", optional = true }
+tsr_ipc = { version = "0.4.0", path = "../tsr_ipc", optional = true }
+tsr_locale = { version = "0.4.0", path = "../tsr_locale", optional = true }
+tsr_nodebuilder = { version = "0.4.0", path = "../tsr_nodebuilder", optional = true }
+tsr_module = { version = "0.4.0", path = "../tsr_module", optional = true }
+tsr_bundled = { version = "0.4.0", path = "../tsr_bundled", optional = true }
 xxhash-rust = { version = "=0.8.18", features = ["xxh3"] }
 
 [dev-dependencies]
@@ -37,6 +45,10 @@ required-features = ["checker"]
 
 [[test]]
 name = "emit"
+required-features = ["checker"]
+
+[[test]]
+name = "transpile"
 required-features = ["checker"]
 
 [lints]

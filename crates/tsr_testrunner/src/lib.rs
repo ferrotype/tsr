@@ -35,6 +35,23 @@ pub mod configurations;
 pub mod enumerate;
 pub mod harness;
 pub mod harness_options;
+pub mod portable;
+pub mod portable_compiler;
+pub use portable::protocol;
+#[path = "../../../tools/phase7/portable/compiler_codec.rs"]
+pub mod compiler_codec;
+#[path = "../../../tools/phase7/portable/compiler_protocol.rs"]
+pub mod compiler_protocol;
+#[path = "../../../tools/phase7/portable/mapper_codec.rs"]
+pub mod mapper_codec;
+pub mod compiler_api {
+    pub use tsr_checker::{Error as QueryError, Operation, TypeRef};
+    pub use tsr_compiler::Program;
+    pub mod mapper {
+        pub use tsr_contentmapper::*;
+        pub use tsr_ipc::Error as IpcError;
+    }
+}
 pub mod result;
 pub mod test_case_parser;
 pub mod transpile_runner;

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "noLib": true,
+    "strict": true,
+    "noEmit": true,
+    "target": "esnext",
+    "module": "esnext"
+  },
+  "files": ["globals.d.ts", "index.ts", "dep.ts"]
+}

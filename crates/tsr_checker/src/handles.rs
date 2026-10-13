@@ -322,6 +322,19 @@ impl Operation<'_> {
         Ok(())
     }
 
+    /// Exercise the wasm expression stack on a native contract run. This is
+    /// observation-only build configuration, not a compiler option or limit.
+    #[cfg(feature = "recursion-probe")]
+    pub fn use_iterative_expression_stack(&mut self) -> Result<(), Error> {
+        self.state_mut()
+            .relations
+            .recursion_probe
+            .as_mut()
+            .ok_or(Error::MissingLink("recursion probe not installed"))?
+            .iterative_expressions = true;
+        Ok(())
+    }
+
     /// Remove the contract observer and return only its executed-path counts.
     #[cfg(feature = "recursion-probe")]
     pub fn take_recursion_probe(&mut self) -> Result<serde_json::Value, Error> {

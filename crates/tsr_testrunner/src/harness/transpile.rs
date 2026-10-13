@@ -13,11 +13,52 @@
 //! computed here.
 use super::errors;
 use serde_json::{json, Value};
-use tsr_ast::Diagnostic;
+use std::sync::Arc;
+use tsr_ast::{Diagnostic, NodeId, SourceFileRead};
 use tsr_checker::CheckerRequest;
-use tsr_compiler::Program;
+use tsr_compiler::{diagnostic_writer::DiagnosticSources, Program};
 use tsr_core::CompilerOptions;
-use tsr_transpile::{transpile_declaration, transpile_module, Options, Output};
+use tsr_transpile::{transpile_declaration, transpile_module, Options};
+
+/// Observations returned by a compilation backend. Baseline rendering stays
+/// here; sources retain diagnostic text, never a fallback compiler.
+pub struct Output {
+    pub output_text: tsr_jsstring::JsString,
+    pub source_map_text: tsr_jsstring::JsString,
+    pub diagnostics: Vec<Diagnostic>,
+    pub sources: Box<dyn DiagnosticSources>,
+}
+
+struct NativeSources(Arc<Program>);
+impl DiagnosticSources for NativeSources {
+    fn diagnostic_source(&self, id: NodeId) -> Result<SourceFileRead<'_>, tsr_compiler::Error> {
+        self.0.diagnostic_source(id)
+    }
+}
+
+/// The native backend, also used by the existing suite unchanged.
+pub fn native_transpile(
+    unit: &Unit,
+    options: &Options<'_>,
+    declaration: bool,
+) -> Result<Output, String> {
+    let request = CheckerRequest::default();
+    let output = if declaration {
+        transpile_declaration(&request, &unit.content, options)
+    } else {
+        transpile_module(&request, &unit.content, options)
+    }
+    .map_err(|error| format!("transpilation failed: {error:?}"))?
+    .ok_or("transpilation was canceled")?;
+    Ok(Output {
+        output_text: output.output_text,
+        source_map_text: output.source_map_text,
+        diagnostics: output.diagnostics,
+        sources: Box::new(NativeSources(output.program)),
+    })
+}
+
+pub type Backend<'a> = dyn FnMut(&Unit, &Options<'_>, bool) -> Result<Output, String> + 'a;
 
 /// One unit of a transpile test: its name and content.
 pub struct Unit {
@@ -88,7 +129,15 @@ pub fn run_test(configuration: &Configuration<'_>) -> Result<Vec<Run>, String> {
     let (configured_name, extension) = configured_name(configuration.file, configuration.name);
     kinds(configuration.options)
         .into_iter()
-        .map(|declaration| run_kind(&configured_name, &extension, configuration, declaration))
+        .map(|declaration| {
+            run_kind(
+                &configured_name,
+                &extension,
+                configuration,
+                declaration,
+                &mut native_transpile,
+            )
+        })
         .collect()
 }
 
@@ -110,7 +159,24 @@ pub fn kinds(options: &CompilerOptions) -> Vec<bool> {
 /// `declaration`, else the module kind.
 pub fn run_one(configuration: &Configuration<'_>, declaration: bool) -> Result<Run, String> {
     let (configured_name, extension) = configured_name(configuration.file, configuration.name);
-    run_kind(&configured_name, &extension, configuration, declaration)
+    run_kind(
+        &configured_name,
+        &extension,
+        configuration,
+        declaration,
+        &mut native_transpile,
+    )
+}
+
+/// Run the same unit schedule and baseline writer with an external compiler.
+/// A backend failure cannot fall back to the native compiler.
+pub fn run_one_with(
+    configuration: &Configuration<'_>,
+    declaration: bool,
+    backend: &mut Backend<'_>,
+) -> Result<Run, String> {
+    let (name, extension) = configured_name(configuration.file, configuration.name);
+    run_kind(&name, &extension, configuration, declaration, backend)
 }
 
 /// Harness port: tsc/internal/testrunner/transpile_runner.go:TranspileBaselineRunner.runKind.
@@ -119,6 +185,7 @@ fn run_kind(
     extension: &[u8],
     configuration: &Configuration<'_>,
     declaration: bool,
+    backend: &mut Backend<'_>,
 ) -> Result<Run, String> {
     let options = configuration.options;
     let mut result = Vec::new();
@@ -133,14 +200,7 @@ fn run_kind(
             file_name: &unit.name,
             report_diagnostics: configuration.report_diagnostics,
         };
-        let request = CheckerRequest::default();
-        let output = if declaration {
-            transpile_declaration(&request, &unit.content, &transpile_options)
-        } else {
-            transpile_module(&request, &unit.content, &transpile_options)
-        }
-        .map_err(|error| format!("transpilation failed: {error:?}"))?
-        .ok_or("transpilation was canceled")?;
+        let output = backend(unit, &transpile_options, declaration)?;
 
         let mut output_extension =
             tsr_tsoptions::output_paths::get_output_extension(&unit.name, options.jsx).to_vec();
@@ -162,10 +222,10 @@ fn run_kind(
             result.extend_from_slice(b"\r\n\r\n//// [Diagnostics reported]\r\n");
             let mut diagnostic_file_name = unit.name.clone();
             if let Some(file) = output.diagnostics[0].file {
-                diagnostic_file_name = file_name(&output.program, file)?;
+                diagnostic_file_name = file_name(output.sources.as_ref(), file)?;
             }
             let error_baseline = errors::render(
-                &output.program,
+                output.sources.as_ref(),
                 &[errors::InputFile {
                     name: &diagnostic_file_name,
                     content: &unit.content,
@@ -241,17 +301,11 @@ fn replace_all(text: &[u8], from: &[u8], to: &[u8]) -> Vec<u8> {
 }
 
 /// The name of the program file `file`.
-fn file_name(program: &Program, file: tsr_arena::NodeId) -> Result<Vec<u8>, String> {
-    let source = program
-        .files()
-        .iter()
-        .find(|candidate| candidate.source() == file)
-        .ok_or("a diagnostic names a file outside the transpilation's program")?;
-    let view = source.bound().view();
-    let source_file = view
-        .source_file()
-        .map_err(|error| format!("unreadable source file: {error:?}"))?;
-    Ok(source_file.file_name().to_vec())
+fn file_name(program: &dyn DiagnosticSources, id: NodeId) -> Result<Vec<u8>, String> {
+    program
+        .diagnostic_source(id)
+        .map(|source| source.file_name().to_vec())
+        .map_err(|error| format!("diagnostic source: {error:?}"))
 }
 
 pub fn hex(raw: &[u8]) -> String {
@@ -275,7 +329,10 @@ pub fn unhex(text: &str) -> Result<Vec<u8>, String> {
 }
 
 /// A diagnostic in the native capture's shape (`phase3Diagnostics`).
-pub fn diagnostic(program: &Program, diagnostic: &Diagnostic) -> Result<Value, String> {
+pub fn diagnostic(
+    program: &dyn DiagnosticSources,
+    diagnostic: &Diagnostic,
+) -> Result<Value, String> {
     let file = match diagnostic.file {
         Some(file) => Value::String(hex(&file_name(program, file)?)),
         None => Value::Null,
@@ -311,7 +368,7 @@ pub fn run_value(run: &Run) -> Result<Value, String> {
                 .output
                 .diagnostics
                 .iter()
-                .map(|item| diagnostic(&unit.output.program, item))
+                .map(|item| diagnostic(unit.output.sources.as_ref(), item))
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(json!({
                 "unit_hex": hex(&unit.unit), "output_name_hex": hex(&unit.output_name),

@@ -456,7 +456,7 @@ impl CheckerState {
                         vec![],
                     )?;
                 }
-                // The `intrinsic` keyword is a leaf type node with no child nodes to check.
+                // checkchildren-allow: intrinsic keyword is a leaf type node with no children to check
                 return Ok(());
             }
             self.check_source_element(annotation)?;

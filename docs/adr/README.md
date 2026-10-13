@@ -6,7 +6,7 @@ One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` o
 |---|---|---|
 | [0001](0001-independent-repository-with-upstream-pinned-as-a-submodule.md) | Independent repository with upstream pinned as a submodule | Accepted |
 | [0002](0002-native-targets-and-the-glibc-floor.md) | Native targets and the glibc floor | Accepted |
-| [0003](0003-memory--webassembly-and-embedding-are-all-required.md) | Memory, WebAssembly and embedding are all required | Accepted |
+| [0003](0003-memory--webassembly-and-embedding-are-all-required.md) | Memory, WebAssembly and embedding are all required | Amended |
 | [0004](0004-the-owner-approves-baseline-divergences.md) | The owner approves baseline divergences | Amended (ADR 0023) |
 | [0005](0005-sequencing-by-dependency-slices-and-parity-gates--with-no-ca.md) | Sequencing by dependency slices and parity gates, with no calendar or staffing model | Accepted |
 | [0006](0006-node-ownership--arenas--lazy-file-storage--bundles-and-check.md) | Node ownership: arenas, lazy file storage, bundles and checked identities | Accepted |
@@ -27,6 +27,7 @@ One decision per file, numbered. `Status` is `Proposed`, `Accepted`, `Amended` o
 | [0021](0021-parse-and-bind-performance-thresholds.md) | Parse-and-bind performance thresholds re-based on measured evidence | Accepted |
 | [0022](0022-checker-type-footprint-threshold.md) | Checker per-type footprint threshold | Accepted |
 | [0023](0023-expectation-files-replace-recorded-evidence.md) | Expectation files computed by CI replace recorded evidence | Accepted |
+| [0024](0024-profiling-compatibility-out-of-scope.md) | Profiling compatibility is out of scope | Accepted |
 
 The three contracts (0006, 0007, 0013) were accepted by the owner on 2026-09-05 after review of their design notes: [ownership](../design/ownership.md), [symbols](../design/symbols.md) and [text](../design/text.md). Each note cites the pinned upstream code it reproduces and lists what E3 or E4 asserts. ADR 0019 was accepted by the owner on 2026-09-19 with server-owned options, a raw plugin stream tunnel and explicit Phase 5 limitations. ADR 0020 was accepted on 2026-09-20: the owner approved the amended prototype limits, Phase 7 budgets and S12 closure using the indexed recent evidence. Normal current-source freshness checks remain unchanged.
 
@@ -36,7 +37,12 @@ Pending technical decisions from the plan's section 13 become records when the o
 
 - Storage layout for nodes and types (item 6): decided on the benchmarking scenarios' census in Phase 7 R1.
 - Interning (item 8): decided on measured string duplication in R1.
-- Trampolines at the four left-operand recursion sites (item 11): decided by the stress tests in R5.
-- Replacement for the `checkchildren` analyzer (item 14): a `dylint` or `rustc_driver` lint with a regression for a skipped child check, decided in R5. Substituting review alone would require an owner amendment to PLAN.
+
+Recorded in Phase 7: the four recursion-site strategies (item 11,
+[ADR 0011](0011-deep-recursion--reserved-stacks-and-growth-guards.md)), with
+the observed wasm nesting limits still open in R5; and the `rustc_driver`
+replacement for `checkchildren` (item 14,
+[ADR 0016](0016-toolchain-and-lints.md)), including planted-omission controls
+and explicit analysis limitations.
 
 Settled since this list was written: the spike subset (item 16, Phase 0) and the fourslash transport (open question 5: a carried patch on the pinned harness, ADR 0019).

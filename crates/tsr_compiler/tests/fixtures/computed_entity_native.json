@@ -1,0 +1,7 @@
+{
+  "display": [
+    "(typeof Symbols)[typeof key]",
+    "(typeof Symbols)[typeof key]"
+  ],
+  "source": "declare const key: unique symbol;\nclass Symbols { static readonly [key]: unique symbol; }\nconst value = Symbols[key];\n"
+}

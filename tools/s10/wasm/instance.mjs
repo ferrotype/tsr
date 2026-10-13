@@ -6,8 +6,20 @@ export class WasmApiError extends Error {
 const API_ERROR = "ts-wasm-api-error:";
 
 export function createInstance(createBindings, module) {
-  let bindings = createBindings();
-  bindings.initSync({ module });
+  const bindings = createBindings();
+  const wasm = bindings.initSync({ module });
+  return manageInstance(bindings, wasm);
+}
+
+// Browser main threads limit synchronous instantiation of large modules.
+// Keep the same ownership/trap controller after the generated async initializer.
+export async function createInstanceAsync(createBindings, module) {
+  const bindings = createBindings();
+  const wasm = await bindings({ module_or_path: module });
+  return manageInstance(bindings, wasm);
+}
+
+function manageInstance(bindings, wasm) {
   let state = "live";
   const resources = new Set();
   function invoke(operation) {
@@ -23,6 +35,7 @@ export function createInstance(createBindings, module) {
       // Rust aborts do not run destructors. Never reenter a possibly poisoned
       // instance. Owned output copies from earlier successful calls stay valid.
       bindings = null;
+      wasm = null;
       state = "failed";
       for (const release of resources) release(false, true);
       resources.clear();
@@ -63,7 +76,23 @@ export function createInstance(createBindings, module) {
   function session(value) {
     const object = owned(value);
     return Object.freeze({
+      check: () => object.use(raw => raw.check()),
+      emitRetained: (request = {}) => {
+        const json = emitJSON(request);
+        return object.use(raw => raw.emit_retained(json));
+      },
+      retainedSnapshotHeader: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.retained_snapshot_header()))),
+      retainedSource: index => {
+        if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) throw new TypeError('source index must be unsigned 32-bit integer');
+        return JSON.parse(new TextDecoder().decode(object.use(raw => raw.retained_source(index))));
+      },
+      retainedWrite: index => {
+        if (!Number.isInteger(index) || index < 0 || index > 0xffffffff) throw new TypeError('write index must be unsigned 32-bit integer');
+        return JSON.parse(new TextDecoder().decode(object.use(raw => raw.retained_write(index))));
+      },
+      retainedSnapshot: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.retained_snapshot()))),
       diagnostics: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.diagnostics()))),
+      resolutionTrace: () => JSON.parse(new TextDecoder().decode(object.use(raw => raw.resolution_trace()))),
       typeAtPosition(path, position) {
         if (!(path instanceof Uint8Array) || !Number.isInteger(position) || position < 0 || position > 0xffffffff) {
           throw new TypeError("type query requires a byte path and unsigned UTF-16 position");
@@ -71,17 +100,7 @@ export function createInstance(createBindings, module) {
         return object.use(raw => raw.type_at_position(path, position));
       },
       emit(request = {}) {
-        // Byte paths travel as JSON byte arrays; Rust validates every field.
-        if (request === null || typeof request !== "object" || Array.isArray(request)) {
-          throw new TypeError("emit request must be an object");
-        }
-        const { files, ...rest } = request;
-        if (files !== undefined && files !== null &&
-            (!Array.isArray(files) || !files.every(file => file instanceof Uint8Array))) {
-          throw new TypeError("emit files must be an array of byte paths");
-        }
-        const json = JSON.stringify(files == null ? rest : { ...rest, files: files.map(file => Array.from(file)) });
-        if (json === undefined) throw new TypeError("emit request must be JSON");
+        const json = emitJSON(request);
         const result = JSON.parse(new TextDecoder().decode(object.use(raw => raw.emit(json))));
         for (const file of result.files) {
           file.name = Uint8Array.from(file.name);
@@ -90,6 +109,34 @@ export function createInstance(createBindings, module) {
         return result;
       },
       retire: () => object.use(raw => raw.retire()),
+      dispose: () => object.dispose(),
+    });
+  }
+  function emitJSON(request) {
+    // Byte paths travel as JSON byte arrays; Rust validates every field.
+    if (request === null || typeof request !== "object" || Array.isArray(request)) {
+      throw new TypeError("emit request must be an object");
+    }
+    const { files, ...rest } = request;
+    if (files !== undefined && files !== null &&
+        (!Array.isArray(files) || !files.every(file => file instanceof Uint8Array))) {
+      throw new TypeError("emit files must be an array of byte paths");
+    }
+    const json = JSON.stringify(files == null ? rest : { ...rest, files: files.map(file => Array.from(file)) });
+    if (json === undefined) throw new TypeError("emit request must be JSON");
+    return json;
+  }
+  function preparedHost(value) {
+    const object = owned(value);
+    return Object.freeze({
+      compileConfig(path, arguments_ = []) {
+        sourceArgs(new Uint8Array(), path, 0);
+        if (!Array.isArray(arguments_) || !arguments_.every(arg => arg instanceof Uint8Array)) {
+          throw new TypeError("config arguments must be byte arrays");
+        }
+        const json = JSON.stringify(arguments_.map(arg => Array.from(arg)));
+        return session(object.consume(raw => raw.compile_config(path, json)));
+      },
       dispose: () => object.dispose(),
     });
   }
@@ -108,10 +155,23 @@ export function createInstance(createBindings, module) {
     }
     return [source, name, kind, jsx, force];
   }
+  function transpileArgs(source, name, optionsJSON, reportDiagnostics) {
+    sourceArgs(source, name, 0);
+    if (typeof optionsJSON !== "string" || typeof reportDiagnostics !== "boolean") {
+      throw new TypeError("transpile requires raw compiler-options JSON and a diagnostic boolean");
+    }
+    return [source, name, optionsJSON, reportDiagnostics];
+  }
   return Object.freeze({
     parse(source, name, kind, jsx = false, force = false) { return call("parse", sourceArgs(source, name, kind, jsx, force)); },
     parseAndEncode(source, name, kind, jsx = false, force = false) {
       return call("parse_and_encode", sourceArgs(source, name, kind, jsx, force));
+    },
+    transpileModule(source, name, optionsJSON, reportDiagnostics = false) {
+      return call("transpile_module", transpileArgs(source, name, optionsJSON, reportDiagnostics));
+    },
+    transpileDeclaration(source, name, optionsJSON, reportDiagnostics = false) {
+      return call("transpile_declaration", transpileArgs(source, name, optionsJSON, reportDiagnostics));
     },
     createHost(cwd, caseSensitive = true) {
       if (!(cwd instanceof Uint8Array) || typeof caseSensitive !== "boolean") {
@@ -128,6 +188,13 @@ export function createInstance(createBindings, module) {
           sourceArgs(new Uint8Array(), path, 0);
           object.use(raw => raw.add_directory(path));
         },
+        addUnavailableFile(path, rawSize) {
+          sourceArgs(new Uint8Array(), path, 0);
+          if (typeof rawSize !== "bigint" || rawSize < 0n || rawSize > 0xffffffffffffffffn) {
+            throw new TypeError("unavailable file size must be an unsigned 64-bit bigint");
+          }
+          object.use(raw => raw.add_unavailable_file(path, rawSize));
+        },
         addSymlink(path, target) {
           sourceArgs(target, path, 0);
           object.use(raw => raw.add_symlink(path, target));
@@ -139,6 +206,7 @@ export function createInstance(createBindings, module) {
           if (json === undefined) throw new TypeError("compiler options must be JSON");
           return session(object.consume(raw => raw.compile(json)));
         },
+        prepare: () => preparedHost(object.consume(raw => raw.prepare())),
         dispose: () => object.dispose(),
       });
     },
@@ -151,9 +219,13 @@ export function createInstance(createBindings, module) {
       if (state === "live") {
         invoke(() => { for (const release of resources) release(true); });
         bindings = null;
+        wasm = null;
         state = "disposed";
       }
     },
     get state() { return state; },
+    get linearMemoryBytes() {
+      return invoke(() => wasm.memory.buffer.byteLength);
+    },
   });
 }

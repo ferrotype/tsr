@@ -1,0 +1,614 @@
+[
+  {
+    "after": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2502,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "x"
+        ]
+      }
+    ],
+    "before": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      }
+    ],
+    "display": "any",
+    "semantic": [],
+    "source": "export class A { accessor x: typeof this.x; }\n"
+  },
+  {
+    "after": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2502,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "x"
+        ]
+      }
+    ],
+    "before": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      }
+    ],
+    "display": "any",
+    "semantic": [],
+    "source": "export class A { accessor x: A[\"x\"]; }\n"
+  },
+  {
+    "after": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2502,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "x"
+        ]
+      }
+    ],
+    "before": [
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Array",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Boolean"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "CallableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Function"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "IArguments"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "NewableFunction"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Number"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "Object"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "RegExp",
+          "es2015"
+        ]
+      },
+      {
+        "code": 2318,
+        "file_nil": true,
+        "pos": 0,
+        "end": 0,
+        "args": [
+          "String",
+          "es2015"
+        ]
+      }
+    ],
+    "display": "any",
+    "semantic": [],
+    "source": "export class A { accessor x: typeof A.prototype.x; }\n"
+  }
+]

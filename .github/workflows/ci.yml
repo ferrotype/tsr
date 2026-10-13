@@ -6,6 +6,9 @@
 # script-tests: the Python tests, their output kept in an artifact.
 # msrv:         the locked workspace compiles on the declared minimum Rust.
 # runner:       builds the compiler suite runner once for its shards.
+# portable-build: builds each portable consumer once and runs browser smoke.
+# portable-parity: compiler rosters in four embed/eight wasm shards; transpile
+#               rosters in one shard each, all checked on pull requests.
 # phase5-runner: builds both Go assertion binaries, test2json and one Rust server.
 # parity:       one job per suite shard; each runs its share of the pin's tests and
 #               uploads its results.
@@ -61,10 +64,41 @@ jobs:
         uses: EmbarkStudios/cargo-deny-action@v2
         with:
           command: check advisories licenses bans sources
+      - name: Budget consumer dependency policy
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: tools/phase7/budget/rust/Cargo.toml
+          command: check advisories licenses bans sources
+          arguments: --config deny.toml
       - name: Ledger and markers
         run: cargo xtask validate
       - name: Packaged assets and publication policy
         run: python3 scripts/package_assets.py --check
+
+  checkchildren:
+    name: checker child-traversal lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned compiler-private tooling
+        run: |
+          nightly=$(python3 -c "import tomllib; print(tomllib.load(open('data/s04/toolchains.toml','rb'))['nightly'])")
+          rustup toolchain install "$nightly" --profile minimal --component rustc-dev
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: checkchildren
+          workspaces: . -> target/phase7/checkchildren-cargo
+      - name: Omission controls and checker analysis
+        run: python3 tools/phase7/checkchildren/run.py check --output "$RUNNER_TEMP/checkchildren.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: checkchildren
+          path: ${{ runner.temp }}/checkchildren.log
+          if-no-files-found: warn
 
   rust-tests:
     name: rust tests ${{ matrix.shard }}
@@ -128,6 +162,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ steps.node.outputs.version }}
+      - name: Budget allocator and artifact loader controls
+        run: |
+          cargo test --locked --manifest-path tools/phase7/budget/rust/Cargo.toml --target-dir target --features allocation-metrics allocator::
+          node --test tools/phase7/budget/test-production-wasm.mjs tools/phase7/budget/go/test-instance.mjs tools/phase7/budget/go/test-wasm.mjs
       - name: LSP and API generated code and pinned codec comparison
         run: |
           cargo xtask gen lsproto --check
@@ -193,6 +231,198 @@ jobs:
           name: tsr-testrunner
           path: target/release/tsr-testrunner
           retention-days: 1
+          if-no-files-found: error
+
+  portable-build:
+    name: build portable consumers through ${{ matrix.runtime }}
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [embed, wasm]
+    steps:
+      - name: Set runner-local browser cache paths
+        run: |
+          echo "PLAYWRIGHT_BROWSERS_PATH=$RUNNER_TEMP/phase7-browsers" >> "$GITHUB_ENV"
+          echo "NPM_CONFIG_CACHE=$RUNNER_TEMP/phase7-browser-npm" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - name: Install the pinned toolchain
+        run: rustup show active-toolchain || rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: portable-${{ matrix.runtime }}
+      - name: Build and test the independent consumer
+        id: public_native_consumer
+        if: matrix.runtime == 'embed'
+        run: |
+          cargo test --release --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target
+          cargo build --release --locked --manifest-path tools/s10/rust-consumer/Cargo.toml --target-dir target
+      - name: Read the wasm and Node pins
+        if: matrix.runtime == 'wasm'
+        id: portable-pins
+        run: |
+          echo "node=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+          echo "bindgen=$(python3 -c "import json;print(json.load(open('tools/s10/toolchains.json'))['wasm_bindgen'])")" >> "$GITHUB_OUTPUT"
+          echo "playwright=$(python3 -c "import json;print(json.load(open('tools/phase7/portable/browser/toolchains.json'))['playwright'])")" >> "$GITHUB_OUTPUT"
+          echo "browser-os=$(python3 -c 'import platform; print(platform.freedesktop_os_release()["ID"] + "-" + platform.freedesktop_os_release()["VERSION_ID"])')" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: matrix.runtime == 'wasm'
+        with:
+          node-version: ${{ steps.portable-pins.outputs.node }}
+      - name: Cache the pinned browser binaries and npm downloads
+        if: matrix.runtime == 'wasm'
+        id: browser-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+            ${{ env.NPM_CONFIG_CACHE }}
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ steps.portable-pins.outputs.browser-os }}-phase7-browsers-${{ steps.portable-pins.outputs.playwright }}-${{ hashFiles('tools/phase7/portable/browser/toolchains.json', 'upstream/package.json') }}
+      - name: Provision the pinned wasm tools
+        if: matrix.runtime == 'wasm'
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-bindgen-cli --version '${{ steps.portable-pins.outputs.bindgen }}' --locked
+      - name: Build the production wasm artifact
+        id: production_wasm
+        if: matrix.runtime == 'wasm'
+        run: |
+          python3 scripts/s10_build.py --checker --wasm-bindgen "$(command -v wasm-bindgen)"
+          node --test tools/phase7/portable/test-wasm.mjs
+      - name: Build the independent test-only wasm compiler consumer
+        id: test_wasm_compiler
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        run: |
+          cargo test --locked --manifest-path tools/phase7/portable/wasm-compiler/Cargo.toml --target-dir target --lib
+          cargo clippy --locked --manifest-path tools/phase7/portable/wasm-compiler/Cargo.toml --target-dir target --all-targets -- -D warnings
+          node --test tools/phase7/portable/test-compiler-wasm.mjs
+          python3 tools/phase7/portable/wasm-compiler/build.py --wasm-bindgen "$(command -v wasm-bindgen)" --output results/wasm-compiler-artifact
+      - name: Install the pinned Playwright runner
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
+        run: |
+          npm install --prefix "$RUNNER_TEMP/phase7-browser" --ignore-scripts --no-audit --no-fund "playwright@${{ steps.portable-pins.outputs.playwright }}"
+      - name: Download browser binaries on a cache miss
+        id: browser-download
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' && steps.browser-cache.outputs.cache-hit != 'true' }}
+        run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install chromium firefox webkit
+      - name: Save successfully provisioned browser binaries
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.browser-download.outcome == 'success' && steps.browser-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+            ${{ env.NPM_CONFIG_CACHE }}
+          key: ${{ steps.browser-cache.outputs.cache-primary-key }}
+      - name: Install browser OS dependencies on the runner
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
+        run: node "$RUNNER_TEMP/phase7-browser/node_modules/playwright/cli.js" install-deps chromium firefox webkit
+      - name: Run the three-engine browser smoke
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' && steps.production_wasm.outcome == 'success' }}
+        timeout-minutes: 15
+        run: |
+          node --test tools/phase7/portable/browser/test-runner.mjs
+          node tools/phase7/portable/browser/run.mjs --artifacts target/s10/checker --output results/browser-smoke --playwright-module "$RUNNER_TEMP/phase7-browser/node_modules/playwright"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'embed' }}
+        with:
+          name: portable-consumer-embed
+          path: target/release/s10_rust_consumer
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        with:
+          name: portable-consumer-wasm
+          # The common upload root preserves target/ and results/ below it.
+          path: |
+            target/s10/checker
+            results/wasm-compiler-artifact
+          retention-days: 1
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && matrix.runtime == 'wasm' }}
+        with:
+          name: parity-portable-browser
+          path: results/browser-smoke
+          retention-days: 7
+          if-no-files-found: error
+
+  portable-parity:
+    name: ${{ matrix.suite }} ${{ matrix.shard }}
+    needs: [runner, portable-build]
+    # Preserve successful runtime/suite results even if another build failed;
+    # missing artifacts or shards still fail the final parity check.
+    if: ${{ !cancelled() }}
+    runs-on: ${{ vars.PARITY_RUNNER || 'ubuntu-latest' }}
+    timeout-minutes: ${{ matrix.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { suite: compiler-embed, runtime: embed, shard: 1/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 2/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 3/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-embed, runtime: embed, shard: 4/4, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 1/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 2/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 3/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 4/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 5/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 6/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 7/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: compiler-wasm, runtime: wasm, shard: 8/8, jobs: 2, timeout: 90, run_timeout: 75 }
+          - { suite: transpile-embed, runtime: embed, shard: 1/1, jobs: 4, timeout: 60, run_timeout: 45 }
+          - { suite: transpile-wasm, runtime: wasm, shard: 1/1, jobs: 2, timeout: 90, run_timeout: 75 }
+    env:
+      TSR_WASM_ARTIFACT_DIR: ${{ github.workspace }}/portable/target/s10/checker
+      TSR_WASM_COMPILER_ARTIFACT_DIR: ${{ github.workspace }}/portable/results/wasm-compiler-artifact
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: tsr-testrunner
+          path: runner
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable-consumer-${{ matrix.runtime }}
+          path: portable
+      - name: Read the pinned Node version
+        if: matrix.runtime == 'wasm'
+        id: node
+        run: echo "version=$(python3 -c "import json;print(json.load(open('upstream/package.json'))['volta']['node'])")" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        if: matrix.runtime == 'wasm'
+        with:
+          node-version: ${{ steps.node.outputs.version }}
+      - name: Run the portable shard
+        timeout-minutes: ${{ matrix.run_timeout }}
+        env:
+          RUNTIME: ${{ matrix.runtime }}
+          SUITE: ${{ matrix.suite }}
+          SHARD: ${{ matrix.shard }}
+          JOBS: ${{ matrix.jobs }}
+        run: |
+          chmod +x runner/tsr-testrunner
+          if [ "$RUNTIME" = embed ]; then
+            consumer=portable/s10_rust_consumer
+            chmod +x "$consumer"
+          else
+            consumer=tools/phase7/portable/wasm-consumer
+            if [ "$SUITE" = compiler-wasm ]; then artifacts="$TSR_WASM_COMPILER_ARTIFACT_DIR"; else artifacts="$TSR_WASM_ARTIFACT_DIR"; fi
+            test -f "$artifacts/build.json"
+          fi
+          python3 scripts/parity.py run "$SUITE" --runner runner/tsr-testrunner --consumer "$consumer" --shard "$SHARD" --jobs "$JOBS" --output "results/$SUITE/$(echo "$SHARD" | tr / -)"
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: parity-portable-${{ matrix.suite }}-${{ strategy.job-index }}
+          path: results
+          retention-days: 7
           if-no-files-found: error
 
   phase5-runner:
@@ -382,7 +612,7 @@ jobs:
 
   parity-check:
     name: parity check
-    needs: [parity, phase5-parity, jsapi]
+    needs: [parity, portable-parity, phase5-parity, jsapi]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
@@ -395,7 +625,7 @@ jobs:
       - name: Compare with the expectation files
         run: |
           status=0
-          for suite in compiler compiler-concurrent transpile fourslash lsp jsapi; do
+          for suite in compiler compiler-concurrent compiler-embed compiler-wasm transpile transpile-embed transpile-wasm fourslash lsp jsapi; do
             python3 scripts/parity.py check "$suite" --results results/"$suite"/* || status=1
           done
           exit "$status"

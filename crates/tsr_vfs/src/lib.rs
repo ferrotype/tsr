@@ -50,12 +50,17 @@ impl From<iofs::IoError> for Error {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct SnapshotId(u64);
 static NEXT_SNAPSHOT: AtomicU64 = AtomicU64::new(1);
-fn snapshot_id() -> SnapshotId {
-    SnapshotId(
-        NEXT_SNAPSHOT
-            .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
-            .expect("filesystem snapshot identities exhausted"),
-    )
+impl SnapshotId {
+    /// Allocate an identity for one immutable filesystem state. A host returns
+    /// `Some(id)` only while all observable contents remain unchanged; changed
+    /// contents require a new identity. Live hosts should return `None`.
+    pub fn fresh() -> Self {
+        Self(
+            NEXT_SNAPSHOT
+                .try_update(Ordering::Relaxed, Ordering::Relaxed, |n| n.checked_add(1))
+                .expect("filesystem snapshot identities exhausted"),
+        )
+    }
 }
 #[derive(Clone, Debug)]
 pub struct FileContent {
@@ -186,6 +191,7 @@ pub trait FileSystem: Send + Sync {
 #[derive(Clone, Debug)]
 enum Entry {
     File(FileContent),
+    UnavailableFile { raw_size: u64 },
     Directory,
     Symlink(JsString),
 }
@@ -236,6 +242,13 @@ impl MemoryBuilder {
     pub fn insert_physical(&mut self, path: &[u8], bytes: impl Into<Arc<[u8]>>) {
         self.insert(path, Entry::File(FileContent::physical(bytes)));
     }
+    /// Record an existing regular file whose bytes are deliberately unavailable.
+    /// Metadata queries and symlink resolution still see the file. Reading it
+    /// returns a path-bearing error, never a missing file or empty content.
+    /// Replace it with `insert_physical` before freezing to provide its bytes.
+    pub fn insert_unavailable_file(&mut self, path: &[u8], raw_size: u64) {
+        self.insert(path, Entry::UnavailableFile { raw_size });
+    }
     pub fn insert_loaded(&mut self, path: &[u8], bytes: impl Into<Arc<[u8]>>) {
         self.insert(path, Entry::File(FileContent::loaded(bytes)));
     }
@@ -250,11 +263,23 @@ impl MemoryBuilder {
         self.entries.remove(&key);
     }
     pub fn finish(self) -> MemorySnapshot {
+        let mut children: BTreeMap<JsString, Vec<JsString>> = BTreeMap::new();
+        for (key, entry) in &self.entries {
+            let parent = path::directory(entry.name.as_bytes());
+            if parent == entry.name.as_bytes() {
+                continue;
+            }
+            children
+                .entry(path::to_path(&parent, b"", self.case_sensitive))
+                .or_default()
+                .push(key.clone());
+        }
         MemorySnapshot {
             cwd: self.cwd,
             case_sensitive: self.case_sensitive,
             entries: self.entries,
-            id: snapshot_id(),
+            children,
+            id: SnapshotId::fresh(),
         }
     }
 }
@@ -263,6 +288,7 @@ pub struct MemorySnapshot {
     cwd: JsString,
     case_sensitive: bool,
     entries: BTreeMap<JsString, NamedEntry>,
+    children: BTreeMap<JsString, Vec<JsString>>,
     id: SnapshotId,
 }
 impl MemorySnapshot {
@@ -315,6 +341,17 @@ impl FileSystem for MemorySnapshot {
                 value: Entry::File(content),
                 ..
             }) => Some(content.clone()),
+            Some(NamedEntry {
+                value: Entry::UnavailableFile { .. },
+                ..
+            }) => {
+                return Err(iofs::IoError::path(
+                    "read",
+                    path,
+                    iofs::IoError::message("snapshot file content is unavailable"),
+                )
+                .into());
+            }
             _ => None,
         })
     }
@@ -324,6 +361,10 @@ impl FileSystem for MemorySnapshot {
                 value: Entry::File(content),
                 ..
             }) => Some(FileInfo::basic(false, content.raw.len() as u64)),
+            Some(NamedEntry {
+                value: Entry::UnavailableFile { raw_size },
+                ..
+            }) => Some(FileInfo::basic(false, *raw_size)),
             Some(NamedEntry {
                 value: Entry::Directory,
                 ..
@@ -338,16 +379,11 @@ impl FileSystem for MemorySnapshot {
             symlinks: Some(BTreeSet::new()),
             ..Default::default()
         };
-        for entry in self.entries.values() {
-            if path::to_path(
-                &path::directory(entry.name.as_bytes()),
-                b"",
-                self.case_sensitive,
-            ) != key
-                || entry.name.as_bytes() == name
-            {
-                continue;
-            }
+        for child in self.children.get(&key).into_iter().flatten() {
+            let entry = self
+                .entries
+                .get(child)
+                .expect("the frozen child index references an existing entry");
             let basename = JsString::from_bytes(path::base_name(entry.name.as_bytes()));
             if let Some(info) = self.stat(entry.name.as_bytes())? {
                 if matches!(entry.value, Entry::Symlink(_)) {

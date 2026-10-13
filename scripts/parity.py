@@ -2,7 +2,7 @@
 """Suite parity against the pin, as expectation files (docs/EVIDENCE-plan.md).
 
     parity.py list   <suite> [--runner PATH]
-    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH]
+    parity.py run    <suite> --output DIR [--shard i/n] [--jobs J] [--timeout S] [--id ID ...] [--runner PATH] [--consumer PATH]
     parity.py check  <suite> --results DIR [DIR ...]
     parity.py accept <suite> --results DIR [DIR ...]
 
@@ -17,17 +17,30 @@ baseline output under DIR/local). `check` merges the result directories,
 compares the failing set with status/parity/<suite>.json and exits non-zero
 on any difference; `accept` rewrites that file, keeping every approved
 reason and refreshing the mechanical labels from the run.
+
+`compiler-embed` and `transpile-embed` enumerate their native rosters and grade
+the external Rust consumer. Only `run` needs the consumer: `--consumer` supplies a prebuilt
+executable, otherwise Cargo builds tools/s10/rust-consumer in release. An
+explicit `--runner` bypasses the runner build only; it does not bypass consumer
+selection. `list`, `check` and `accept` never build the consumer.
+`compiler-wasm` and `transpile-wasm` use the same external byte protocols with
+the verified tools/phase7/portable/wasm-consumer launcher (or an identical copy
+with its transport files). `run` requires an explicit `--consumer`, validates
+the artifact and pinned Node runtime, and records their hashes. Portable shard
+identities must agree at `check`/`accept`; native consumers cannot grade wasm.
 """
 from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
+import hashlib
 import json
 import os
 from pathlib import Path
 import platform
 import shutil
+import signal
 import subprocess
 import sys
 import time
@@ -62,6 +75,10 @@ SUITES = {
     "compiler": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single"), 600),
     "compiler-concurrent": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "concurrent"), 600),
     "transpile": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile"), 60),
+    "transpile-embed": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile", "--backend", "embed"), 60),
+    "transpile-wasm": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "transpile", "--backend", "embed"), 60),
+    "compiler-embed": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single", "--backend", "embed"), 600),
+    "compiler-wasm": Suite("tsr_testrunner", "tsr-testrunner", ("--suite", "compiler", "--mode", "single", "--backend", "embed"), 600),
     "tsc": Suite("phase4_tsctests", "phase4_tsctests", ("--suite", "tsc"), 120),
 }
 
@@ -71,6 +88,7 @@ def pin():
 
 
 BATCH_SUITES = ("fourslash", "lsp", "jsapi")
+PORTABLE_SUITES = ("transpile-embed", "transpile-wasm", "compiler-embed", "compiler-wasm")
 
 
 def bridge(suite):
@@ -120,8 +138,147 @@ def runner_path(suite, explicit=None):
     return Path(executables[-1])
 
 
-def runner_command(suite, runner, *rest):
-    return [str(runner), *SUITES[suite].arguments, *rest]
+def consumer_path(explicit=None):
+    """Resolve the external consumer only for `run`; honor Cargo's artifact
+    selection rather than assuming a target directory or host target."""
+    if explicit:
+        executable = Path(explicit).resolve()
+    else:
+        manifest = ROOT / "tools/s10/rust-consumer/Cargo.toml"
+        binary = "s10_rust_consumer"
+        command = ["cargo", "build", "--release", "--locked", "--manifest-path", str(manifest),
+                   "--bin", binary, "--message-format=json-render-diagnostics"]
+        completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
+        if completed.returncode != 0:
+            sys.stderr.write(completed.stderr)
+            sys.exit("cargo build failed for the embedding consumer")
+        executables = []
+        for line in completed.stdout.splitlines():
+            if not line.startswith("{"):
+                continue
+            artifact = json.loads(line)
+            target = artifact.get("target", {})
+            if (artifact.get("reason") == "compiler-artifact"
+                    and target.get("name") == binary and "bin" in target.get("kind", [])
+                    and artifact.get("manifest_path")
+                    and Path(artifact["manifest_path"]).resolve() == manifest.resolve()
+                    and artifact.get("executable")):
+                executables.append(Path(artifact["executable"]))
+        if len(executables) != 1:
+            sys.exit("cargo did not report exactly one embedding consumer executable")
+        executable = executables[0].resolve()
+    if not executable.is_file() or not os.access(executable, os.X_OK):
+        sys.exit(f"embedding consumer is not an executable file: {executable}")
+    return executable
+
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def portable_identity(suite, consumer):
+    """Bind the grade to bytes and a verified transport, never a path label.
+
+    Wasm uses the repository's audited launcher (or an identical relocated
+    copy). Only after checking that code do we ask its artifact loader to
+    validate the wasm, bindings and ABI and report the actual Node runtime.
+    """
+    if suite.endswith("-embed"):
+        completed = subprocess.run([str(consumer), "--identity"], cwd=ROOT, capture_output=True, text=True, timeout=60)
+        try:
+            identity = json.loads(completed.stdout)
+        except ValueError:
+            identity = None
+        if completed.returncode or identity != {"version": 1, "runtime": "embed"}:
+            sys.exit(f"{suite} requires an embed consumer identity")
+        return {**identity, "consumer_sha256": sha256(consumer)}
+    family = suite.rsplit("-", 1)[0]
+    portable = ROOT / "tools/phase7/portable"
+    names = ["wasm-consumer", "wasm-identity.mjs"]
+    names += (["compiler-wasm.mjs", "compiler-imports.mjs"] if family == "compiler" else
+              ["wasm.mjs", "../../s10/wasm/instance.mjs", "../../s10/wasm/imports.mjs"])
+    transport = {}
+    for name in names:
+        actual = consumer if name == "wasm-consumer" else consumer.parent / name
+        if not actual.is_file() or sha256(actual) != sha256(portable / name):
+            sys.exit(f"{suite} requires the verified wasm launcher and transport: {actual}")
+        transport[name] = sha256(actual)
+    command = [str(consumer), *(["--compiler"] if family == "compiler" else []), "--identity"]
+    completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=60)
+    if completed.returncode:
+        sys.stderr.write(completed.stderr)
+        sys.exit(f"{suite}: wasm runtime/artifact verification failed")
+    try:
+        identity = json.loads(completed.stdout)
+    except ValueError:
+        sys.exit(f"{suite}: invalid wasm identity response")
+    if not isinstance(identity, dict):
+        sys.exit(f"{suite}: invalid wasm identity response")
+    identity["transport"] = transport
+    validate_portable_identity(suite, identity)
+    pins = json.loads((ROOT / "tools/s10/toolchains.json").read_text())
+    node = "v" + json.loads((ROOT / "upstream/package.json").read_text())["volta"]["node"]
+    if identity["engine"]["version"] != node or identity["engine"]["flags"] != pins["node_flags"]:
+        sys.exit(f"{suite}: wasm engine differs from the pinned Node version or flags")
+    return identity
+
+
+def validate_portable_identity(suite, identity):
+    def digest(value):
+        return isinstance(value, str) and len(value) == 64 and all(char in "0123456789abcdef" for char in value)
+
+    runtime = suite.rsplit("-", 1)[1]
+    valid = isinstance(identity, dict) and identity.get("version") == 1 and identity.get("runtime") == runtime
+    if valid and runtime == "embed":
+        valid = digest(identity.get("consumer_sha256"))
+    elif valid:
+        family = suite.rsplit("-", 1)[0]
+        engine = identity.get("engine", {})
+        artifacts = identity.get("artifacts", {})
+        transport = identity.get("transport", {})
+        valid = (identity.get("family") == family and digest(identity.get("build_sha256"))
+                 and isinstance(engine, dict) and digest(engine.get("sha256"))
+                 and isinstance(engine.get("version"), str) and isinstance(engine.get("flags"), list)
+                 and "node_options" in engine and (engine["node_options"] is None or isinstance(engine["node_options"], str))
+                 and isinstance(artifacts, dict) and set(artifacts) == {family.replace("transpile", "checker") + "_bg.wasm", "bindings.mjs"}
+                 and all(digest(value) for value in artifacts.values())
+                 and isinstance(transport, dict) and "wasm-consumer" in transport
+                 and all(digest(value) for value in transport.values()))
+    if not valid:
+        sys.exit(f"{suite}: missing or invalid verified portable runtime/artifact identity")
+
+
+def runner_command(suite, runner, *rest, consumer=None):
+    arguments = [str(runner), *SUITES[suite].arguments]
+    if consumer is not None:
+        if suite not in PORTABLE_SUITES:
+            raise ValueError("a consumer applies only to compiler/transpile embed or wasm suites")
+        arguments.extend(("--consumer", str(consumer)))
+    return [*arguments, *rest]
+
+
+def run_embed_command(command, timeout):
+    """The runner's deadline also kills its external consumer descendants."""
+    with subprocess.Popen(command, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                          text=True, start_new_session=os.name == "posix") as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+        except BaseException:
+            if os.name == "posix":
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+            elif os.name == "nt":
+                subprocess.run(["taskkill", "/PID", str(process.pid), "/T", "/F"],
+                               capture_output=True, check=False)
+                if process.poll() is None:
+                    process.kill()
+            else:
+                process.kill()
+            process.communicate()
+            raise
+        return subprocess.CompletedProcess(command, process.returncode, stdout, stderr)
 
 
 def list_variants(suite, runner):
@@ -144,12 +301,15 @@ def shard(variants, spec):
     return variants[index - 1::count], (index, count)
 
 
-def run_variant(suite, runner, variant, local, timeout):
+def run_variant(suite, runner, variant, local, timeout, consumer=None):
     """The result lines of one variant; a crash or a deadline fails the whole variant."""
-    command = runner_command(suite, runner, "run", "--id", variant, "--local", str(local))
+    command = runner_command(suite, runner, "run", "--id", variant, "--local", str(local), consumer=consumer)
     started = time.monotonic()
     try:
-        completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
+        if consumer is not None:
+            completed = run_embed_command(command, timeout)
+        else:
+            completed = subprocess.run(command, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
     except subprocess.TimeoutExpired:
         return [{"id": variant, "state": "fail", "reason": f"deadline: {timeout} s"}], time.monotonic() - started
     elapsed = time.monotonic() - started
@@ -177,12 +337,19 @@ def run_variant(suite, runner, variant, local, timeout):
 
 def run(args):
     suite = args.suite
+    explicit_consumer = getattr(args, "consumer", None)
+    if explicit_consumer and suite not in PORTABLE_SUITES:
+        sys.exit("--consumer applies only to compiler/transpile embed or wasm suites")
+    if suite in PORTABLE_SUITES and suite.endswith("-wasm") and not explicit_consumer:
+        sys.exit(suite + " requires --consumer with an explicit wasm host executable")
     # The pinned client's getExePath reads one repository symlink, which the
     # runner points at the binary under test before each file; parallel
     # workers would point it at each other's binary.
     if suite == "jsapi" and (args.jobs or 1) > 1:
         sys.exit("jsapi runs one file at a time: --jobs must be 1")
     runner = runner_path(suite, args.runner)
+    consumer = consumer_path(explicit_consumer) if suite in PORTABLE_SUITES else None
+    identity = portable_identity(suite, consumer) if consumer is not None else None
     roster = list_variants(suite, runner) if not args.id or SUITES[suite].batch else None
     variants = args.id or roster
     if args.id and SUITES[suite].batch and (len(set(variants)) != len(variants) or not set(variants) <= set(roster)):
@@ -209,6 +376,9 @@ def run(args):
             "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
     if SUITES[suite].batch:
         meta["native_selection"] = {key: runner[key] for key in ("goos", "goarch", "compiled_sources")}
+    if consumer is not None:
+        meta["consumer"] = str(consumer)
+        meta["portable_identity"] = identity
     counts = dict.fromkeys(STATES, 0)
     slowest = []
     with (output / "results.ndjson").open("w") as results, ThreadPoolExecutor(jobs) as pool:
@@ -231,7 +401,7 @@ def run(args):
                 timings = future.result()
                 slowest = sorted(slowest + [(seconds, name) for name, seconds in timings.items()], reverse=True)[:5]
         else:
-            futures = {pool.submit(run_variant, suite, runner, variant, local, timeout): variant for variant in selected}
+            futures = {pool.submit(run_variant, suite, runner, variant, local, timeout, consumer): variant for variant in selected}
             for done, future in enumerate(as_completed(futures), 1):
                 rows, elapsed = future.result()
                 slowest = sorted(slowest + [(elapsed, futures[future])], reverse=True)[:5]
@@ -241,6 +411,8 @@ def run(args):
                 if done % 500 == 0 or done == len(selected):
                     print(f"{done}/{len(selected)} variants; sub-tests pass {counts['pass']} fail {counts['fail']} "
                           f"skip {counts['skip']}", file=sys.stderr)
+    if consumer is not None and portable_identity(suite, consumer) != identity:
+        sys.exit("portable runtime or artifact changed during capture; repeat the run")
     meta["finished"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     meta["counts"] = counts
     meta["slowest"] = [{"variant": variant, "seconds": round(seconds, 1)} for seconds, variant in slowest]
@@ -301,6 +473,12 @@ def merge(suite, directories):
         selections = {json.dumps(meta.get("native_selection"), sort_keys=True) for meta in metas}
         if len(selections) != 1 or "null" in selections:
             sys.exit("the result directories disagree on native host/source selection")
+    if suite in PORTABLE_SUITES:
+        for meta in metas:
+            validate_portable_identity(suite, meta.get("portable_identity"))
+        identities = {json.dumps(meta["portable_identity"], sort_keys=True) for meta in metas}
+        if len(identities) != 1:
+            sys.exit("the result directories disagree on portable runtime/artifact identity")
     counts = {meta["shard"][1] for meta in metas}
     pins = {meta["pin"] for meta in metas}
     totals = {meta["total"] for meta in metas}
@@ -314,7 +492,10 @@ def merge(suite, directories):
     total = totals.pop()
     if len(variants) != total or len(set(variants)) != total:
         sys.exit(f"the shards answer {len(set(variants))} distinct variants of the {total} enumerated")
-    return {"pin": pins.pop(), "total": total}, rows
+    merged = {"pin": pins.pop(), "total": total}
+    if suite in PORTABLE_SUITES:
+        merged["portable_identity"] = metas[0]["portable_identity"]
+    return merged, rows
 
 
 def failing_ids(rows):
@@ -404,6 +585,7 @@ def main(argv=None):
         if name in ("list", "run"):
             command.add_argument("--runner", help="a prebuilt runner binary, or a Phase 5 prepared.json, instead of building")
         if name == "run":
+            command.add_argument("--consumer", help="external executable: optional for embed suites (otherwise build); required for wasm suites")
             command.add_argument("--output", required=True)
             command.add_argument("--shard", help="i/n: this shard of the sorted variant list")
             command.add_argument("--jobs", type=int)

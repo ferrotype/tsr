@@ -1,0 +1,2 @@
+#!/bin/sh
+exec node --expose-gc --stack-size=4096 "$(dirname "$0")/wasm.mjs"

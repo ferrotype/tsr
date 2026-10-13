@@ -1,0 +1,23 @@
+[
+  {
+    "helper": "local",
+    "kind": 4,
+    "node_nil": true,
+    "emit_flags": 0,
+    "output": "runtime error: invalid memory address or nil pointer dereference"
+  },
+  {
+    "helper": "export",
+    "kind": 4,
+    "node_nil": true,
+    "emit_flags": 0,
+    "output": "runtime error: invalid memory address or nil pointer dereference"
+  },
+  {
+    "helper": "declaration",
+    "kind": 4,
+    "node_nil": true,
+    "emit_flags": 0,
+    "output": "runtime error: invalid memory address or nil pointer dereference"
+  }
+]

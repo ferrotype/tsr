@@ -37,6 +37,11 @@ Workloads, and the harness commands that make their captures:
               bluesky) at 2, 4 and 8 checkers (docs/PHASE7-plan.md, R0):
               scripts/phase7_scenarios.py provision, then
               tools/phase7/bench/capture.py build and run (target/phase7/bench)
+  embed-<mode>-<scenario>, wasm-<mode>-<scenario>
+              one-checker public embedding/production wasm, check or emit:
+              tools/phase7/budget/measure.py (explicit --capture required for
+              durable captures). Native retained heap is a separate missing
+              instrumented metric; retained RSS never substitutes for it.
 """
 from __future__ import annotations
 
@@ -69,7 +74,7 @@ ARCH_NAMES = {"arm64": "aarch64", "amd64": "x86_64"}
 
 @dataclass(frozen=True)
 class Workload:
-    capture: str
+    capture: str | None
     read: Callable[[Path, argparse.Namespace], dict]
 
 
@@ -215,6 +220,36 @@ def scenario_reader(scenario, mode):
     return read
 
 
+def budget_reader(scenario, mode, runtime):
+    """Replay authenticated production budget rows without rerunning a child."""
+    def read(capture, args):
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        module = importlib.import_module("tools.phase7.budget.measure")
+        measured = module.read_capture(capture.resolve(), scenario, mode, runtime)
+        allocation_path = getattr(args, "allocation_capture", None)
+        if allocation_path is not None:
+            if runtime != "native":
+                raise ValueError("--allocation-capture applies only to native embedding workloads")
+            allocation = importlib.import_module("tools.phase7.budget.allocation").read_capture(
+                Path(allocation_path).resolve(), scenario, mode, ordinary_reference=capture.resolve())
+            measured["ratios"]["retained_bytes"] = allocation["ratio"]
+            for engine in ("go", "rust"):
+                measured["samples"][engine]["retained_bytes"] = allocation["samples"][engine]
+            measured["metadata"]["native_allocation"] = allocation
+            measured["metadata"].get("unavailable", {}).pop("retained_bytes", None)
+        return measured
+    return read
+
+
+def budget_size_reader(runtime):
+    def read(capture, args):
+        if str(ROOT) not in sys.path:
+            sys.path.insert(0, str(ROOT))
+        return importlib.import_module("tools.phase7.budget.size").read_capture(capture.resolve(), runtime)
+    return read
+
+
 def read_api(capture, args):
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
@@ -226,7 +261,12 @@ WORKLOADS = {
     "api": Workload("target/phase7/api", read_api),
     "checker": Workload("target/s08/checkerbench", read_checker),
     "lsp": Workload("target/phase5/latency", read_lsp),
+    "embed-size": Workload(None, budget_size_reader("native")),
+    "wasm-size": Workload(None, budget_size_reader("wasm")),
     **{f"{mode}-{scenario}": Workload("target/phase7/bench", scenario_reader(scenario, mode))
+       for scenario in SCENARIOS for mode in SCENARIO_MODES},
+    **{f"{prefix}-{mode}-{scenario}": Workload(None, budget_reader(scenario, mode, runtime))
+       for prefix, runtime in (("embed", "native"), ("wasm", "wasm"))
        for scenario in SCENARIOS for mode in SCENARIO_MODES},
 }
 
@@ -260,6 +300,29 @@ def finite(value):
     return type(value) in (int, float) and math.isfinite(value)
 
 
+def published_budget_metadata(metadata):
+    """Keep recorded runtime policy without publishing a caller's search path."""
+    removed = False
+    def sanitize(value):
+        nonlocal removed
+        if isinstance(value, list):
+            return [sanitize(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        result = {}
+        for key, item in value.items():
+            if key == 'environment' and isinstance(item, dict) and 'PATH' in item:
+                item = {name: entry for name, entry in item.items() if name != 'PATH'}
+                removed = True
+            result[key] = sanitize(item)
+        return result
+    result = sanitize(metadata)
+    if removed:
+        result['redactions'] = list(result.get('redactions', [])) + [
+            'environment.PATH omitted from published metadata; capture retains its recorded launch policy']
+    return result
+
+
 def run_document(workload, measurement, label=None, revision=None, recorded_at=None):
     """The status/perf run file of one measurement (docs/EVIDENCE-plan.md, section 3)."""
     ratios = measurement["ratios"]
@@ -269,6 +332,14 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
     if bad:
         raise ValueError(f"{workload}: ratios that are not finite numbers: {', '.join(bad)}")
     when = recorded_at or measurement.get("recorded_at")
+    budget_workload = workload in ('embed-size', 'wasm-size') or workload.startswith(('embed-check-', 'embed-emit-', 'wasm-check-', 'wasm-emit-'))
+    if budget_workload:
+        artifact_revision = measurement.get('revision')
+        if (not isinstance(artifact_revision, str) or len(artifact_revision) != 40 or
+                any(character not in '0123456789abcdef' for character in artifact_revision)):
+            raise ValueError(f'{workload}: capture lacks an artifact-associated revision; recapture from revision-bound builds')
+        if revision is not None and revision != artifact_revision:
+            raise ValueError(f'{workload}: revision override differs from the captured artifacts')
     document = {
         "workload": workload,
         "pin": pin(),
@@ -281,6 +352,8 @@ def run_document(workload, measurement, label=None, revision=None, recorded_at=N
     for optional in ("summaries", "metadata"):
         if optional in measurement:
             document[optional] = measurement[optional]
+    if budget_workload and 'metadata' in document:
+        document['metadata'] = published_budget_metadata(document['metadata'])
     return document
 
 
@@ -309,6 +382,8 @@ def write_run(document, out=None):
 
 def record(args):
     workload = WORKLOADS[args.workload]
+    if not args.capture and workload.capture is None:
+        raise ValueError(f"{args.workload}: --capture must name the preserved capture outside target")
     capture = Path(args.capture or ROOT / workload.capture)
     measurement = workload.read(capture, args)
     path = write_run(run_document(args.workload, measurement, args.label), args.out).resolve()
@@ -445,6 +520,8 @@ def main(argv=None):
     command = commands.add_parser("record", help="write a run file from a finished capture")
     command.add_argument("workload", choices=sorted(WORKLOADS))
     command.add_argument("--capture", help="the harness's capture directory (default: its own)")
+    command.add_argument("--allocation-capture", type=Path,
+                         help="native embedding only: independently validated instrumented retained-heap capture")
     command.add_argument("--label", help="the host label shown on the status page")
     command.add_argument("--out", help="the status/perf directory to write under (default: status/perf)")
     command.add_argument("--graph-report", type=Path, default=ROOT / "target/s07-bindworkload/report.json",

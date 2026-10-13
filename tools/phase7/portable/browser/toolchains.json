@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "playwright": "1.62.1",
+  "engines": ["chromium", "firefox", "webkit"],
+  "cases": [
+    "parse-and-owned-encode",
+    "memory-host-check-and-api-errors",
+    "memory-host-javascript-and-declaration-emit",
+    "single-file-module-and-declaration-transpile",
+    "bounded-nested-input",
+    "production-trap-invalidation-and-fresh-instance"
+  ],
+  "note": "Use the matching engine revisions from this Playwright package. No engine-specific stack flags are applied. Tool and engine caches belong outside Cargo target and evidence output."
+}

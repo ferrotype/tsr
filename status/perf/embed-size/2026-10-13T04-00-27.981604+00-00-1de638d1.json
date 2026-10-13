@@ -1,0 +1,156 @@
+{
+  "workload": "embed-size",
+  "pin": "1f70213d4922b434345f639b441681e470c7cfc1",
+  "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+  "host": {
+    "os": "macos",
+    "arch": "aarch64",
+    "cpus": 18,
+    "label": "macos aarch64, 18 CPUs"
+  },
+  "recorded_at": "2026-10-13T04:00:27.981604+00:00",
+  "ratios": {
+    "artifact_bytes": 1.2938457778672263
+  },
+  "samples": {
+    "go": {
+      "artifact_bytes": [20033856]
+    },
+    "rust": {
+      "artifact_bytes": [25920720]
+    }
+  },
+  "metadata": {
+    "runtime": "native",
+    "scope": {
+      "common": "production parse/config/load/check/optional emit; one checker; builtin libraries",
+      "native": "standalone public tsr_embed consumer versus pinned Go production consumer",
+      "wasm": "public production tsr_wasm checker versus pinned Go production consumer",
+      "extra_rust_wasm_surface": "single-file module/declaration transpile and public AST/value operations",
+      "excluded": "test-only compiler acceptance wasm, test walker, allocator instrumentation",
+      "ratio": "Rust body bytes / Go body bytes; runtime glue reported separately"
+    },
+    "artifact_bytes": {
+      "go": {
+        "body": 20033856,
+        "glue": 0,
+        "total": 20033856
+      },
+      "rust": {
+        "body": 25920720,
+        "glue": 0,
+        "total": 25920720
+      }
+    },
+    "artifacts": {
+      "go": {
+        "manifest": {
+          "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/build.json",
+          "bytes": 3670,
+          "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"
+        },
+        "runtime": "native",
+        "engine": "go",
+        "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+        "eligibility_reasons": [],
+        "dirty": true,
+        "go_gc_policy": "runtime.GC after prepare/prepare_end and checkpoint; source-digest bound",
+        "executable": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/budget-go",
+        "files": [{"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/build.json", "bytes": 3670, "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"}, {"path": "/Users/cristian/git/ts-rust/data/upstream.json", "bytes": 266, "sha256": "8b5663aa92e846a46690016e8ba979cfb2fc1122d5180c37d9957613ffd47fbe"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/operation.go", "bytes": 12002, "sha256": "305dafbebc041fe450d78e6e203be120942cc6bebfafae397020e610e23d4074"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/stream.go", "bytes": 12221, "sha256": "ce74c5d8e21b995334966b2c4cef420b3c6911a452875cf74214a6acbc83ccff"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/budget-go", "bytes": 20033858, "sha256": "204ed12cbc02b8719dd155d0e52f5ba142e6684f50cbc8509184112145f933b0"}],
+        "environment": {
+          "GOGC": "100",
+          "GOMEMLIMIT": null,
+          "GOEXPERIMENT": null,
+          "NODE_OPTIONS": null
+        },
+        "production_eligible": true,
+        "contract_sources": [{"path": "/Users/cristian/git/ts-rust/data/upstream.json", "bytes": 266, "sha256": "8b5663aa92e846a46690016e8ba979cfb2fc1122d5180c37d9957613ffd47fbe"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/operation.go", "bytes": 12002, "sha256": "305dafbebc041fe450d78e6e203be120942cc6bebfafae397020e610e23d4074"}, {"path": "/Users/cristian/git/ts-rust/tools/phase7/budget/go/body/stream.go", "bytes": 12221, "sha256": "ce74c5d8e21b995334966b2c4cef420b3c6911a452875cf74214a6acbc83ccff"}]
+      },
+      "rust": {
+        "manifest": {
+          "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-native-size-current-02/build.json",
+          "bytes": 117811,
+          "sha256": "f4a7574d2b03238afd8242c817f311531ee5d2653c1d165e2a462e8683248c26"
+        },
+        "runtime": "native",
+        "engine": "rust",
+        "revision": "1de638d1b0eaec1d3c9d9218def0584370f9e899",
+        "eligibility_reasons": [],
+        "dirty": true,
+        "profile": {
+          "name": "release",
+          "panic": "unwind",
+          "lto": "fat",
+          "codegen_units": 1
+        },
+        "executable": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-native-size-current-02/phase7_rust_budget",
+        "files": [{"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-native-size-current-02/build.json", "bytes": 117811, "sha256": "f4a7574d2b03238afd8242c817f311531ee5d2653c1d165e2a462e8683248c26"}, {"path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-native-size-current-02/phase7_rust_budget", "bytes": 28896848, "sha256": "90e16a00b19371d4a92ec9a0d34024c88b5a3a4fdee7f0963c28052f1b107a93"}],
+        "environment": {
+          "GOMEMLIMIT": null,
+          "GOEXPERIMENT": null,
+          "NODE_OPTIONS": null
+        },
+        "production_eligible": true,
+        "contract_sources": []
+      }
+    },
+    "saved_manifests": {
+      "go": {
+        "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/go-build.json",
+        "bytes": 3670,
+        "sha256": "cbc5513948994d0ddd20814696f9378845519e239005c1ed5e60dbb2980d5570"
+      },
+      "rust": {
+        "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/rust-build.json",
+        "bytes": 117811,
+        "sha256": "f4a7574d2b03238afd8242c817f311531ee5d2653c1d165e2a462e8683248c26"
+      }
+    },
+    "native_stripping": {
+      "policy": "llvm-strip-all-v1",
+      "platform": "darwin",
+      "tool": {
+        "path": "/Users/cristian/.rustup/toolchains/1.97.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/llvm-strip",
+        "bytes": 5339280,
+        "sha256": "ccee726be447414072f925b06ef85dd36a3f693d48b03f6ed8cc94135751029b"
+      },
+      "flags": ["--strip-all"],
+      "artifacts": {
+        "go": {
+          "source": {
+            "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/go-size-current-02/budget-go",
+            "bytes": 20033858,
+            "sha256": "204ed12cbc02b8719dd155d0e52f5ba142e6684f50cbc8509184112145f933b0"
+          },
+          "output": {
+            "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/go-stripped",
+            "bytes": 20033856,
+            "sha256": "73b54bd8ab1d45dc1835b276708ec27dca45d3ce7b6245ed26a712c784188a32"
+          },
+          "command": ["/Users/cristian/.rustup/toolchains/1.97.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/llvm-strip", "--strip-all", "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/go-stripped"],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        },
+        "rust": {
+          "source": {
+            "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/rust-native-size-current-02/phase7_rust_budget",
+            "bytes": 28896848,
+            "sha256": "90e16a00b19371d4a92ec9a0d34024c88b5a3a4fdee7f0963c28052f1b107a93"
+          },
+          "output": {
+            "path": "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/rust-stripped",
+            "bytes": 25920720,
+            "sha256": "a3dc66f1210d16a091de98f660a38a816202c017a9836f8994c8afdae1401d98"
+          },
+          "command": ["/Users/cristian/.rustup/toolchains/1.97.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/llvm-strip", "--strip-all", "/Users/cristian/git/ts-rust-benchmarks/2026-10-13/native-size-current-03/rust-stripped"],
+          "exit": 0,
+          "stdout": "",
+          "stderr": ""
+        }
+      }
+    },
+    "production_eligible": true,
+    "eligibility_reasons": []
+  }
+}

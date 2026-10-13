@@ -11,16 +11,39 @@ use tsr_jsstring::JsString;
 
 /// One source file's facts, retained from the program's files (the texts
 /// share the program's backing).
-struct FileFacts {
-    file_name: JsString,
-    path: JsString,
-    text: tsr_jsstring::SourceText,
-    original_text: Option<tsr_jsstring::SourceText>,
-    content_mapper: JsString,
+pub struct FileFacts {
+    pub file_name: JsString,
+    pub path: JsString,
+    pub text: tsr_jsstring::SourceText,
+    pub original_text: Option<tsr_jsstring::SourceText>,
+    pub content_mapper: JsString,
+}
+
+/// Owned observations returned by a compiler backend. Lookup keys are the
+/// compiler's canonical paths, including aliases, rather than paths inferred
+/// from the source-file names by the baseline writer.
+pub struct ProgramSnapshot {
+    pub files: Vec<FileFacts>,
+    pub lookups: Vec<(Vec<u8>, usize)>,
+    pub options: CompilerOptions,
+    pub current_directory: Vec<u8>,
+    pub case_sensitive: bool,
+    pub common_source_directory: Result<Vec<u8>, String>,
+    pub content_mapper_extensions: Vec<JsString>,
+}
+
+enum Backing {
+    Native(Arc<Program>),
+    Snapshot {
+        options: Box<CompilerOptions>,
+        current_directory: Vec<u8>,
+        case_sensitive: bool,
+        content_mapper_extensions: Vec<JsString>,
+    },
 }
 
 pub struct ProgramFacts {
-    program: Arc<Program>,
+    backing: Backing,
     files: Vec<FileFacts>,
     by_path: HashMap<Vec<u8>, usize>,
     common_source_directory: OnceLock<Result<Vec<u8>, String>>,
@@ -49,10 +72,38 @@ impl ProgramFacts {
             });
         }
         Ok(Self {
-            program,
+            backing: Backing::Native(program),
             files,
             by_path,
             common_source_directory: OnceLock::new(),
+        })
+    }
+
+    /// Restore observations only; this neither parses nor checks source text.
+    pub fn from_snapshot(snapshot: ProgramSnapshot) -> Result<Self, Failure> {
+        let mut by_path = HashMap::with_capacity(snapshot.lookups.len());
+        for (path, index) in snapshot.lookups {
+            if index >= snapshot.files.len() {
+                return Err(Failure::Input(
+                    "program lookup has a foreign file index".into(),
+                ));
+            }
+            if by_path.insert(path, index).is_some() {
+                return Err(Failure::Input(
+                    "program lookup repeats a canonical path".into(),
+                ));
+            }
+        }
+        Ok(Self {
+            backing: Backing::Snapshot {
+                options: Box::new(snapshot.options),
+                current_directory: snapshot.current_directory,
+                case_sensitive: snapshot.case_sensitive,
+                content_mapper_extensions: snapshot.content_mapper_extensions,
+            },
+            files: snapshot.files,
+            by_path,
+            common_source_directory: OnceLock::from(snapshot.common_source_directory),
         })
     }
 
@@ -76,19 +127,37 @@ impl ProgramView for ProgramFacts {
         self.files.iter().map(Self::view).collect()
     }
     fn source_file(&self, file_name: &[u8]) -> Option<SourceFileView<'_>> {
-        let file = self.program.source_file(file_name)?;
-        let source = file.bound().view().source_file().ok()?;
+        let path = match &self.backing {
+            Backing::Native(program) => {
+                let file = program.source_file(file_name)?;
+                let source = file.bound().view().source_file().ok()?;
+                source.parse_options().path.clone()
+            }
+            Backing::Snapshot {
+                current_directory,
+                case_sensitive,
+                ..
+            } => tsr_tspath::to_path(file_name, current_directory, *case_sensitive),
+        };
         self.by_path
-            .get(source.path())
+            .get(path.as_bytes())
             .map(|&index| Self::view(&self.files[index]))
     }
     fn options(&self) -> &CompilerOptions {
-        self.program.options()
+        match &self.backing {
+            Backing::Native(program) => program.options(),
+            Backing::Snapshot { options, .. } => options,
+        }
     }
     fn common_source_directory(&self) -> Result<Vec<u8>, Failure> {
         self.common_source_directory
             .get_or_init(|| {
-                let host = ProgramCheckerHost::new(self.program.clone());
+                let Backing::Native(program) = &self.backing else {
+                    // Snapshot construction initializes this cell, including
+                    // a backend refusal to compute the directory.
+                    return Err("missing observed common source directory".into());
+                };
+                let host = ProgramCheckerHost::new(program.clone());
                 tsr_checker::CheckerHost::common_source_directory(&host)
                     .map(<[u8]>::to_vec)
                     .map_err(|error| format!("{error:?}"))
@@ -97,12 +166,26 @@ impl ProgramView for ProgramFacts {
             .map_err(|error| Failure::Input(format!("common source directory: {error}")))
     }
     fn current_directory(&self) -> &[u8] {
-        self.program.current_directory()
+        match &self.backing {
+            Backing::Native(program) => program.current_directory(),
+            Backing::Snapshot {
+                current_directory, ..
+            } => current_directory,
+        }
     }
     fn use_case_sensitive_file_names(&self) -> bool {
-        self.program.use_case_sensitive_file_names()
+        match &self.backing {
+            Backing::Native(program) => program.use_case_sensitive_file_names(),
+            Backing::Snapshot { case_sensitive, .. } => *case_sensitive,
+        }
     }
     fn content_mapper_extensions(&self) -> Vec<JsString> {
-        self.program.content_mapper_extensions()
+        match &self.backing {
+            Backing::Native(program) => program.content_mapper_extensions(),
+            Backing::Snapshot {
+                content_mapper_extensions,
+                ..
+            } => content_mapper_extensions.clone(),
+        }
     }
 }

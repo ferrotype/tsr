@@ -19,8 +19,8 @@ use crate::compile::{self, Compilation, CompileError, TestFile};
 use crate::enumerate::Variant;
 use crate::harness::baselines::{
     self as writers, DeclarationCompilationContext, DeclarationCompilationResult, Failure,
-    JsEmitInput, JsonErrorBaseline, RepeatOutputs, SourcemapInput, SourcemapRecordInput,
-    TestFile as FileView,
+    JsEmitInput, JsonErrorBaseline, ProgramView, RepeatOutputs, SourcemapInput,
+    SourcemapRecordInput, TestFile as FileView,
 };
 use crate::harness::{errors, subtests, typebaseline};
 use crate::harness_options::{HarnessOptions, TestConfiguration};
@@ -33,7 +33,7 @@ use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::path::{Path, PathBuf};
 use tsr_ast::{Diagnostic, NodeId};
 use tsr_checker::Operation;
-use tsr_compiler::{CompilerCheckerPool, Program};
+use tsr_compiler::CompilerCheckerPool;
 use tsr_core::CompilerOptions;
 use tsr_tsoptions::ParsedCommandLine;
 
@@ -222,37 +222,58 @@ fn has_reference_path(text: &[u8]) -> bool {
 /// replaces it in the very test files `Repeat` compiles again, so the
 /// compilation's kept inputs take the same text.
 // port: tsc/internal/testrunner/compiler_runner.go:newCompilerTest
-pub fn compile(
+pub fn compile(prepared: Prepared, testdata: &TestData, mode: Mode) -> Result<CompilerTest, Stop> {
+    compile_with_backend(prepared, testdata, mode, None)
+}
+
+fn compile_with_backend(
     mut prepared: Prepared,
     testdata: &TestData,
     mode: Mode,
+    consumer: Option<&Path>,
 ) -> Result<CompilerTest, Stop> {
-    let mut result = compile::compile_files(
-        prepared.to_be_compiled.clone(),
-        prepared.other_files.clone(),
-        prepared
-            .variant
-            .configuration
-            .as_ref()
-            .map(|named| &named.config),
-        prepared.content.ts_config.clone(),
-        &prepared.current_directory,
-        prepared.content.symlinks.clone(),
-        testdata,
-        mode,
-    )
+    let mut result = if let Some(consumer) = consumer {
+        compile::compile_files_ex_with_consumer(
+            compile::Inputs {
+                input_files: prepared.to_be_compiled.clone(),
+                other_files: prepared.other_files.clone(),
+                harness_options: prepared.harness_options.clone(),
+                compiler_options: prepared.options.clone(),
+                current_directory: prepared.current_directory.clone(),
+                symlinks: prepared.content.symlinks.clone(),
+                tsconfig: prepared.content.ts_config.clone(),
+                mode,
+            },
+            testdata,
+            consumer,
+        )
+    } else {
+        compile::compile_files(
+            prepared.to_be_compiled.clone(),
+            prepared.other_files.clone(),
+            prepared
+                .variant
+                .configuration
+                .as_ref()
+                .map(|named| &named.config),
+            prepared.content.ts_config.clone(),
+            &prepared.current_directory,
+            prepared.content.symlinks.clone(),
+            testdata,
+            mode,
+        )
+    }
     .map_err(compile_stop)?;
 
     // Content-mapped files are transformed during program construction; the transformed text is what the
     // compiler actually parses and reports positions against. Baseline that text (rather than the original
     // foreign source) so the type, symbol, and error baselines line up with the compiler's positions.
-    let program = result.program.program().clone();
     for file in prepared
         .to_be_compiled
         .iter_mut()
         .chain(prepared.other_files.iter_mut())
     {
-        let Some(text) = content_mapped_text(&program, &file.unit_name) else {
+        let Some(text) = content_mapped_text(result.facts(), &file.unit_name) else {
             continue;
         };
         for input in result
@@ -282,14 +303,9 @@ fn compile_stop(error: CompileError) -> Stop {
 
 /// `sf.Text()` of the program's file for `unit_name` when a content mapper
 /// produced it (`sf.ContentMapper() != ""`).
-fn content_mapped_text(program: &Program, unit_name: &[u8]) -> Option<Vec<u8>> {
-    let source = program
-        .source_file(unit_name)?
-        .bound()
-        .view()
-        .source_file()
-        .ok()?;
-    (!source.content_mapper().is_empty()).then(|| source.text().as_bytes().to_vec())
+fn content_mapped_text(program: &dyn ProgramView, unit_name: &[u8]) -> Option<Vec<u8>> {
+    let source = program.source_file(unit_name)?;
+    (!source.content_mapper.is_empty()).then(|| source.text.to_vec())
 }
 
 /// `runSingleConfigTest`: compile, then the nine `verify*` sub-tests in the
@@ -303,10 +319,25 @@ pub fn run_single_config_test(
     mode: Mode,
     report: &mut Report,
 ) {
+    run_single_config_test_with_backend(prepared, testdata, roots, mode, None, report);
+}
+
+/// The same subtests and renderers, with compiler work executed by the selected
+/// public consumer. A failed child is a failed test, never native fallback.
+pub fn run_single_config_test_with_backend(
+    prepared: Prepared,
+    testdata: &TestData,
+    roots: &Roots,
+    mode: Mode,
+    consumer: Option<&Path>,
+    report: &mut Report,
+) {
     let id = prepared.variant.id();
     let planned = planned_subtests(&prepared);
     let panic_context = format!("Panic on compiler test {}", prepared.variant.file.display());
-    let stopped = match catch_unwind(AssertUnwindSafe(|| compile(prepared, testdata, mode))) {
+    let stopped = match catch_unwind(AssertUnwindSafe(|| {
+        compile_with_backend(prepared, testdata, mode, consumer)
+    })) {
         Ok(Ok(test)) => {
             test.verify_diagnostics(roots, report);
             test.verify_content_mapper(roots, report);
@@ -415,18 +446,14 @@ impl CompilerTest {
         }
     }
 
-    /// `c.result.Program`'s compiler program.
-    fn program(&self) -> &Program {
-        self.result.program.program()
-    }
-
     /// The program's checker pool with an operation held on each of its
     /// checkers, in checker order (`GetTypeCheckerForFile` per file,
     /// `ForEachCheckerParallel`).
     fn pool_operations(&self) -> Result<(&CompilerCheckerPool, Vec<Operation<'_>>), String> {
         let pool = self
             .result
-            .program
+            .native_program()
+            .ok_or("compiler checker leases belong to the external consumer")?
             .program_like()
             .checked_program()
             .compiler_checker_pool()
@@ -449,7 +476,7 @@ impl CompilerTest {
                 self.filename()
             ),
             || {
-                let program = self.program();
+                let program = self.result.diagnostic_sources();
                 let mut files: Vec<&TestFile> = self
                     .prepared
                     .ts_config_files
@@ -460,7 +487,10 @@ impl CompilerTest {
                 let mut diagnostics = Cow::Borrowed(self.result.diagnostics.as_slice());
                 // Content-mapped files' diagnostics are baselined separately (see verifyContentMapper), where they can
                 // be rendered against the correct text; the squiggle renderer here assumes a single coordinate space.
-                let content_mapped = self.content_mapped_file_names();
+                let content_mapped = match self.content_mapped_file_names() {
+                    Ok(names) => names,
+                    Err(error) => return Outcome::fail(error),
+                };
                 if !content_mapped.is_empty() {
                     files.retain(|file| {
                         !content_mapped.contains(&tsr_tspath::absolute(
@@ -514,7 +544,7 @@ impl CompilerTest {
                 do_content_mapper_baseline(
                     roots,
                     self.configured_name(),
-                    self.program(),
+                    self.result.sources(),
                     &self.result.diagnostics,
                     self.baseline_options(),
                 )
@@ -525,16 +555,20 @@ impl CompilerTest {
 
     /// The absolute names of the files a content mapper produced.
     // port: tsc/internal/testrunner/compiler_runner.go:compilerTest.contentMappedFileNames
-    pub fn content_mapped_file_names(&self) -> Vec<Vec<u8>> {
-        let program = self.program();
-        program
-            .files()
-            .iter()
-            .filter_map(|file| {
-                let source = file.bound().view().source_file().ok()?;
-                program
-                    .content_mapper(&source)
-                    .map(|_| source.file_name().to_vec())
+    pub fn content_mapped_file_names(&self) -> Result<Vec<Vec<u8>>, String> {
+        let sources = self.result.sources();
+        // GetContentMapper also verifies the configured extension and identity.
+        // Supplemental .ts files can carry mapper metadata without satisfying
+        // that predicate; their diagnostics still belong in .errors.txt.
+        sources
+            .mapped_files()
+            .map_err(|error| error.to_string())?
+            .into_iter()
+            .map(|(file, _)| {
+                sources
+                    .diagnostic_source(file)
+                    .map(|source| source.file_name().to_vec())
+                    .map_err(|error| format!("mapped source: {error:?}"))
             })
             .collect()
     }
@@ -613,40 +647,49 @@ impl CompilerTest {
                 }
             }
         }
-        let repeat_result = match repeat.as_ref().map(Compilation::result).transpose() {
-            Ok(repeat_result) => repeat_result,
-            Err(failure) => return failure_outcome(&failure),
-        };
-        let repeat_outputs = repeat_result
-            .as_ref()
-            .map(|without_checking| RepeatOutputs {
-                js: without_checking.js.clone(),
-                dts: without_checking.dts.clone(),
-            });
+        let outcome = (|| {
+            let repeat_result = match repeat.as_ref().map(Compilation::result).transpose() {
+                Ok(repeat_result) => repeat_result,
+                Err(failure) => return failure_outcome(&failure),
+            };
+            let repeat_outputs = repeat_result
+                .as_ref()
+                .map(|without_checking| RepeatOutputs {
+                    js: without_checking.js.clone(),
+                    dts: without_checking.dts.clone(),
+                });
 
-        let composed = writers::js_emit_baseline(&JsEmitInput {
-            configured_name: self.configured_name().as_bytes(),
-            header: &header,
-            options,
-            full_emit_paths: harness.full_emit_paths,
-            harness_current_directory: &harness.current_directory,
-            to_be_compiled: &to_be_compiled,
-            other_files: &other_files,
-            result: &result,
-            declaration: declaration.as_ref(),
-            no_check_repeat: repeat_outputs.as_ref(),
-            json_errors: &JsonErrors,
-        });
-        let outcome = match composed {
-            Ok(composed) => baseline::run(
-                roots,
-                &composed.path,
-                &composed.actual,
-                self.baseline_options(),
+            let composed = writers::js_emit_baseline(&JsEmitInput {
+                configured_name: self.configured_name().as_bytes(),
+                header: &header,
+                options,
+                full_emit_paths: harness.full_emit_paths,
+                harness_current_directory: &harness.current_directory,
+                to_be_compiled: &to_be_compiled,
+                other_files: &other_files,
+                result: &result,
+                declaration: declaration.as_ref(),
+                no_check_repeat: repeat_outputs.as_ref(),
+                json_errors: &JsonErrors,
+            });
+            let outcome = match composed {
+                Ok(composed) => baseline::run(
+                    roots,
+                    &composed.path,
+                    &composed.actual,
+                    self.baseline_options(),
+                ),
+                Err(failure) => failure_outcome(&failure),
+            };
+            with_failures(outcome, &failed_checks)
+        })();
+        match repeat.map(Compilation::release).transpose() {
+            Ok(_) => outcome,
+            Err(error) => with_failures(
+                outcome,
+                &[format!("releasing the noCheck compilation failed: {error}")],
             ),
-            Err(failure) => failure_outcome(&failure),
-        };
-        with_failures(outcome, &failed_checks)
+        }
     }
 
     /// `compileDeclarationFiles`: `CompileFilesEx` over the context's
@@ -662,58 +705,73 @@ impl CompilerTest {
         ts_config_files: &[FileView<'a>],
         testdata: &TestData,
     ) -> Result<(DeclarationCompilationResult<'a>, Vec<String>), Outcome> {
-        let config = self.program().config();
+        let config = self.result.config();
         let tsconfig = config.config_file.as_ref().map(|config_file| {
             let mut tsconfig = ParsedCommandLine::new(CompilerOptions::default(), Vec::new());
             tsconfig.config_file = Some(config_file.clone());
             tsconfig.content_mappers.clone_from(&config.content_mappers);
             tsconfig
         });
-        let compiled = compile::compile_files_ex(
-            compile::Inputs {
-                input_files: owned(&context.decl_input_files),
-                other_files: owned(&context.decl_other_files),
-                harness_options: self.result.harness_options.clone(),
-                compiler_options: self.result.options.clone(),
-                current_directory: context.current_directory.to_vec(),
-                symlinks: self.result.symlinks.clone(),
-                tsconfig,
-                mode: self.result.inputs.mode,
-            },
-            testdata,
-        )
-        .map_err(|error| {
-            Outcome::fail(format!("the declaration files did not compile: {error}"))
-        })?;
-        let mut result = DeclarationCompilationResult {
-            decl_input_files: context.decl_input_files.clone(),
-            decl_other_files: context.decl_other_files.clone(),
-            diagnostics: compiled.diagnostics.len(),
-            error_baseline: Vec::new(),
-        };
-        let mut failed_checks = Vec::new();
-        if !compiled.diagnostics.is_empty() {
-            let files = writers::dts_file_error_inputs(ts_config_files, &result);
-            let inputs: Vec<errors::InputFile<'_>> = files
-                .iter()
-                .map(|file| errors::InputFile {
-                    name: file.unit_name,
-                    content: file.content,
-                })
-                .collect();
-            let rendered = errors::error_baseline(
-                compiled.program.program(),
-                &inputs,
-                &compiled.diagnostics,
-                false, /*pretty*/
+        let compiled = self
+            .result
+            .compile_followup(
+                compile::Inputs {
+                    input_files: owned(&context.decl_input_files),
+                    other_files: owned(&context.decl_other_files),
+                    harness_options: self.result.harness_options.clone(),
+                    compiler_options: self.result.options.clone(),
+                    current_directory: context.current_directory.to_vec(),
+                    symlinks: self.result.symlinks.clone(),
+                    tsconfig,
+                    mode: self.result.inputs.mode,
+                },
+                testdata,
             )
             .map_err(|error| {
-                Outcome::fail(format!("the DtsFileErrors error baseline failed: {error}"))
+                Outcome::fail(format!("the declaration files did not compile: {error}"))
             })?;
-            result.error_baseline = rendered.text;
-            failed_checks = rendered.failed_checks;
+        let result = (|| {
+            let mut result = DeclarationCompilationResult {
+                decl_input_files: context.decl_input_files.clone(),
+                decl_other_files: context.decl_other_files.clone(),
+                diagnostics: compiled.diagnostics.len(),
+                error_baseline: Vec::new(),
+            };
+            let mut failed_checks = Vec::new();
+            if !compiled.diagnostics.is_empty() {
+                let files = writers::dts_file_error_inputs(ts_config_files, &result);
+                let inputs: Vec<errors::InputFile<'_>> = files
+                    .iter()
+                    .map(|file| errors::InputFile {
+                        name: file.unit_name,
+                        content: file.content,
+                    })
+                    .collect();
+                let rendered = errors::error_baseline(
+                    compiled.diagnostic_sources(),
+                    &inputs,
+                    &compiled.diagnostics,
+                    false, /*pretty*/
+                )
+                .map_err(|error| {
+                    Outcome::fail(format!("the DtsFileErrors error baseline failed: {error}"))
+                })?;
+                result.error_baseline = rendered.text;
+                failed_checks = rendered.failed_checks;
+            }
+            Ok((result, failed_checks))
+        })();
+        match compiled.release() {
+            Ok(()) => result,
+            Err(error) => {
+                let cleanup = format!("releasing the declaration compilation failed: {error}");
+                let outcome = match result {
+                    Ok((_, failures)) => with_failures(Outcome::Pass, &failures),
+                    Err(outcome) => outcome,
+                };
+                Err(with_failures(outcome, &[cleanup]))
+            }
         }
-        Ok((result, failed_checks))
     }
 
     /// The pin computes the header for `DoSourcemapBaseline`, which does not
@@ -805,7 +863,7 @@ impl CompilerTest {
         if self.result.harness_options.no_types_and_symbols {
             return;
         }
-        let program = self.program();
+        let program = self.result.facts();
         let all_files: Vec<typebaseline::InputFile<'_>> = self
             .prepared
             .to_be_compiled
@@ -841,6 +899,17 @@ impl CompilerTest {
         report: &mut Report,
     ) {
         let id = self.id();
+        if let Some(session) = self.result.portable_session() {
+            self.portable_type_and_symbol_baseline(
+                session,
+                roots,
+                header,
+                all_files,
+                has_error_baseline,
+                report,
+            );
+            return;
+        }
         let (pool, mut operations) = match self.pool_operations() {
             Ok(held) => held,
             Err(reason) => {
@@ -864,8 +933,11 @@ impl CompilerTest {
             ..Default::default()
         };
         let mut timing = typebaseline::NoTiming;
+        let Some(native) = self.result.native_program() else {
+            unreachable!("portable compilation handled before acquiring native checkers");
+        };
         let mut walker = typebaseline::TypeWriterWalker::new(
-            self.program(),
+            native.program(),
             &mut checkers,
             has_error_baseline,
             &mut trace,
@@ -886,6 +958,84 @@ impl CompilerTest {
                 },
             );
             report.subtest(&id, subtest, outcome);
+        }
+    }
+
+    fn portable_type_and_symbol_baseline(
+        &self,
+        session: &crate::portable_compiler::Session,
+        roots: &Roots,
+        header: &[u8],
+        files: &[typebaseline::InputFile<'_>],
+        had_errors: bool,
+        report: &mut Report,
+    ) {
+        let names = files
+            .iter()
+            .map(|file| file.name.to_vec())
+            .collect::<Vec<_>>();
+        let mut domains = [ObservedDomain::default(), ObservedDomain::default()];
+        let mut symbols_started = false;
+        let result = session.observe(&names, had_errors, |symbols, index, rows| {
+            if !symbols && symbols_started {
+                return Err("consumer returned type observations after symbols".to_owned());
+            }
+            symbols_started |= symbols;
+            let domain = &mut domains[usize::from(symbols)];
+            let input = files
+                .get(index)
+                .ok_or("consumer observation file index is invalid")?;
+            if domain.stopped || index != domain.next {
+                return Err("consumer observation schedule differs from the request".to_owned());
+            }
+            domain.next += 1;
+            match typebaseline::observed_file(input, rows, symbols) {
+                Ok(Some(text)) => domain.text.extend_from_slice(&text),
+                Ok(None) => domain.stopped = true,
+                Err(error) => {
+                    domain.error = Some(error.to_string());
+                    domain.stopped = true;
+                }
+            }
+            Ok(!domain.stopped)
+        });
+        match result {
+            Ok(observed) => {
+                for (domain, error) in domains
+                    .iter_mut()
+                    .zip([observed.types_error, observed.symbols_error])
+                {
+                    if domain.error.is_none() {
+                        domain.error = error;
+                    }
+                    if domain.error.is_none() && !domain.stopped && domain.next != files.len() {
+                        domain.error =
+                            Some("consumer omitted requested file observations".to_owned());
+                    }
+                }
+            }
+            Err(error) => {
+                for domain in &mut domains {
+                    domain.error = Some(error.clone());
+                }
+            }
+        }
+        for ((subtest, extension), domain) in [(TYPE, ".types"), (SYMBOL, ".symbols")]
+            .into_iter()
+            .zip(domains)
+        {
+            let outcome = if let Some(error) = domain.error {
+                Outcome::fail(format!("the {subtest} walk failed: {error}"))
+            } else {
+                let text = typebaseline::observed_baseline(&domain.text, header);
+                baseline::run(
+                    roots,
+                    &replace_ts_extension(self.configured_name(), extension),
+                    text.as_deref().unwrap_or(NO_CONTENT),
+                    self.baseline_options(),
+                )
+            };
+            report.subtest(&self.id(), subtest, outcome);
         }
     }
 
@@ -922,21 +1072,19 @@ impl CompilerTest {
         let outcome = recover_and_fail(
             &format!("Panic on compiler test {}", self.filename()),
             || {
+                if let Some(session) = self.result.portable_session() {
+                    return match session.assertions(true, false) {
+                        Ok(output) => union_ordering_outcome(output.union_ordering.as_ref()),
+                        Err(error) => Outcome::fail(error),
+                    };
+                }
                 let operations = match self.pool_operations() {
                     Ok((_, operations)) => operations,
                     Err(reason) => return Outcome::fail(reason),
                 };
                 let checkers: Vec<&Operation<'_>> = operations.iter().collect();
                 let verdict = subtests::union_ordering_checkers(&checkers);
-                match verdict["state"].as_str() {
-                    Some("executed") if verdict["inconsistent"].as_u64() == Some(0) => {
-                        Outcome::Pass
-                    }
-                    Some("executed") => {
-                        Outcome::fail("compareTypes does not sort union types consistently")
-                    }
-                    _ => failed_verdict("union ordering", &verdict),
-                }
+                union_ordering_outcome(Some(&verdict))
             },
         );
         report.subtest(&self.id(), UNION_ORDERING, outcome);
@@ -950,17 +1098,62 @@ impl CompilerTest {
         let outcome = recover_and_fail(
             &format!("Panic on compiler test {}", self.filename()),
             || {
-                let verdict = subtests::parent_pointers(self.program());
-                match (verdict["state"].as_str(), verdict["failure"].as_str()) {
-                    (Some("executed"), None) => Outcome::Pass,
-                    (Some("executed"), Some(failure)) => {
-                        Outcome::fail_with(failure, verdict["node"].to_string())
-                    }
-                    _ => failed_verdict("source file parent pointers", &verdict),
+                if let Some(session) = self.result.portable_session() {
+                    return match session.assertions(false, true) {
+                        Ok(output) => parent_pointers_outcome(output.parent_pointers.as_ref()),
+                        Err(error) => Outcome::fail(error),
+                    };
                 }
+                let native = self.result.native_program().expect("native compilation");
+                let verdict = subtests::parent_pointers(native.program());
+                parent_pointers_outcome(Some(&verdict))
             },
         );
         report.subtest(&self.id(), PARENT_POINTERS, outcome);
+    }
+}
+
+#[derive(Default)]
+struct ObservedDomain {
+    text: Vec<u8>,
+    next: usize,
+    stopped: bool,
+    error: Option<String>,
+}
+
+fn union_ordering_outcome(verdict: Option<&Value>) -> Outcome {
+    let Some(verdict) = verdict else {
+        return Outcome::fail("consumer omitted union-ordering observation");
+    };
+    match verdict["state"].as_str() {
+        Some("executed")
+            if verdict["inconsistent"].as_u64() == Some(0)
+                && verdict["checkers"].as_u64().is_some()
+                && verdict["unions"].as_u64().is_some() =>
+        {
+            Outcome::Pass
+        }
+        Some("executed") => Outcome::fail("compareTypes does not sort union types consistently"),
+        _ => failed_verdict("union ordering", verdict),
+    }
+}
+
+fn parent_pointers_outcome(verdict: Option<&Value>) -> Outcome {
+    let Some(verdict) = verdict else {
+        return Outcome::fail("consumer omitted source-parent observation");
+    };
+    match (verdict["state"].as_str(), verdict["failure"].as_str()) {
+        (Some("executed"), None)
+            if verdict.get("failure") == Some(&Value::Null)
+                && verdict["files"].as_u64().is_some()
+                && verdict["nodes"].as_u64().is_some() =>
+        {
+            Outcome::Pass
+        }
+        (Some("executed"), Some(failure)) => {
+            Outcome::fail_with(failure, verdict["node"].to_string())
+        }
+        _ => failed_verdict("source file parent pointers", verdict),
     }
 }
 
@@ -981,7 +1174,7 @@ fn failed_verdict(what: &str, verdict: &Value) -> Outcome {
 fn do_error_baseline(
     roots: &Roots,
     baseline_path: &str,
-    program: &Program,
+    program: &dyn tsr_compiler::diagnostic_writer::DiagnosticSources,
     input_files: &[errors::InputFile<'_>],
     diagnostics: &[Diagnostic],
     pretty: bool,
@@ -1010,7 +1203,7 @@ fn do_error_baseline(
 fn do_content_mapper_baseline(
     roots: &Roots,
     baseline_path: &str,
-    program: &Program,
+    program: &dyn errors::ContentMapperSources,
     diagnostics: &[Diagnostic],
     options: Options<'_>,
 ) -> Outcome {
@@ -1080,12 +1273,11 @@ fn owned(files: &[FileView<'_>]) -> Vec<TestFile> {
 }
 
 /// The name of the program file whose root is `file`.
-fn file_name_of(program: &Program, file: NodeId) -> Option<Vec<u8>> {
-    let file = program
-        .files()
-        .iter()
-        .find(|candidate| candidate.source() == file)?;
-    let source = file.bound().view().source_file().ok()?;
+fn file_name_of(
+    program: &dyn tsr_compiler::diagnostic_writer::DiagnosticSources,
+    file: NodeId,
+) -> Option<Vec<u8>> {
+    let source = program.diagnostic_source(file).ok()?;
     Some(source.file_name().to_vec())
 }
 
@@ -1171,14 +1363,56 @@ fn path_bytes(path: &Path) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::{
-        baseline_header, has_reference_path, planned_subtests, replace_ts_extension, with_failures,
-        Prepared, OUTPUT,
+        baseline_header, has_reference_path, parent_pointers_outcome, planned_subtests,
+        replace_ts_extension, union_ordering_outcome, with_failures, Prepared, OUTPUT,
     };
     use crate::enumerate::Variant;
     use crate::result::Outcome;
     use crate::test_case_parser::TestCaseContent;
     use crate::TestData;
     use std::path::{Path, PathBuf};
+
+    #[test]
+    fn absent_or_malformed_consumer_assertions_do_not_pass() {
+        for verdict in [
+            None,
+            Some(serde_json::json!({})),
+            Some(serde_json::json!({"state": "executed"})),
+        ] {
+            assert!(matches!(
+                union_ordering_outcome(verdict.as_ref()),
+                Outcome::Fail { .. }
+            ));
+            assert!(matches!(
+                parent_pointers_outcome(verdict.as_ref()),
+                Outcome::Fail { .. }
+            ));
+        }
+        assert_eq!(
+            union_ordering_outcome(Some(&serde_json::json!({
+                "state": "executed", "inconsistent": 0, "checkers": 1, "unions": 0
+            }))),
+            Outcome::Pass
+        );
+        assert_eq!(
+            parent_pointers_outcome(Some(&serde_json::json!({
+                "state": "executed", "failure": null, "files": 1, "nodes": 1
+            }))),
+            Outcome::Pass
+        );
+        assert!(matches!(
+            union_ordering_outcome(Some(&serde_json::json!({
+                "state": "executed", "inconsistent": 1, "checkers": 1, "unions": 1
+            }))),
+            Outcome::Fail { .. }
+        ));
+        assert!(matches!(
+            parent_pointers_outcome(Some(&serde_json::json!({
+                "state": "executed", "failure": "wrong parent", "files": 1, "nodes": 1
+            }))),
+            Outcome::Fail { .. }
+        ));
+    }
 
     #[test]
     fn the_header_is_the_test_path_under_testdata() {

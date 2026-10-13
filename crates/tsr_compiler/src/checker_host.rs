@@ -323,6 +323,18 @@ impl CheckerHost for ProgramCheckerHost {
             }))
     }
 
+    fn get_source_of_project_reference_if_output_included<'a>(
+        &'a self,
+        file_name: &'a [u8],
+    ) -> &'a [u8] {
+        let file_path = path::to_path(
+            file_name,
+            self.get_current_directory(),
+            self.use_case_sensitive_file_names(),
+        );
+        self.program
+            .source_of_project_reference_if_output_included(file_path.as_bytes(), file_name)
+    }
     fn get_module_specifier_paths(
         &self,
         importer: &[u8],

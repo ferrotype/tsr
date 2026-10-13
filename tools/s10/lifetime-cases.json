@@ -2,14 +2,34 @@
   "version": 1,
   "consumer": "tools/s10/rust-consumer/Cargo.toml",
   "test": "lifetime",
-  "modes": ["debug", "release", "miri", "address_sanitizer"],
-  "cases": [
-    "lifetime::repeated_create_query_drop_returns_tracked_storage_to_baseline",
-    "lifetime::retained_type_keeps_its_program_alive_and_rejects_other_sessions",
-    "lifetime::reentry_is_an_error_and_retirement_invalidates_retained_results",
-    "lifetime::retire_before_initialization_cannot_create_a_checker",
-    "lifetime::native_unwind_retires_the_session_and_preserves_the_payload",
-    "lifetime::concurrent_first_queries_share_one_checker_identity"
+  "modes": [
+    "debug",
+    "release",
+    "miri",
+    "address_sanitizer"
   ],
-  "applicability": "E3 owner, generation, operation and retained-result contracts at the public embedding boundary, including repeated disposal counters, panic retirement, reentry and contention. Storage-internal fault injection, socket queue publication, formatting scratch and project-service replacement remain their existing E3 suites; this consumer exposes none of those services. Native unwind and contention are not claimed for wasm instances."
+  "cases": [
+    "callback_order_and_inline_maps_are_observed_independently_of_output_files",
+    "compiler_diagnostics_and_queries_share_the_emit_pool",
+    "compiler_request_cancellation_preserves_native_emit_and_checker_contracts",
+    "compiler_scope_panic_retires_both_checker_roots",
+    "concurrent_first_queries_share_a_checker_identity",
+    "emit_refuses_a_target_file_from_another_program",
+    "emitter_records_and_write_metadata_retain_their_source_owners",
+    "malformed_source_keeps_original_bytes_and_resolvable_diagnostics",
+    "native_query_unwind_preserves_payload_and_invalidates_the_session",
+    "public_ownership_retained_results_and_generated_syntax_keep_exact_owners",
+    "public_ownership_shared_file_survives_concurrent_snapshot_edit",
+    "reentry_fails_and_retirement_invalidates_retained_queries_and_emit",
+    "repeated_load_check_query_emit_drop_releases_tracked_storage",
+    "retained_type_survives_session_drop_and_rejects_a_foreign_session",
+    "retirement_before_initialization_refuses_a_query",
+    "transpile_results_retain_sources_and_follow_pinned_cancellation"
+  ],
+  "applicability": "Public facade applicability is mapped by obligation in docs/PHASE7-R4.md: S06 source/bundle backing and generated syntax; S07 shared bound-file identity and concurrent snapshot edits; S09 exact-owner retained type/symbol/signature/list/node access, final disposal, retirement, reentry, unwind and first-use contention. The source roster and exact executed names must agree in every full-roster capture mode. Internal storage mutation/fault hooks, generation commit gates, socket publication/formatting scratch, pool idle replacement and project-service replacement are covered by their original E3 suites, not claimed as facade operations. Native unwind and contention are not claimed for wasm instances. Historical fourteen-case four-mode receipts remain historical; the two new public ownership cases require their own focused execution evidence.",
+  "supporting_cases": {
+    "services": [
+      "caller_owned_mapper_project_loads_and_emits_canonical_and_supplemental_sources"
+    ]
+  }
 }

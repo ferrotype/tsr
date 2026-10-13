@@ -869,7 +869,29 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionEx
+    #[inline]
     pub(crate) fn check_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        #[cfg(target_arch = "wasm32")]
+        {
+            self.check_expression_iterative(node, mode)
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        {
+            #[cfg(feature = "recursion-probe")]
+            if self
+                .relations
+                .recursion_probe
+                .as_ref()
+                .is_some_and(|probe| probe.iterative_expressions)
+            {
+                return self.check_expression_iterative(node, mode);
+            }
+            self.check_expression_recursive(node, mode)
+        }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn check_expression_recursive(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
         let _trace = self.trace_node_span("checkExpression", node)?;
         let previous_mode = std::mem::replace(&mut self.expression_mode, mode);
         let previous = self.current_node.replace(node);
@@ -905,7 +927,7 @@ impl CheckerState {
         result
     }
 
-    fn check_expression_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
+    pub(crate) fn check_expression_worker(&mut self, node: NodeId) -> Result<TypeId, Error> {
         let read = self.node(node)?;
         let ty = match read.kind().known() {
             Some(K::StringLiteral | K::NoSubstitutionTemplateLiteral) => {

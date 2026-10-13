@@ -148,12 +148,12 @@ before one of them. `tsr` depends on every library it re-exports and goes last:
 32. `tsr_transformers`
 33. `tsr_compiler`
 34. `tsr_tracing`
-35. `tsr_embed`
+35. `tsr_transpile`
 36. `tsr_incremental`
-37. `tsr_autoimport`
-38. `tsr_project`
-39. `tsr_ls`
-40. `tsr_transpile`
+37. `tsr_embed`
+38. `tsr_autoimport`
+39. `tsr_project`
+40. `tsr_ls`
 41. `tsr_api`
 42. `tsr_lsp`
 43. `tsr_tsc`
@@ -168,6 +168,9 @@ before one of them. `tsr` depends on every library it re-exports and goes last:
 | Package | crates.io | Reason |
 | --- | --- | --- |
 | `phase4_tsctests` | Private | Repository-only Phase 4 command-line test harness |
+| `phase7-live-watch` | Private | Repository-only native watcher resource probe |
+| `phase7_rust_budget` | Private | Repository-only public embedding budget consumer |
+| `phase7_wasm_compiler` | Private | Repository-only WebAssembly compiler consumer of the public embedding API |
 | `s08_relater_prototype` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s09_format_harness` | Private | Repository-only benchmark, experiment, test or capture tool |
 | `s10_corpus` | Private | Repository-only benchmark, experiment, test or capture tool |

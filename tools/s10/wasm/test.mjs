@@ -62,6 +62,16 @@ if (mode !== "parser") {
   const badHost = checker.createHost(bytes("/"));
   assert.throws(() => badHost.compile({ target: "not-a-numeric-enum" }), WasmApiError);
   assert.throws(() => badHost.addDirectory(bytes("/consumed")), /disposed/);
+  for (const compilerOptions of [{ incremental: true }, { composite: true }, { composite: true, incremental: false }]) {
+    const configuredHost = checker.createHost(bytes("/"));
+    configuredHost.addFile(bytes("/tsconfig.json"), bytes(JSON.stringify({ compilerOptions, files: ["main.ts"] })), false);
+    configuredHost.addFile(bytes("/main.ts"), bytes("export const answer = 42;"), false);
+    const prepared = configuredHost.prepare();
+    assert.throws(() => prepared.compileConfig(bytes("/tsconfig.json")), error =>
+      error instanceof WasmApiError && /incremental\/watch\/external mapper execution unsupported/.test(error.message));
+    assert.equal(checker.state, "live");
+    assert.equal(new TextDecoder().decode(sibling.typeAtPosition(bytes("/b.ts"), 6)), "number");
+  }
   const serialHost = checker.createHost(bytes("/"));
   const cycle = {}; cycle.self = cycle;
   assert.throws(() => serialHost.compile(cycle), TypeError);
@@ -85,7 +95,22 @@ if (mode !== "parser") {
   }
   assert.throws(() => emitting.emit({ files: ["/src/a.ts"] }), TypeError);
   assert.equal(decode(emitting.emit().files[0].text), "export const value = 1;\n");
+  emitting.check();
+  emitting.emitRetained();
+  const retained = emitting.retainedSnapshot();
+  const header = emitting.retainedSnapshotHeader();
+  const source = emitting.retainedSource(0);
+  const write = emitting.retainedWrite(0);
+  assert.throws(() => emitting.emitRetained({ files: [bytes("/missing.ts")] }), WasmApiError);
+  assert.deepEqual(emitting.retainedSnapshot(), retained);
+  assert.deepEqual(emitting.retainedSnapshotHeader(), header);
+  assert.deepEqual(emitting.retainedSource(0), source);
+  assert.deepEqual(emitting.retainedWrite(0), write);
   emitting.retire();
+  assert.throws(() => emitting.check(), WasmApiError);
+  assert.throws(() => emitting.emitRetained(), WasmApiError);
+  assert.deepEqual(emitting.retainedSnapshotHeader(), header);
+  assert.deepEqual(emitting.retainedWrite(0), write);
   assert.throws(() => emitting.emit(), WasmApiError);
   assert.equal(checker.state, "live");
   emitting.dispose();
