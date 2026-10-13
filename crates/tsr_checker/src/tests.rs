@@ -63,6 +63,67 @@ fn value_link_misses_assign_ids_but_diagnostic_and_pointer_key_reads_do_not() {
 }
 
 #[test]
+fn completed_symbol_type_hits_preserve_native_ids_and_specialized_misses() {
+    use tsr_ast::check_flags as cf;
+    let (_counters, _generation, _identity, owner) = owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    for checks in [
+        0,
+        cf::DEFERRED_TYPE,
+        cf::INSTANTIATED,
+        cf::MAPPED,
+        cf::REVERSE_MAPPED,
+    ] {
+        let symbol = state
+            .new_symbol_ex(
+                symbol_flags::PROPERTY,
+                JsString::from_bytes(b"p".as_slice()),
+                checks,
+            )
+            .unwrap();
+        // Observer-only seeding must not assign the lazy comparison ID. A
+        // completed type can exist even when the specialized source links are
+        // unavailable: all native dispatchers return it before using them.
+        state.value_symbol_links.probe_entry(symbol).resolved_type =
+            Some(state.builtins.number_type);
+        assert_eq!(
+            tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap()),
+            0
+        );
+        let types = state.types.len();
+        assert_eq!(
+            state.get_type_of_symbol(symbol).unwrap(),
+            state.builtins.number_type
+        );
+        assert_ne!(
+            tsr_ast::existing_runtime_symbol_id(&state.symbol(symbol).unwrap()),
+            0
+        );
+        assert_eq!(state.types.len(), types);
+        state.value_symbol_links.probe_entry(symbol).resolved_type = None;
+        assert!(
+            state.get_type_of_symbol(symbol).is_err(),
+            "uncached specialized symbol {checks}"
+        );
+    }
+    let type_only = state
+        .new_symbol(
+            symbol_flags::TYPE_ALIAS,
+            JsString::from_bytes(b"T".as_slice()),
+        )
+        .unwrap();
+    assert_eq!(
+        state.get_type_of_symbol(type_only).unwrap(),
+        state.builtins.error_type
+    );
+    assert_eq!(
+        tsr_ast::existing_runtime_symbol_id(&state.symbol(type_only).unwrap()),
+        0
+    );
+}
+
+#[test]
 fn cloned_symbol_links_observe_the_new_symbol_before_the_source() {
     // checker.go:createSymbolWithType gets result links before source links.
     // Both symbols have the same name and no declarations, so compareSymbols

@@ -855,14 +855,10 @@ impl CheckerState {
             return Ok(Some(candidate));
         }
         for candidate in &mut state.candidates {
-            let parameters = self
-                .signatures
-                .get(*candidate)?
-                .type_parameters
-                .clone()
-                .unwrap_or_else(|| [].into());
+            let parameters = self.signatures.get(*candidate)?.type_parameters.clone();
+            let parameters = parameters.as_deref().unwrap_or_default();
             if !type_arguments.is_empty()
-                && (type_arguments.len() < self.min_type_argument_count(&parameters)?
+                && (type_arguments.len() < self.min_type_argument_count(parameters)?
                     || type_arguments.len() > parameters.len())
             {
                 continue;
@@ -881,7 +877,7 @@ impl CheckerState {
                         0
                     };
                     let context =
-                        self.new_inference_context(&parameters, Some(*candidate), flags)?;
+                        self.new_inference_context(parameters, Some(*candidate), flags)?;
                     inference = Some(context);
                     let arguments = self.infer_call_type_arguments_ex(
                         node,
@@ -905,7 +901,9 @@ impl CheckerState {
                 };
                 self.call_signature_instantiation(*candidate, &type_arguments, false, inference)?
             };
-            if self.non_array_rest_type(*candidate)?.is_some()
+            // Only instantiation can change this candidate's rest arity.
+            if !parameters.is_empty()
+                && self.non_array_rest_type(*candidate)?.is_some()
                 && !self.call_has_correct_arity(node, args, checked)?
             {
                 state.arity_error = Some(checked);
@@ -947,5 +945,167 @@ impl CheckerState {
             return Ok(Some(checked));
         }
         Ok(None)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tsr_ast::{Factory, FactoryMethods, JsString};
+
+    fn call(state: &mut CheckerState, expression: Option<NodeId>, args: &[NodeId]) -> NodeId {
+        let nodes = state
+            .factory
+            .node_slice(args.iter().copied().map(Some).collect())
+            .unwrap();
+        let list = state
+            .factory
+            .new_list(tsr_core::TextRange::new(0, 10), nodes)
+            .unwrap();
+        let call = state
+            .factory
+            .new_call_expression(expression, None, None, Some(list), 0);
+        state
+            .factory
+            .set_node_range(call, tsr_core::TextRange::new(0, 12));
+        call
+    }
+
+    fn parameter(state: &mut CheckerState, ty: TypeId) -> SymbolId {
+        let symbol = state
+            .new_symbol(
+                sf::FUNCTION_SCOPED_VARIABLE,
+                JsString::from_bytes(b"p".as_slice()),
+            )
+            .unwrap();
+        state.value_symbol_links.probe_entry(symbol).resolved_type = Some(ty);
+        symbol
+    }
+
+    fn call_with_invalid_callee(state: &mut CheckerState) -> NodeId {
+        let node = call(state, None, &[]);
+        let invalid = NodeId::from_parts(state.factory.id().arena(), u32::MAX).unwrap();
+        // Constructors validate retained edges. Introduce the malformed edge
+        // only after construction so the checker, rather than the factory,
+        // decides whether that edge must be read.
+        let mut write = state.factory.node_mut(node).unwrap();
+        let tsr_ast::NodeData::CallExpression(data) = write.data_mut() else {
+            unreachable!("call fixture has call payload")
+        };
+        data.expression = Some(invalid);
+        node
+    }
+
+    fn candidate_state(node: NodeId, args: Vec<NodeId>, candidate: SignatureId) -> TypedCall {
+        TypedCall {
+            node,
+            args,
+            type_arguments: Vec::new(),
+            candidates: vec![candidate],
+            argument_mode: 0,
+            // Exercise the candidate loop, including its nongeneric branch.
+            single_non_generic: false,
+            argument_errors: Vec::new(),
+            arity_error: None,
+            constraint_error: None,
+        }
+    }
+
+    #[test]
+    fn nongeneric_candidates_keep_results_without_creating_types() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let number = state.builtins.number_type;
+        let parameter = parameter(state, number);
+        let argument = state.new_synthetic_expression(number, false, None).unwrap();
+        let node = call(state, None, &[argument]);
+        for parameters in [None, Some(crate::TypeList::default())] {
+            let signature = state
+                .signatures
+                .new_signature(
+                    0,
+                    None,
+                    parameters,
+                    None,
+                    Some(vec![parameter].into()),
+                    Some(number),
+                    None,
+                    1,
+                )
+                .unwrap();
+            let mut call = candidate_state(node, vec![argument], signature);
+            let before = (state.types.len(), state.instantiation.total_count);
+            for relation in [RelationKind::Subtype, RelationKind::Assignable] {
+                assert_eq!(
+                    state.choose_typed_call(&mut call, relation),
+                    Ok(Some(signature))
+                );
+                assert!(call.argument_errors.is_empty());
+                assert!(call.arity_error.is_none());
+            }
+            assert_eq!((state.types.len(), state.instantiation.total_count), before);
+        }
+    }
+
+    #[test]
+    fn nongeneric_rest_checks_this_before_resolving_effective_rest_again() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let any = state.builtins.any_type;
+        let number = state.builtins.number_type;
+        let rest = parameter(state, any);
+        let this = parameter(state, number);
+        let signature = state
+            .signatures
+            .new_signature(
+                sg::HAS_REST_PARAMETER,
+                None,
+                None,
+                Some(this),
+                Some(vec![rest].into()),
+                Some(number),
+                None,
+                0,
+            )
+            .unwrap();
+        let node = call_with_invalid_callee(state);
+        // The first arity check succeeds without needing the global any[] type.
+        assert_eq!(state.call_has_correct_arity(node, &[], signature), Ok(true));
+        assert_eq!(
+            state.non_array_rest_type(signature),
+            Err(Error::MissingLink("any array global"))
+        );
+        let mut call = candidate_state(node, Vec::new(), signature);
+        // Go enters applicability directly for nongeneric candidates. The
+        // required `this` check therefore observes the bad callee first. An
+        // extra rest/arity pass would report the missing any[] global instead.
+        assert_eq!(
+            state.choose_typed_call(&mut call, RelationKind::Assignable),
+            Err(Error::Arena(tsr_arena::Error::InvalidSlot)),
+        );
+        assert!(call.arity_error.is_none());
+    }
+
+    #[test]
+    fn absent_or_void_this_does_not_read_an_unused_callee() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let void = state.builtins.void_type;
+        let this = parameter(state, void);
+        let node = call_with_invalid_callee(state);
+        for this in [None, Some(this)] {
+            let signature = state
+                .signatures
+                .new_signature(0, None, None, this, None, Some(void), None, 0)
+                .unwrap();
+            let mut call = candidate_state(node, Vec::new(), signature);
+            assert_eq!(
+                state.choose_typed_call(&mut call, RelationKind::Assignable),
+                Ok(Some(signature))
+            );
+        }
     }
 }

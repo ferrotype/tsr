@@ -145,7 +145,8 @@ bounded candidate.
 
 The [2026-10-13 checker-core experiments](PERF-checker-core-2026-10-13.md)
 continue this work with concurrent candidate/control screens, retained changes
-and rejected trials. They do not close R1.
+and rejected trials. The [overload and inference follow-up](PERF-checker-algorithms-2026-10-13.md)
+adds a fresh profile and a second set of paired screens. Neither closes R1.
 
 Remaining work includes the checker algorithms identified in that record,
 memory and scaling on the real scenarios. Retain or reject each candidate on
