@@ -174,3 +174,43 @@ object types and lazy symbol/type creation. This push did not establish a
 safe cache or a way to skip those semantic passes. Accessor and local-directory
 changes measured so far do not justify a broad NodeId rewrite. R1's complete
 scenario, mode and checker-count acceptance matrix remains separate.
+
+## Follow-up: retained-list candidates N and O
+
+Both candidates below use the retained H/I/J/K executable as their control,
+and were tested separately. Neither is retained. Removing temporary vectors
+from these paths did not materially reduce full-project checking time.
+
+- **N — retained resolved-member lists.** Property, signature and index-info
+  readers returned views over existing shared backing instead of fresh vectors.
+  Public and mutable boundaries still copied explicitly. This required a
+  private ranged-list abstraction and changes at its consumers.
+- **O — retained inference constituents.** Union/intersection inference and
+  relation loops used shared type lists or inline singleton values instead of
+  temporary vectors. Traversal order, duplicates, matcher calls and error order
+  remained unchanged.
+
+| Candidate / H/I/J/K; VS Code, two checkers | Pairs | Wall ratio | Check ratio | CPU user ratio | RSS ratio |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| N | 3 | 1.0011 | 0.9980 | 0.9969 | 0.9973 |
+| O | 3 | 0.9981 | 0.9972 | 0.9960 | 0.9992 |
+
+These small screens do not establish a useful improvement. Each added an
+internal representation and migration cost, so both were removed rather than
+kept on a prediction of future savings. This is not evidence that all
+allocation or list-storage changes are ineffective.
+
+Each candidate passed checker tests (116 for N, 113 for O), checker clippy
+with all targets/features and warnings denied, formatting, and
+`cargo xtask validate`. Both passed 67 selected compiler variants, 603 subtests,
+with no failures, skips or parity expectation changes. Every measured sample
+matched the frozen diagnostic/file output and exactly 2,509,704 types.
+
+Patches, source copies, exact executables, build and validation logs, selected
+parity results and raw concurrent pairs are preserved outside `target/` in
+`../ts-rust-benchmarks/2026-10-13/checker-context/`, under `candidate-n`,
+`candidate-o`, `validation-{n,o}`, `parity-{n,o}`, `n-vscode-2` and `o-vscode-2`.
+The control binary is `control/tsrust` with SHA-256
+`3ec1aa6a822179cb92e25bbc1f5f5007be37f3af48e181e07beba8b718e0aa51`.
+Use the same committed `pairs.py` command above with these executable paths,
+three pairs, VS Code and two checkers to reproduce either isolated screen.

@@ -233,6 +233,7 @@ class ConcurrentPairTests(unittest.TestCase):
         with mock.patch.object(common, 'run', side_effect=run), mock.patch.object(common, 'observe', side_effect=observed):
             report = self.screen(self.root / 'screen', mode='emit', count=3)
         self.assertTrue(report['complete'])
+        self.assertEqual(report['method'], 'concurrent pairs; alternating submission order; no profiler')
         self.assertEqual(report['type_count_policy'], 'equal')
         self.assertEqual(report['median_ratios'], dict.fromkeys(pairs.METRICS, 3.0))
         self.assertEqual([row['submission_order'] for row in report['pairs']],
@@ -249,6 +250,56 @@ class ConcurrentPairTests(unittest.TestCase):
         self.assertEqual(len(set(directories)), 6)
         self.assertTrue(all(not directory.exists() for directory in directories))
         self.assertEqual(self.unchanged.call_count, 2)
+
+    def test_serial_pairs_use_one_worker_without_barrier_and_alternate_execution(self):
+        events = []
+        executor = pairs.concurrent.futures.ThreadPoolExecutor
+        observe = common.observe
+
+        def run(binary, cwd, args, timeout):
+            # A new child cannot enter while the previous child is unfinished.
+            self.assertEqual(len(events) % 2, 0)
+            events.append(('start', binary.name))
+            result = self.result(100 if binary.name == 'control' else 200)
+            events.append(('finish', binary.name))
+            return result
+
+        def observed(*args):
+            self.assertEqual(len(events) % 4, 0, 'validation must wait for both children')
+            return observe(*args)
+
+        with mock.patch.object(common, 'run', side_effect=run), \
+                mock.patch.object(common, 'observe', side_effect=observed), \
+                mock.patch.object(pairs.concurrent.futures, 'ThreadPoolExecutor', wraps=executor) as pool, \
+                mock.patch.object(pairs.threading, 'Barrier', side_effect=AssertionError('serial barrier')):
+            report = self.screen(self.root / 'serial', count=3, serial=True)
+        self.assertEqual(pool.call_args_list, [mock.call(1)] * 3)
+        order = ['control', 'candidate', 'candidate', 'control', 'control', 'candidate']
+        self.assertEqual(events, [(event, name) for name in order for event in ('start', 'finish')])
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['method'], 'serial pairs; alternating execution order; no profiler')
+        self.assertEqual(report['median_ratios'], dict.fromkeys(pairs.METRICS, 2.0))
+        self.assertEqual([row['submission_order'] for row in report['pairs']],
+                         [['control', 'candidate'], ['candidate', 'control'], ['control', 'candidate']])
+
+    def test_serial_pairs_keep_exact_type_validation_and_failure_evidence(self):
+        for explicit in (False, True):
+            with self.subTest(explicit=explicit):
+                output = self.root / f'serial-types-{explicit}'
+                options = ({'control_types': 1000, 'candidate_types': 801,
+                            'type_count_reason': 'Avoid unused types.'} if explicit else {})
+
+                def run(binary, *args, **kwargs):
+                    return {**self.result(), 'stdout': stdout(types=1000 if binary.name == 'control' else 802)}
+
+                message = 'differs from expected' if explicit else 'type counts differ'
+                with mock.patch.object(common, 'run', side_effect=run), self.assertRaisesRegex(ValueError, message):
+                    self.screen(output, serial=True, **options)
+                report = json.loads((output / 'summary.json').read_text())
+                self.assertFalse(report['complete'])
+                self.assertNotIn('median_ratios', report)
+                for role in ('control', 'candidate'):
+                    self.assertTrue((output / f'0-{role}.stdout').is_file())
 
     def test_invalid_pairs_keep_raw_results_and_never_publish_ratios(self):
         cases = {
@@ -431,6 +482,17 @@ class ConcurrentPairTests(unittest.TestCase):
         self.assertTrue(report['complete'])
         self.assertEqual(report['type_count_expectations'], {'control': 1000, 'candidate': 801})
         self.assertEqual(report['type_count_reason'], 'Short-circuit avoids constructing unused types.')
+
+    def test_cli_forwards_serial_mode(self):
+        output = self.root / 'cli-serial'
+        with mock.patch.object(common, 'load', return_value=self.descriptor), \
+                mock.patch.object(common, 'run', side_effect=lambda *a, **k: self.result()):
+            pairs.main(['--scenario', 'xstate', '--mode', 'check', '--pairs', '1', '--serial',
+                        '--control', str(self.control), '--candidate', str(self.candidate),
+                        '--output', str(output)])
+        report = json.loads((output / 'summary.json').read_text())
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['method'], 'serial pairs; alternating execution order; no profiler')
 
 
 def pair(index, go_wall, rust_wall):
