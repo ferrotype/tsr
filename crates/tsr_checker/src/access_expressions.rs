@@ -611,10 +611,12 @@ impl CheckerState {
                         && is_this
                         && without_initializer
                     {
+                        let declaration_parent = read.parent();
+                        let declaration_flags = read.flags();
                         let container = self.control_flow_container(node)?;
                         assume = self.node(container)?.kind() == K::Constructor
-                            && self.node(container)?.parent() == read.parent()
-                            && read.flags() & nf::AMBIENT == 0;
+                            && self.node(container)?.parent() == declaration_parent
+                            && declaration_flags & nf::AMBIENT == 0;
                     } else if let Some(binary) = read.data_source().as_binary_expression() {
                         let left = binary
                             .left()

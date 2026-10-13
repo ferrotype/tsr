@@ -58,7 +58,7 @@ struct FlowQuery {
     reference: NodeId,
     /// The reference read once, at the first comparison of the walk.
     shape: Option<crate::flow_reference::ReferenceShape>,
-    flow_owner: NodeId,
+    graph: FlowGraph,
     declared: TypeId,
     initial: TypeId,
     container: Option<NodeId>,
@@ -67,11 +67,78 @@ struct FlowQuery {
     reduce_labels: Vec<tsr_ast::FlowReduceLabelData>,
 }
 
+/// One immutable binder graph selected before a walk mutates checker state.
+/// The shared file retains both the binding and all graph dependencies. Only
+/// completed core files use this path; other owners retain their routed reads.
+struct FlowGraph {
+    owner: NodeId,
+    shared: Option<tsr_ast::SharedBoundFile>,
+}
+
+impl FlowGraph {
+    fn binding<'a>(&'a self, state: &'a CheckerState) -> Result<&'a tsr_ast::BindResult, Error> {
+        match &self.shared {
+            Some(shared) => Ok(shared.result()),
+            None => Ok(state.program()?.bind_result(self.owner)?),
+        }
+    }
+
+    fn node(&self, state: &CheckerState, flow: FlowId) -> Result<FlowNode, Error> {
+        Ok(self.binding(state)?.flows().get(flow)?.to_owned())
+    }
+
+    /// Preserve eager list validation before any branch can return early.
+    /// Publication checks present IDs but permits a list item without a flow,
+    /// which is invalid when that list is consumed as antecedents.
+    fn antecedents(
+        &self,
+        state: &CheckerState,
+        mut list: Option<FlowListId>,
+    ) -> Result<Option<FlowListId>, Error> {
+        let first = list;
+        let lists = self.binding(state)?.flow_lists();
+        while let Some(id) = list {
+            let item = lists.get(id)?;
+            required(item.flow(), "flow list element")?;
+            list = item.next();
+        }
+        Ok(first)
+    }
+
+    /// Consume a validated antecedent list without allocating a temporary
+    /// vector. Slot reads retain the same owner and bounds checks.
+    fn next(
+        &self,
+        state: &CheckerState,
+        list: &mut Option<FlowListId>,
+    ) -> Result<Option<FlowId>, Error> {
+        let Some(id) = *list else {
+            return Ok(None);
+        };
+        let item = self.binding(state)?.flow_lists().get(id)?;
+        let flow = required(item.flow(), "flow list element")?;
+        *list = item.next();
+        Ok(Some(flow))
+    }
+}
+
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
 }
 
 impl CheckerState {
+    fn flow_graph(&self, owner: NodeId) -> Result<FlowGraph, Error> {
+        let owner = self
+            .flow
+            .synthetic
+            .get(&owner)
+            .map_or(owner, |&(source, _)| source);
+        Ok(FlowGraph {
+            owner,
+            shared: self.program()?.shared_binding(owner),
+        })
+    }
+
     fn flow_node(&self, owner: NodeId, flow: FlowId) -> Result<FlowNode, Error> {
         let owner = self
             .flow
@@ -133,7 +200,22 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNode
     pub(crate) fn reachable_flow(&mut self, owner: NodeId, flow: FlowId) -> Result<bool, Error> {
-        let result = self.reachable_flow_worker(owner, flow, &mut Vec::new())?;
+        // Completed hits need no graph retention or owner routing.
+        if let Some((last, result)) = self.flow.last_reachable {
+            if last == flow {
+                return Ok(result);
+            }
+        }
+        if let Some(&result) = self.flow.reachable.get(&flow) {
+            self.flow.last_reachable = Some((flow, result));
+            return Ok(result);
+        }
+        let graph = self.flow_graph(owner)?;
+        self.reachable_flow_in(&graph, flow)
+    }
+
+    fn reachable_flow_in(&mut self, graph: &FlowGraph, flow: FlowId) -> Result<bool, Error> {
+        let result = self.reachable_flow_worker(graph, flow, &mut Vec::new())?;
         self.flow.last_reachable = Some((flow, result));
         Ok(result)
     }
@@ -141,7 +223,7 @@ impl CheckerState {
     // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNodeWorker
     fn reachable_flow_worker(
         &mut self,
-        owner: NodeId,
+        graph: &FlowGraph,
         mut flow: FlowId,
         reduced: &mut Vec<tsr_ast::FlowReduceLabelData>,
     ) -> Result<bool, Error> {
@@ -165,28 +247,29 @@ impl CheckerState {
                     }
                     passed.push(flow);
                 }
-                let node = self.flow_node(owner, flow)?;
+                let node = graph.node(self, flow)?;
                 if node.flags & (ff::ASSIGNMENT | ff::CONDITION | ff::ARRAY_MUTATION) != 0 {
                     flow = required(node.antecedent, "reachable antecedent")?;
                 } else if node.flags & ff::BRANCH_LABEL != 0 {
                     // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel
                     // port: tsc/internal/checker/flow.go:getBranchLabelAntecedents
-                    let list = reduced
+                    let mut list = reduced
                         .iter()
                         .rev()
                         .find(|r| r.target == Some(flow))
                         .map_or(node.antecedents, |r| r.antecedents);
+                    list = graph.antecedents(self, list)?;
                     let mut reachable = false;
-                    for branch in self.flow_antecedents(owner, list)? {
-                        if self.reachable_flow_worker(owner, branch, reduced)? {
+                    while let Some(branch) = graph.next(self, &mut list)? {
+                        if self.reachable_flow_worker(graph, branch, reduced)? {
                             reachable = true;
                             break;
                         }
                     }
                     break reachable;
                 } else if node.flags & ff::LOOP_LABEL != 0 {
-                    let branches = self.flow_antecedents(owner, node.antecedents)?;
-                    let Some(&first) = branches.first() else {
+                    let mut list = graph.antecedents(self, node.antecedents)?;
+                    let Some(first) = graph.next(self, &mut list)? else {
                         break false;
                     };
                     flow = first;
@@ -199,7 +282,7 @@ impl CheckerState {
                     self.flow.last_reachable = None;
                     reduced.push(data);
                     let result = self.reachable_flow_worker(
-                        owner,
+                        graph,
                         required(node.antecedent, "reduce antecedent")?,
                         reduced,
                     );
@@ -373,7 +456,7 @@ impl CheckerState {
         let mut query = FlowQuery {
             reference,
             shape: None,
-            flow_owner,
+            graph: self.flow_graph(flow_owner)?,
             declared,
             initial,
             container,
@@ -427,7 +510,7 @@ impl CheckerState {
         let mut query = FlowQuery {
             reference,
             shape: None,
-            flow_owner: expression,
+            graph: self.flow_graph(expression)?,
             declared,
             initial,
             container: Some(function),
@@ -465,7 +548,12 @@ impl CheckerState {
             query.shape = Some(self.reference_shape(query.reference)?);
         }
         let shape = query.shape.as_ref().expect("built above");
-        self.matching_shape(shape, target)
+        let scope = query
+            .graph
+            .shared
+            .as_ref()
+            .map(crate::flow_reference::TargetScope::new);
+        self.matching_shape(shape, target, scope)
     }
     /// `contains_flow_reference(query.reference, target)` through the shape.
     fn query_reference_contained(
@@ -477,7 +565,12 @@ impl CheckerState {
             query.shape = Some(self.reference_shape(query.reference)?);
         }
         let shape = query.shape.as_ref().expect("built above");
-        self.shape_contains(shape, target)
+        let scope = query
+            .graph
+            .shared
+            .as_ref()
+            .map(crate::flow_reference::TargetScope::new);
+        self.shape_contains(shape, target, scope)
     }
     /// `evolving_mutation_target(query.reference, mutation)` through the shape.
     fn evolving_mutation_target_of_query(
@@ -508,7 +601,7 @@ impl CheckerState {
         let result = stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
             let mut shared = None;
             loop {
-                let node = self.flow_node(query.flow_owner, flow)?;
+                let node = query.graph.node(self, flow)?;
                 if node.flags & ff::SHARED != 0 {
                     if let Some((_, ty)) = query.shared.iter().find(|(id, _)| *id == flow) {
                         return Ok(*ty);
@@ -521,7 +614,7 @@ impl CheckerState {
                         return Err(tsr_arena::Error::InvalidGraph.into());
                     };
                     if self.matching_query_reference(query, target)? {
-                        if !self.reachable_flow(query.flow_owner, flow)? {
+                        if !self.reachable_flow_in(&query.graph, flow)? {
                             FlowType::complete(self.builtins.unreachable_never_type)
                         } else if self.assignment_target_kind(target)?
                             == crate::flow_assignments::AssignmentKind::Compound
@@ -565,7 +658,7 @@ impl CheckerState {
                             FlowType::complete(ty)
                         }
                     } else if self.query_reference_contained(query, target)? {
-                        if !self.reachable_flow(query.flow_owner, flow)? {
+                        if !self.reachable_flow_in(&query.graph, flow)? {
                             return Ok(FlowType::complete(self.builtins.unreachable_never_type));
                         }
                         let read = self.node(target)?;
@@ -648,23 +741,29 @@ impl CheckerState {
                         }
                     }
                 } else if node.flags & ff::BRANCH_LABEL != 0 {
-                    let list = query
+                    let mut list = query
                         .reduce_labels
                         .iter()
                         .rev()
                         .find(|r| r.target == Some(flow))
                         .map_or(node.antecedents, |r| r.antecedents);
-                    let branches = self.flow_antecedents(query.flow_owner, list)?;
-                    if branches.len() == 1 {
-                        flow = branches[0];
-                        continue;
+                    list = query.graph.antecedents(self, list)?;
+                    let first = query.graph.next(self, &mut list)?;
+                    if list.is_none() {
+                        if let Some(first) = first {
+                            flow = first;
+                            continue;
+                        }
                     }
                     let mut types = Vec::new();
                     let mut subtype = false;
                     let mut incomplete = false;
                     let mut bypass = None;
-                    for branch in branches {
-                        let branch_node = self.flow_node(query.flow_owner, branch)?;
+                    let mut branch = first;
+                    while let Some(current) = branch {
+                        branch = query.graph.next(self, &mut list)?;
+                        let branch = current;
+                        let branch_node = query.graph.node(self, branch)?;
                         if bypass.is_none() && branch_node.flags & ff::SWITCH_CLAUSE != 0 {
                             let Some(FlowData::SwitchClause(data)) = branch_node.node else {
                                 return Err(tsr_arena::Error::InvalidGraph.into());
@@ -704,12 +803,15 @@ impl CheckerState {
                     let ty = self.flow_union_type(query, &types, subtype)?;
                     self.new_flow_type(ty, incomplete)?
                 } else if node.flags & ff::LOOP_LABEL != 0 {
-                    let branches = self.flow_antecedents(query.flow_owner, node.antecedents)?;
-                    if branches.len() == 1 {
-                        flow = branches[0];
-                        continue;
+                    let mut list = query.graph.antecedents(self, node.antecedents)?;
+                    let first = query.graph.next(self, &mut list)?;
+                    if list.is_none() {
+                        if let Some(first) = first {
+                            flow = first;
+                            continue;
+                        }
                     }
-                    self.type_at_flow_loop(query, flow, &branches)?
+                    self.type_at_flow_loop(query, flow, node.antecedents)?
                 } else if node.flags & ff::REDUCE_LABEL != 0 {
                     let Some(FlowData::ReduceLabel(data)) = node.node else {
                         return Err(tsr_arena::Error::InvalidGraph.into());
@@ -924,7 +1026,7 @@ impl CheckerState {
         &mut self,
         query: &mut FlowQuery,
         flow: FlowId,
-        branches: &[FlowId],
+        mut branches: Option<FlowListId>,
     ) -> Result<FlowType, Error> {
         let Some(reference) = self.flow_reference_key(query)? else {
             return Ok(FlowType::complete(query.declared));
@@ -951,7 +1053,7 @@ impl CheckerState {
         let mut types = Vec::with_capacity(4);
         let mut first = None;
         let mut subtype = false;
-        for &branch in branches {
+        while let Some(branch) = query.graph.next(self, &mut branches)? {
             let previous = if first.is_none() {
                 let previous = self.type_at_flow(query, branch)?;
                 first = Some(previous);
@@ -1308,7 +1410,10 @@ impl FlowAnalysis {
             "flowLoopCache",
             self.loop_cache.len(),
             self.loop_cache.allocation_size(),
-            self.loop_cache.keys().map(|key| key.reference.len()).sum(),
+            self.loop_cache
+                .keys()
+                .map(|key| key.reference.heap_bytes())
+                .sum(),
         );
         charge(
             "flowLoopStack",
@@ -1316,7 +1421,9 @@ impl FlowAnalysis {
             self.loop_stack.capacity() * size_of::<FlowLoopInfo>(),
             self.loop_stack
                 .iter()
-                .map(|info| info.key.reference.len() + info.types.capacity() * size_of::<TypeId>())
+                .map(|info| {
+                    info.key.reference.heap_bytes() + info.types.capacity() * size_of::<TypeId>()
+                })
                 .sum(),
         );
         charge(
@@ -1396,5 +1503,95 @@ impl CheckerState {
             vec![],
         ))?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod graph_tests {
+    use super::*;
+    use tsr_ast::{AstBuilder, FlowList, SourceFileParseOptions};
+    use tsr_jsstring::SourceText;
+
+    fn build_graph(
+        counters: &tsr_arena::Counters,
+        missing_tail_flow: bool,
+    ) -> (FlowGraph, FlowId, FlowListId, FlowId) {
+        let text = SourceText::from_bytes(b"".as_slice());
+        let mut builder = AstBuilder::new(text.clone(), counters);
+        let source = builder.new_source_file(
+            SourceFileParseOptions {
+                file_name: tsr_ast::JsString::from_bytes(b"/flow.ts".as_slice()),
+                ..SourceFileParseOptions::default()
+            },
+            text,
+            None,
+            None,
+        );
+        let parsed = builder.complete(source).unwrap();
+        let mut ids = None;
+        let completed = parsed
+            .bind_and_publish(|binding| {
+                let start = binding.flows_mut().push(FlowNode::new(ff::START));
+                let tail = binding.flow_lists_mut().push(FlowList {
+                    flow: (!missing_tail_flow).then_some(start),
+                    next: None,
+                });
+                let head = binding.flow_lists_mut().push(FlowList {
+                    flow: Some(start),
+                    next: Some(tail),
+                });
+                let branch = binding.flows_mut().push(FlowNode {
+                    flags: ff::BRANCH_LABEL,
+                    antecedents: Some(head),
+                    ..FlowNode::default()
+                });
+                ids = Some((start, head, branch));
+                Ok(())
+            })
+            .unwrap();
+        let (start, head, branch) = ids.unwrap();
+        (
+            FlowGraph {
+                owner: source,
+                shared: completed.shared(),
+            },
+            start,
+            head,
+            branch,
+        )
+    }
+
+    #[test]
+    fn retained_flow_graph_checks_foreign_node_and_list_owners() {
+        let (counters, _generation, _identity, owner) = crate::tests::owner();
+        let (graph, start, head, _) = build_graph(&counters, false);
+        let (_, foreign_start, foreign_head, _) = build_graph(&counters, false);
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        // No program is installed: the graph itself must retain sufficient
+        // storage after its temporary CompletedFile has been dropped.
+        assert_eq!(graph.node(state, start).unwrap().flags, ff::START);
+        assert_eq!(graph.antecedents(state, Some(head)).unwrap(), Some(head));
+        assert!(matches!(
+            graph.node(state, foreign_start),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
+        ));
+        assert!(matches!(
+            graph.antecedents(state, Some(foreign_head)),
+            Err(Error::Arena(tsr_arena::Error::WrongOwner))
+        ));
+    }
+
+    #[test]
+    fn reachable_flow_validates_the_tail_before_a_reachable_first_branch() {
+        let (counters, _generation, _identity, owner) = crate::tests::owner();
+        let (graph, _, _, branch) = build_graph(&counters, true);
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        assert!(matches!(
+            state.reachable_flow_in(&graph, branch),
+            Err(Error::MissingLink("flow list element"))
+        ));
+        assert!(!state.flow.reachable.contains_key(&branch));
     }
 }

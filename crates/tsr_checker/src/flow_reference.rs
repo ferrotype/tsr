@@ -1,10 +1,59 @@
 //! Reference equivalence is symbol based, with source-qualified property paths.
 use crate::symbols::NameBuf;
 use crate::{CheckerState, Error};
-use tsr_arena::{NodeId, SymbolId};
+use tsr_arena::{ArenaId, NodeId, SymbolId};
 use tsr_ast::{node_flags as nf, symbol_flags as sf, JsString, SyntaxKind as K};
 fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
     value.ok_or(Error::MissingLink(context))
+}
+
+/// Syntax in the immutable core file already retained by a flow query. The
+/// view borrows that query, so a target read can survive mutable checker calls.
+/// Imports, lazy nodes and checker factory nodes keep the general lookup path.
+#[derive(Clone, Copy)]
+pub(crate) struct TargetScope<'a> {
+    arena: ArenaId,
+    view: tsr_ast::AstView<'a>,
+}
+impl<'a> TargetScope<'a> {
+    pub(crate) fn new(shared: &'a tsr_ast::SharedBoundFile) -> Self {
+        Self {
+            arena: shared.result().source().arena(),
+            view: shared.view().ast(),
+        }
+    }
+
+    fn view_for(self, node: NodeId) -> Option<tsr_ast::AstView<'a>> {
+        (node.arena() == self.arena).then_some(self.view)
+    }
+}
+
+/// Retain the target read only when its owner is externally held and immutable.
+/// A fallback owner is read afresh at each use, including after semantic calls.
+struct MatchingTarget<'a> {
+    id: NodeId,
+    read: Option<tsr_ast::NodeRead<'a>>,
+}
+impl<'a> MatchingTarget<'a> {
+    fn new(scope: Option<TargetScope<'a>>, id: NodeId) -> Result<Self, Error> {
+        let read = scope
+            .and_then(|scope| scope.view_for(id))
+            .map(|view| view.node(id))
+            .transpose()?;
+        Ok(Self { id, read })
+    }
+
+    #[inline]
+    fn with_read<R>(
+        &self,
+        state: &CheckerState,
+        read: impl FnOnce(&tsr_ast::NodeRead<'_>) -> Result<R, Error>,
+    ) -> Result<R, Error> {
+        match &self.read {
+            Some(target) => read(target),
+            None => read(&state.node(self.id)?),
+        }
+    }
 }
 
 impl CheckerState {
@@ -359,24 +408,7 @@ impl CheckerState {
                     .as_element_access_expression()
                     .ok_or(tsr_arena::Error::InvalidGraph)?;
                 let argument = required(data.argument_expression(), "element name argument")?;
-                let read = self.node(argument)?;
-                if matches!(
-                    read.kind().known(),
-                    Some(K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral)
-                ) {
-                    return Ok(Some(self.node_text(argument)?.into_js_string()));
-                }
-                if tsr_ast::is_entity_name_expression(self.ast(argument)?, argument)? {
-                    let Some(symbol) = self.resolve_entity_name(argument, sf::VALUE, true)? else {
-                        return Ok(None);
-                    };
-                    if self.is_constant_flow_variable(symbol)?
-                        || self.symbol(symbol)?.flags() & sf::ENUM_MEMBER != 0
-                    {
-                        return self.flow_name_from_entity(argument, symbol);
-                    }
-                }
-                Ok(None)
+                self.flow_element_argument_name(argument, None)
             }
             Some(K::BindingElement) => self.destructuring_property_name(access),
             Some(K::Parameter) => {
@@ -391,6 +423,75 @@ impl CheckerState {
             _ => Ok(None),
         }
     }
+    fn flow_element_argument_name(
+        &mut self,
+        argument: NodeId,
+        scope: Option<TargetScope<'_>>,
+    ) -> Result<Option<JsString>, Error> {
+        let argument_kind =
+            MatchingTarget::new(scope, argument)?.with_read(self, |read| Ok(read.kind()))?;
+        if matches!(
+            argument_kind.known(),
+            Some(K::StringLiteral | K::NumericLiteral | K::NoSubstitutionTemplateLiteral)
+        ) {
+            return Ok(Some(self.target_text(argument, scope)?));
+        }
+        if tsr_ast::is_entity_name_expression(self.target_ast(argument, scope)?, argument)? {
+            let Some(symbol) = self.resolve_entity_name(argument, sf::VALUE, true)? else {
+                return Ok(None);
+            };
+            if self.is_constant_flow_variable(symbol)?
+                || self.symbol(symbol)?.flags() & sf::ENUM_MEMBER != 0
+            {
+                return self.flow_name_from_entity(argument, symbol);
+            }
+        }
+        Ok(None)
+    }
+
+    fn target_ast<'a>(
+        &'a self,
+        node: NodeId,
+        scope: Option<TargetScope<'a>>,
+    ) -> Result<tsr_ast::AstView<'a>, Error> {
+        match scope.and_then(|scope| scope.view_for(node)) {
+            Some(view) => Ok(view),
+            None => self.ast(node),
+        }
+    }
+
+    fn target_text(&self, node: NodeId, scope: Option<TargetScope<'_>>) -> Result<JsString, Error> {
+        match scope.and_then(|scope| scope.view_for(node)) {
+            Some(view) => Ok(view.node_text(node)?.into_js_string()),
+            None => Ok(self.node_text(node)?.into_js_string()),
+        }
+    }
+
+    fn matching_target_property_name(
+        &mut self,
+        target: &MatchingTarget<'_>,
+        scope: Option<TargetScope<'_>>,
+    ) -> Result<Option<JsString>, Error> {
+        let Some(read) = &target.read else {
+            return self.flow_property_name(target.id);
+        };
+        match read.kind().known() {
+            Some(K::PropertyAccessExpression) => {
+                let name = required(read.name(), "accessed property name")?;
+                Ok(Some(self.target_text(name, scope)?))
+            }
+            Some(K::ElementAccessExpression) => {
+                let data = read
+                    .data_source()
+                    .as_element_access_expression()
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
+                let argument = required(data.argument_expression(), "element name argument")?;
+                self.flow_element_argument_name(argument, scope)
+            }
+            _ => Ok(None),
+        }
+    }
+
     // port: tsc/internal/checker/flow.go:Checker.tryGetNameFromEntityNameExpression
     fn flow_name_from_entity(
         &mut self,
@@ -597,8 +698,9 @@ impl CheckerState {
         &mut self,
         shape: &ReferenceShape,
         target: NodeId,
+        scope: Option<TargetScope<'_>>,
     ) -> Result<bool, Error> {
-        self.matching_shape_at(shape, 0, target)
+        self.matching_shape_at(shape, 0, target, scope)
     }
 
     /// `contains_flow_reference(reference, target)` with the reference's shape.
@@ -606,9 +708,10 @@ impl CheckerState {
         &mut self,
         shape: &ReferenceShape,
         target: NodeId,
+        scope: Option<TargetScope<'_>>,
     ) -> Result<bool, Error> {
         for peeled in 1..=shape.contains_candidates {
-            if self.matching_shape_at(shape, peeled, target)? {
+            if self.matching_shape_at(shape, peeled, target, scope)? {
                 return Ok(true);
             }
         }
@@ -616,16 +719,16 @@ impl CheckerState {
     }
 
     /// Match `target` against the reference with its first `index` accesses
-    /// peeled: the worker's target-side cases, with the source's reads
-    /// replaced by the shape.
+    /// peeled. The same worker serves retained core reads and routed fallbacks.
     fn matching_shape_at(
         &mut self,
         shape: &ReferenceShape,
         index: usize,
         target: NodeId,
+        scope: Option<TargetScope<'_>>,
     ) -> Result<bool, Error> {
         stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            self.matching_shape_worker(shape, index, target)
+            self.matching_shape_worker(shape, index, target, scope)
         })
     }
     fn matching_shape_worker(
@@ -633,34 +736,42 @@ impl CheckerState {
         shape: &ReferenceShape,
         index: usize,
         target: NodeId,
+        scope: Option<TargetScope<'_>>,
     ) -> Result<bool, Error> {
-        let read = self.node(target)?;
-        let target_kind = read.kind();
+        let read = MatchingTarget::new(scope, target)?;
+        let target_kind = read.with_read(self, |read| Ok(read.kind()))?;
         if matches!(
             target_kind.known(),
             Some(K::ParenthesizedExpression | K::NonNullExpression)
         ) {
-            return self.matching_shape_at(
-                shape,
-                index,
-                required(read.expression(), "target reference operand")?,
-            );
+            let operand = read.with_read(self, |read| {
+                required(read.expression(), "target reference operand")
+            })?;
+            return self.matching_shape_at(shape, index, operand, scope);
         }
         if target_kind == K::BinaryExpression {
-            let binary = read
-                .data_source()
-                .as_binary_expression()
-                .ok_or(tsr_arena::Error::InvalidGraph)?;
-            let left = required(binary.left(), "target binary left")?;
-            let right = required(binary.right(), "target binary right")?;
-            let operator = self
-                .ast(target)?
-                .node(required(binary.operator_token(), "target binary operator")?)?
-                .kind();
+            let (left, right, operator_token) = read.with_read(self, |read| {
+                let binary = read
+                    .data_source()
+                    .as_binary_expression()
+                    .ok_or(tsr_arena::Error::InvalidGraph)?;
+                Ok((
+                    required(binary.left(), "target binary left")?,
+                    required(binary.right(), "target binary right")?,
+                    required(binary.operator_token(), "target binary operator")?,
+                ))
+            })?;
+            let view = self.target_ast(target, scope)?;
+            let operator = view.node(operator_token)?.kind();
+            // The assignment helper would reread this binary and operator.
+            // Its remaining test still validates the left-hand-side syntax.
+            let assignment = (operator == K::EqualsToken
+                || tsr_ast::is_assignment_operator(operator))
+                && tsr_ast::is_left_hand_side_expression(view, left)?;
             return Ok(
-                tsr_ast::is_assignment_expression(self.ast(target)?, target, false)?
-                    && self.matching_shape_at(shape, index, left)?
-                    || operator == K::CommaToken && self.matching_shape_at(shape, index, right)?,
+                assignment && self.matching_shape_at(shape, index, left, scope)?
+                    || operator == K::CommaToken
+                        && self.matching_shape_at(shape, index, right, scope)?,
             );
         }
         let Some(step) = shape.accesses.get(index) else {
@@ -680,12 +791,21 @@ impl CheckerState {
                 }
                 ReferenceRoot::Super => target_kind == K::SuperKeyword,
                 ReferenceRoot::MetaProperty { keyword, name } => {
-                    match read.data_source().as_meta_property() {
-                        Some(data) if data.keyword_token() == *keyword => {
-                            let target_name = required(read.name(), "meta target name")?;
-                            self.ast(target)?.node_text(target_name)?.as_bytes() == name.as_bytes()
+                    let target_name =
+                        read.with_read(self, |read| match read.data_source().as_meta_property() {
+                            Some(data) if data.keyword_token() == *keyword => {
+                                Ok(Some(required(read.name(), "meta target name")?))
+                            }
+                            _ => Ok(None),
+                        })?;
+                    match target_name {
+                        Some(target_name) => {
+                            self.target_ast(target, scope)?
+                                .node_text(target_name)?
+                                .as_bytes()
+                                == name.as_bytes()
                         }
-                        _ => false,
+                        None => false,
                     }
                 }
                 ReferenceRoot::Unmatched => false,
@@ -697,26 +817,33 @@ impl CheckerState {
         ) {
             return Ok(false);
         }
-        let target_base = required(read.expression(), "target property base")?;
+        let target_base = read.with_read(self, |read| {
+            required(read.expression(), "target property base")
+        })?;
         if let Some(name) = &step.name {
-            if let Some(target_name) = self.flow_property_name(target)? {
+            if let Some(target_name) = self.matching_target_property_name(&read, scope)? {
                 return Ok(name.as_bytes() == target_name.as_bytes()
-                    && self.matching_shape_at(shape, index + 1, target_base)?);
+                    && self.matching_shape_at(shape, index + 1, target_base, scope)?);
             }
         }
         if let Some(source_arg) = step.element_argument {
-            let target_read = self.node(target)?;
-            if let Some(target_data) = target_read.data_source().as_element_access_expression() {
-                let target_arg =
-                    required(target_data.argument_expression(), "target element argument")?;
-                if self.node(target_arg)?.kind() == K::Identifier {
+            let target_argument = read.with_read(self, |read| {
+                read.data_source()
+                    .as_element_access_expression()
+                    .map(|data| required(data.argument_expression(), "target element argument"))
+                    .transpose()
+            })?;
+            if let Some(target_arg) = target_argument {
+                let argument_kind = MatchingTarget::new(scope, target_arg)?
+                    .with_read(self, |read| Ok(read.kind()))?;
+                if argument_kind == K::Identifier {
                     let symbol = self.resolved_value_symbol(source_arg)?;
                     if symbol == self.resolved_value_symbol(target_arg)?
                         && (self.is_constant_flow_variable(symbol)?
                             || self.is_parameter_or_mutable_local_variable(symbol)?
                                 && !self.is_symbol_assigned(symbol)?)
                     {
-                        return self.matching_shape_at(shape, index + 1, target_base);
+                        return self.matching_shape_at(shape, index + 1, target_base, scope);
                     }
                 }
             }
@@ -724,3 +851,6 @@ impl CheckerState {
         Ok(false)
     }
 }
+
+#[cfg(test)]
+mod tests;

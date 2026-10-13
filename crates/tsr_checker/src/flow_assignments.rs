@@ -102,31 +102,17 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.getControlFlowContainer
-    pub(crate) fn control_flow_container(&self, node: NodeId) -> Result<NodeId, Error> {
+    pub(crate) fn control_flow_container(&mut self, node: NodeId) -> Result<NodeId, Error> {
         self.control_flow_container_or_none(node)?
             .ok_or(Error::MissingLink("control-flow container"))
     }
 
     pub(crate) fn control_flow_container_or_none(
-        &self,
+        &mut self,
         node: NodeId,
     ) -> Result<Option<NodeId>, Error> {
-        // Every ancestor is in the node's file: one view serves the walk.
-        let view = self.ast(node)?;
-        let mut current = view.node(node)?.parent();
-        while let Some(id) = current {
-            let read = view.node(id)?;
-            if matches!(
-                read.kind().known(),
-                Some(K::ModuleBlock | K::SourceFile | K::PropertyDeclaration)
-            ) || tsr_ast::utilities::is_function_like(Some(&read))
-                && tsr_ast::get_immediately_invoked_function_expression(view, id)?.is_none()
-            {
-                return Ok(Some(id));
-            }
-            current = read.parent();
-        }
-        Ok(None)
+        let (view, cache, enabled) = self.ancestry_view(node)?;
+        cache.control_flow_container(view, node, enabled)
     }
 
     // port: tsc/internal/checker/utilities.go:Checker.isParameterOrMutableLocalVariable

@@ -13,12 +13,37 @@ pub(crate) struct InstantiationState {
     #[cfg(feature = "recursion-probe")]
     pub(crate) probe: Option<crate::handles::c2_probe::InstantiationProbe>,
     pub(crate) mappers: Vec<crate::mapper::Mapper>,
+    // Inactive slots retain only an empty map's allocation, as the pin's
+    // activeTypeMappersCaches slice does beyond its length. They must never
+    // participate in mapper lookup or keep types reachable.
     active: Vec<(MapperId, crate::types::Map<CacheKey, TypeId>)>,
+    active_len: usize,
     pub(crate) depth: u32,
     pub(crate) count: u64,
     pub(crate) total_count: u64,
     pub(crate) reliability_mappers: [Option<MapperId>; 2],
     pub(crate) unique_literal_mapper: Option<MapperId>,
+}
+
+impl InstantiationState {
+    // port: tsc/internal/checker/checker.go:Checker.pushActiveMapper
+    fn push_active_mapper(&mut self, mapper: MapperId) -> usize {
+        let index = self.active_len;
+        if let Some((id, cache)) = self.active.get_mut(index) {
+            debug_assert!(cache.is_empty());
+            *id = mapper;
+        } else {
+            self.active.push((mapper, crate::types::Map::default()));
+        }
+        self.active_len += 1;
+        index
+    }
+
+    // port: tsc/internal/checker/checker.go:Checker.popActiveMapper
+    fn pop_active_mapper(&mut self) {
+        self.active_len -= 1;
+        self.active[self.active_len].1.clear();
+    }
 }
 
 impl CheckerState {
@@ -178,17 +203,10 @@ impl CheckerState {
                 .map(|(symbol, arguments)| (*symbol, &arguments[..])),
         );
         let key = key.finish();
-        let active_index = self
-            .instantiation
-            .active
+        let active_index = self.instantiation.active[..self.instantiation.active_len]
             .iter()
             .rposition(|(id, _)| *id == mapper);
-        let index = active_index.unwrap_or(self.instantiation.active.len());
-        if active_index.is_none() {
-            self.instantiation
-                .active
-                .push((mapper, crate::types::Map::default()));
-        }
+        let index = active_index.unwrap_or_else(|| self.instantiation.push_active_mapper(mapper));
         if let Some(&cached) = self.instantiation.active[index].1.get(&key) {
             return Ok(cached);
         }
@@ -207,7 +225,7 @@ impl CheckerState {
         });
         self.instantiation.depth -= 1;
         if active_index.is_none() {
-            self.instantiation.active.pop();
+            self.instantiation.pop_active_mapper();
         } else if let Ok(result) = result {
             self.instantiation.active[index].1.insert(key, result);
         }
@@ -216,7 +234,7 @@ impl CheckerState {
 
     // port: tsc/internal/checker/checker.go:Checker.clearActiveMapperCaches
     pub(crate) fn clear_active_mapper_caches(&mut self) {
-        for (_, cache) in &mut self.instantiation.active {
+        for (_, cache) in &mut self.instantiation.active[..self.instantiation.active_len] {
             cache.clear();
         }
     }
@@ -226,15 +244,22 @@ impl CheckerState {
         types: &TypeList,
         mapper: Option<MapperId>,
     ) -> Result<TypeList, Error> {
-        let mut result = Vec::with_capacity(types.len());
-        for &ty in types.iter() {
-            result.push(self.instantiate_type(ty, mapper)?);
+        // instantiateList in the pin calls the mapper in source order, but
+        // allocates only once an element actually changes. Most lists survive
+        // instantiation unchanged and can keep their shared backing.
+        for (index, &ty) in types.iter().enumerate() {
+            let mapped = self.instantiate_type(ty, mapper)?;
+            if mapped != ty {
+                let mut result = Vec::with_capacity(types.len());
+                result.extend_from_slice(&types[..index]);
+                result.push(mapped);
+                for &rest in &types[index + 1..] {
+                    result.push(self.instantiate_type(rest, mapper)?);
+                }
+                return Ok(result.into());
+            }
         }
-        Ok(if result.as_slice() == types.as_ref() {
-            types.clone()
-        } else {
-            result.into()
-        })
+        Ok(types.clone())
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateTypeAlias
@@ -891,11 +916,170 @@ impl InstantiationState {
 #[cfg(any(test, feature = "storage-pilot"))]
 impl InstantiationState {
     pub(crate) fn census_active_mappers(&self) -> impl Iterator<Item = MapperId> + '_ {
-        self.active.iter().map(|(id, _)| *id)
+        self.active[..self.active_len].iter().map(|(id, _)| *id)
     }
     pub(crate) fn census_active_types(&self) -> impl Iterator<Item = TypeId> + '_ {
-        self.active
+        self.active[..self.active_len]
             .iter()
             .flat_map(|(_, cache)| cache.values().copied())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn active_mapper_hits_and_clearing_preserve_instantiation_counters() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let parameter = state.new_type_parameter(None).unwrap();
+        let number = state.builtins.number_type;
+        let mapper = state
+            .alloc_mapper(crate::mapper::Mapper::Simple {
+                source: parameter,
+                target: number,
+            })
+            .unwrap();
+
+        state.instantiation.push_active_mapper(mapper);
+        for _ in 0..2 {
+            assert_eq!(
+                state.instantiate_type(parameter, Some(mapper)).unwrap(),
+                number
+            );
+            assert_eq!(state.instantiation.active_len, 1);
+            assert_eq!(state.instantiation.depth, 0);
+            assert_eq!(state.instantiation.count, 1);
+            assert_eq!(state.instantiation.total_count, 1);
+        }
+
+        state.clear_active_mapper_caches();
+        assert_eq!(
+            state.instantiate_type(parameter, Some(mapper)).unwrap(),
+            number
+        );
+        assert_eq!(state.instantiation.count, 2);
+        assert_eq!(state.instantiation.total_count, 2);
+        state.instantiation.pop_active_mapper();
+
+        // The same mapper's inactive slot must neither supply a stale answer
+        // nor look active and retain a new answer after either invocation.
+        for expected_count in 3..=4 {
+            assert_eq!(
+                state.instantiate_type(parameter, Some(mapper)).unwrap(),
+                number
+            );
+            assert_eq!(state.instantiation.active_len, 0);
+            assert_eq!(state.instantiation.depth, 0);
+            assert_eq!(state.instantiation.count, expected_count);
+            assert_eq!(state.instantiation.total_count, expected_count);
+            assert!(state.instantiation.active[0].1.is_empty());
+        }
+    }
+
+    #[test]
+    fn inactive_mapper_slots_reuse_capacity_without_reusing_results() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let a = state
+            .alloc_mapper(crate::mapper::Mapper::Permissive)
+            .unwrap();
+        let b = state
+            .alloc_mapper(crate::mapper::Mapper::Restrictive)
+            .unwrap();
+        let key = || {
+            let mut builder = crate::key::KeyBuilder::new();
+            builder.write_type(state.builtins.number_type);
+            builder.finish()
+        };
+        let key = key();
+        let instantiation = &mut state.instantiation;
+        assert_eq!(instantiation.push_active_mapper(a), 0);
+        instantiation.active[0]
+            .1
+            .insert(key.clone(), state.builtins.number_type);
+        assert_eq!(instantiation.push_active_mapper(b), 1);
+        instantiation.active[1]
+            .1
+            .insert(key.clone(), state.builtins.string_type);
+        let capacity = instantiation.active[1].1.capacity();
+        instantiation.pop_active_mapper();
+        assert_eq!(instantiation.active[1].1.capacity(), capacity);
+        assert_eq!(
+            instantiation.census_active_mappers().collect::<Vec<_>>(),
+            [a]
+        );
+        assert_eq!(
+            instantiation.census_active_types().collect::<Vec<_>>(),
+            [state.builtins.number_type]
+        );
+        assert_eq!(instantiation.push_active_mapper(a), 1);
+        assert!(instantiation.active[1].1.is_empty());
+        assert_eq!(
+            instantiation.active[0].1.get(&key),
+            Some(&state.builtins.number_type)
+        );
+        instantiation.pop_active_mapper();
+        instantiation.pop_active_mapper();
+        assert_eq!(instantiation.active_len, 0);
+        assert!(instantiation.census_active_mappers().next().is_none());
+        assert!(instantiation.census_active_types().next().is_none());
+    }
+
+    #[test]
+    fn failed_instantiation_clears_the_active_slot_before_reuse() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let parameter = state.new_type_parameter(None).unwrap();
+        let invalid_mapper = MapperId::next(0, 100).unwrap();
+        assert!(state
+            .instantiate_type(parameter, Some(invalid_mapper))
+            .is_err());
+        assert_eq!(state.instantiation.active_len, 0);
+        assert_eq!(state.instantiation.depth, 0);
+        assert!(state
+            .instantiation
+            .active
+            .iter()
+            .all(|(_, cache)| cache.is_empty()));
+        let mapper = state
+            .alloc_mapper(crate::mapper::Mapper::Simple {
+                source: parameter,
+                target: state.builtins.number_type,
+            })
+            .unwrap();
+        assert_eq!(
+            state.instantiate_type(parameter, Some(mapper)).unwrap(),
+            state.builtins.number_type
+        );
+        assert_eq!(state.instantiation.active_len, 0);
+    }
+
+    #[test]
+    fn instantiate_lists_keep_unchanged_backing_and_preserve_changed_order() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let parameter = state.new_type_parameter(None).unwrap();
+        let number = state.builtins.number_type;
+        let string = state.builtins.string_type;
+        let mapper = state
+            .alloc_mapper(crate::mapper::Mapper::Simple {
+                source: parameter,
+                target: string,
+            })
+            .unwrap();
+        let unchanged: TypeList = vec![number, string].into();
+        let result = state.instantiate_types(&unchanged, Some(mapper)).unwrap();
+        assert!(std::sync::Arc::ptr_eq(&unchanged, &result));
+        let changed: TypeList = vec![number, parameter, number, parameter].into();
+        let result = state.instantiate_types(&changed, Some(mapper)).unwrap();
+        assert_eq!(&*result, &[number, string, number, string]);
+        assert_eq!(&*changed, &[number, parameter, number, parameter]);
+        assert_eq!(state.instantiation.total_count, 2);
     }
 }
