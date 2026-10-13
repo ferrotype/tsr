@@ -213,7 +213,8 @@ impl CheckerState {
             let (key, _) =
                 self.relation_key(source, target, 0, kind == RelationKind::Identity, false)?;
             if let Some(&result) = self.relations.caches[kind.index()].get(&key) {
-                self.variance.reliability |= result & crate::variance::RELIABILITY;
+                // The pin replays cached reliability in recursiveTypeRelatedTo,
+                // but this front cache probe returns only the relation result.
                 return Ok(result & SUCCEEDED != 0);
             }
         }
@@ -1174,6 +1175,89 @@ impl Relations {
         for frame in self.frames.iter().flatten() {
             roots.extend_from_slice(&frame.source_stack);
             roots.extend_from_slice(&frame.target_stack);
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::variance::{REPORTS_UNMEASURABLE, REPORTS_UNRELIABLE};
+
+    #[test]
+    fn cached_relations_propagate_reliability_only_in_recursive_comparisons() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let source = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let target = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let reliability = [
+            0,
+            REPORTS_UNMEASURABLE,
+            REPORTS_UNRELIABLE,
+            REPORTS_UNMEASURABLE | REPORTS_UNRELIABLE,
+        ];
+
+        // Seed the cache boundary directly. Pinned isTypeRelatedTo returns
+        // only its answer; recursiveTypeRelatedTo also replays reliability.
+        // Native probes cover both successful and failed cached comparisons,
+        // including pre-existing flags that must survive either path.
+        for kind in [
+            RelationKind::Identity,
+            RelationKind::Assignable,
+            RelationKind::Subtype,
+            RelationKind::StrictSubtype,
+            RelationKind::Comparable,
+        ] {
+            let (key, _) = state
+                .relation_key(source, target, 0, kind == RelationKind::Identity, false)
+                .unwrap();
+            let frame = state.new_relation_frame(kind).unwrap();
+            for outcome in [SUCCEEDED, FAILED] {
+                for cached_flags in reliability {
+                    let cached = outcome | cached_flags;
+                    state.relations.caches[kind.index()].insert(key.clone(), cached);
+                    for before in reliability {
+                        state.variance.reliability = before;
+                        assert_eq!(
+                            state.is_type_related_to(source, target, kind).unwrap(),
+                            outcome == SUCCEEDED,
+                            "front result: {kind:?}, cached={cached}, before={before}"
+                        );
+                        assert_eq!(
+                            state.variance.reliability, before,
+                            "front reliability: {kind:?}, cached={cached}, before={before}"
+                        );
+
+                        let recursive = Relater {
+                            checker: state,
+                            kind,
+                            frame,
+                            report_errors: false,
+                            errors: crate::relation_errors::RelationErrors::default(),
+                        }
+                        .recursive_related(source, target, BOTH, 0)
+                        .unwrap();
+                        assert_eq!(
+                            recursive,
+                            if outcome == SUCCEEDED {
+                                tr::TRUE
+                            } else {
+                                tr::FALSE
+                            }
+                        );
+                        assert_eq!(
+                            state.variance.reliability,
+                            before | cached_flags,
+                            "recursive reliability: {kind:?}, cached={cached}, before={before}"
+                        );
+                        assert_eq!(
+                            state.relations.caches[kind.index()].get(&key),
+                            Some(&cached)
+                        );
+                    }
+                }
+            }
         }
     }
 }
