@@ -214,3 +214,14 @@ The control binary is `control/tsrust` with SHA-256
 `3ec1aa6a822179cb92e25bbc1f5f5007be37f3af48e181e07beba8b718e0aa51`.
 Use the same committed `pairs.py` command above with these executable paths,
 three pairs, VS Code and two checkers to reproduce either isolated screen.
+
+## Follow-up: matched Go/Rust work counts
+
+[The completed work-count investigation](PERF-checker-work-2026-10-13.md)
+tests the repeated-work hypothesis directly. Overload selection, contextual
+retries, inference and normal expression-cache misses are nearly identical
+on three real projects. It found and fixes one missing index-signature guard
+that caused unnecessary front relation calls. Most skipped calls returned
+before structural comparison, so the count reduction alone is not a speedup.
+The record includes a separate ordinary-binary paired screen and the remaining
+counting limits; it does not support a broad overload/inference rewrite.
