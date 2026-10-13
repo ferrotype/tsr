@@ -143,8 +143,12 @@ bounded candidate.
 
 ## Remaining R1 work
 
-This first candidate does not close R1. Next: checker node/payload access from
-the fresh check profile, then memory and scaling on the real scenarios. Retain
-or reject each candidate on measured concurrent pairs. The five-scenario,
+The [2026-10-13 checker-core experiments](PERF-checker-core-2026-10-13.md)
+continue this work with concurrent candidate/control screens, retained changes
+and rejected trials. They do not close R1.
+
+Remaining work includes the checker algorithms identified in that record,
+memory and scaling on the real scenarios. Retain or reject each candidate on
+measured concurrent pairs. The five-scenario,
 two-mode, 2/4/8-checker acceptance matrix belongs at the checkpoint exit;
 no thresholds or R0 results change here.

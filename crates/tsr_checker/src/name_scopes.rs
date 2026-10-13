@@ -64,29 +64,9 @@ impl CheckerState {
     }
 
     // port: tsc/internal/checker/checker.go:Checker.isInAmbientOrTypeNode
-    pub(crate) fn in_ambient_or_type_node(&self, node: NodeId) -> Result<bool, Error> {
-        // Every ancestor is in the node's file: one view serves the walk.
-        let view = self.ast(node)?;
-        if view.node(node)?.flags() & nf::AMBIENT != 0 {
-            return Ok(true);
-        }
-        let mut ancestor = Some(node);
-        while let Some(node) = ancestor {
-            let read = view.node(node)?;
-            if matches!(
-                read.kind().known(),
-                Some(
-                    K::InterfaceDeclaration
-                        | K::TypeAliasDeclaration
-                        | K::JSTypeAliasDeclaration
-                        | K::TypeLiteral
-                )
-            ) {
-                return Ok(true);
-            }
-            ancestor = read.parent();
-        }
-        Ok(false)
+    pub(crate) fn in_ambient_or_type_node(&mut self, node: NodeId) -> Result<bool, Error> {
+        let (view, cache, enabled) = self.ancestry_view(node)?;
+        cache.in_ambient_or_type_node(view, node, enabled)
     }
 
     // port: tsc/internal/checker/utilities.go:IsInTypeQuery

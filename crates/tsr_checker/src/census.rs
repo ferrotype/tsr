@@ -405,6 +405,7 @@ impl CheckerState {
             census.add("flow_analysis", count, allocation + keys);
         });
         self.census_enums(&mut census);
+        self.ancestry.census(&mut census);
         self.body_checks.census(&mut census);
         self.calls.census(&mut census);
         self.jsx.census(&mut census);
@@ -635,7 +636,7 @@ impl CheckerState {
     fn census_object(census: &mut Census, family: &'static str, data: &crate::ObjectData) {
         Self::census_structured(census, family, &data.structured);
         if let Some(map) = &data.instantiations {
-            let keys: usize = map.keys().map(|key| key.len()).sum();
+            let keys: usize = map.keys().map(crate::CacheKey::heap_bytes).sum();
             census.add(
                 "type_caches",
                 map.len(),
@@ -720,7 +721,11 @@ impl CheckerState {
             "unionTypes",
             caches.union_types.len(),
             caches.union_types.allocation_size(),
-            caches.union_types.keys().map(|key| key.len()).sum(),
+            caches
+                .union_types
+                .keys()
+                .map(crate::CacheKey::heap_bytes)
+                .sum(),
         );
         charge(
             "unionOfUnionTypes",
@@ -729,20 +734,28 @@ impl CheckerState {
             caches
                 .union_of_union_types
                 .keys()
-                .map(|key| key.alias.len())
+                .map(|key| key.alias.heap_bytes())
                 .sum(),
         );
         charge(
             "tupleTypes",
             caches.tuple_types.len(),
             caches.tuple_types.allocation_size(),
-            caches.tuple_types.keys().map(|key| key.len()).sum(),
+            caches
+                .tuple_types
+                .keys()
+                .map(crate::CacheKey::heap_bytes)
+                .sum(),
         );
         charge(
             "intersectionTypes",
             caches.intersection_types.len(),
             caches.intersection_types.allocation_size(),
-            caches.intersection_types.keys().map(|key| key.len()).sum(),
+            caches
+                .intersection_types
+                .keys()
+                .map(crate::CacheKey::heap_bytes)
+                .sum(),
         );
         charge(
             "templateLiteralTypes",
@@ -751,7 +764,7 @@ impl CheckerState {
             caches
                 .template_literal_types
                 .keys()
-                .map(|key| key.len())
+                .map(crate::CacheKey::heap_bytes)
                 .sum(),
         );
     }

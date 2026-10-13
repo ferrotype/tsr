@@ -198,9 +198,9 @@ class ConcurrentPairTests(unittest.TestCase):
         return {'exit': 0, 'stdout': stdout(), 'stderr': '', 'wall_ns': wall,
                 'peak_rss_bytes': wall, 'user_ns': wall, 'system_ns': 1}
 
-    def screen(self, output, mode='check', count=1):
+    def screen(self, output, mode='check', count=1, **options):
         return pairs.screen(self.descriptor, self.control, self.candidate, output,
-                            mode=mode, checkers=4, pairs=count, timeout=17)
+                            mode=mode, checkers=4, pairs=count, timeout=17, **options)
 
     def test_pairs_overlap_and_hash_after_both_finish_with_paired_medians(self):
         rendezvous = threading.Barrier(2)
@@ -233,6 +233,7 @@ class ConcurrentPairTests(unittest.TestCase):
         with mock.patch.object(common, 'run', side_effect=run), mock.patch.object(common, 'observe', side_effect=observed):
             report = self.screen(self.root / 'screen', mode='emit', count=3)
         self.assertTrue(report['complete'])
+        self.assertEqual(report['type_count_policy'], 'equal')
         self.assertEqual(report['median_ratios'], dict.fromkeys(pairs.METRICS, 3.0))
         self.assertEqual([row['submission_order'] for row in report['pairs']],
                          [['control', 'candidate'], ['candidate', 'control'], ['control', 'candidate']])
@@ -296,6 +297,93 @@ class ConcurrentPairTests(unittest.TestCase):
         self.assertFalse(report['complete'])
         self.assertNotIn('median_ratios', report)
 
+    def test_explicit_type_counts_record_the_reason_and_each_pairs_counts(self):
+        def run(binary, *args, **kwargs):
+            count = 1000 if binary.name == 'control' else 801
+            return {**self.result(), 'stdout': stdout(types=count)}
+
+        output = self.root / 'explicit-types'
+        with mock.patch.object(common, 'run', side_effect=run):
+            report = self.screen(output, count=3, control_types=1000, candidate_types=801,
+                                 type_count_reason='  Avoid constructing unused overload types.  ')
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['type_count_policy'], 'explicit')
+        self.assertEqual(report['type_count_expectations'], {'control': 1000, 'candidate': 801})
+        self.assertEqual(report['type_count_reason'], 'Avoid constructing unused overload types.')
+        self.assertEqual([pair['types'] for pair in report['pairs']],
+                         [{'control': 1000, 'candidate': 801}] * 3)
+        self.assertEqual(json.loads((output / 'summary.json').read_text()), report)
+
+    def test_explicit_types_reject_either_sides_count_drift_after_a_valid_pair(self):
+        for bad, observed in [('control', 999), ('candidate', 802), ('candidate', 1000)]:
+            with self.subTest(bad=bad, observed=observed):
+                calls = {'control': 0, 'candidate': 0}
+
+                def run(binary, *args, **kwargs):
+                    calls[binary.name] += 1
+                    count = 1000 if binary.name == 'control' else 801
+                    if binary.name == bad and calls[bad] == 2:
+                        count = observed
+                    return {**self.result(), 'stdout': stdout(types=count)}
+
+                output = self.root / f'drift-{bad}-{observed}'
+                with mock.patch.object(common, 'run', side_effect=run), \
+                        self.assertRaisesRegex(ValueError, f'{bad}: type count {observed} differs from expected'):
+                    self.screen(output, count=3, control_types=1000, candidate_types=801,
+                                type_count_reason='Avoid unused type construction.')
+                report = json.loads((output / 'summary.json').read_text())
+                self.assertFalse(report['complete'])
+                self.assertEqual(len(report['pairs']), 1)
+                self.assertEqual(calls, {'control': 2, 'candidate': 2})
+                self.assertNotIn('median_ratios', report)
+                for role in calls:
+                    self.assertTrue((output / f'1-{role}.json').is_file())
+                raw = json.loads((output / f'1-{bad}.json').read_text())
+                self.assertTrue(any('differs from expected' in issue for issue in raw['issues']))
+
+    def test_explicit_types_preserve_the_oracle_type_floor_and_work_checks(self):
+        cases = [('type-floor', 100, {'stdout': stdout(types=100)}, 'types'),
+                 ('changed-output', 801, {'stdout': stdout(types=801, diagnostics=['x.ts(1,1): error TS1: changed.'])}, 'output'),
+                 ('missing-file', 801, {'stdout': stdout(types=801, listed=('a.ts',))}, 'files')]
+        for label, candidate_types, changes, message in cases:
+            with self.subTest(label=label):
+                def run(binary, *args, **kwargs):
+                    return {**self.result(), **(changes if binary.name == 'candidate' else {})}
+
+                with mock.patch.object(common, 'run', side_effect=run), self.assertRaisesRegex(ValueError, message):
+                    self.screen(self.root / label, control_types=1000, candidate_types=candidate_types,
+                                type_count_reason='Exact type counts do not excuse changed work.')
+
+    def test_invalid_explicit_type_policy_cannot_start_a_compiler(self):
+        cases = [
+            {'control_types': 1000},
+            {'candidate_types': 801},
+            {'type_count_reason': 'Reason without counts.'},
+            {'control_types': 1000, 'candidate_types': 801},
+            {'control_types': 1000, 'candidate_types': 801, 'type_count_reason': ' \t '},
+            *[{'control_types': control, 'candidate_types': candidate,
+               'type_count_reason': 'Invalid count.'}
+              for control, candidate in [(0, 801), (1000, 0), (-1, 801), (1000, -1),
+                                         (True, 801), (1000, False), (1000.0, 801), (1000, '801')]],
+        ]
+        with mock.patch.object(common, 'run') as run:
+            for index, options in enumerate(cases):
+                with self.subTest(options=options), self.assertRaises(ValueError):
+                    self.screen(self.root / f'invalid-policy-{index}', **options)
+                self.assertFalse((self.root / f'invalid-policy-{index}').exists())
+            run.assert_not_called()
+
+    def test_explicit_type_counts_do_not_allow_changed_emitted_bytes(self):
+        def run(binary, cwd, args, timeout):
+            output = Path(args[args.index('--outDir') + 1])
+            (output / 'a.js').write_text('changed output' if binary.name == 'candidate' else 'compiled output')
+            return {**self.result(), 'stdout': stdout(types=1000 if binary.name == 'control' else 801)}
+
+        with mock.patch.object(common, 'run', side_effect=run), self.assertRaisesRegex(ValueError, 'emitted'):
+            self.screen(self.root / 'explicit-changed-emit', mode='emit',
+                        control_types=1000, candidate_types=801,
+                        type_count_reason='Avoid unused types while preserving emitted bytes.')
+
     def test_invalid_count_or_existing_output_cannot_start_a_compiler(self):
         with mock.patch.object(common, 'run') as run:
             with self.assertRaisesRegex(ValueError, 'positive'):
@@ -324,6 +412,25 @@ class ConcurrentPairTests(unittest.TestCase):
         report = json.loads((output / 'summary.json').read_text())
         self.assertEqual(report['cache'], str(cache))
         self.assertTrue(report['complete'])
+
+    def test_cli_forwards_exact_type_counts_and_reason(self):
+        previous = common.CACHE
+        output = self.root / 'cli-explicit-types'
+
+        def run(binary, *args, **kwargs):
+            return {**self.result(), 'stdout': stdout(types=1000 if binary.name == 'control' else 801)}
+
+        with mock.patch.object(common, 'load', return_value=self.descriptor), \
+                mock.patch.object(common, 'run', side_effect=run):
+            pairs.main(['--scenario', 'xstate', '--mode', 'check', '--pairs', '1',
+                        '--control', str(self.control), '--candidate', str(self.candidate),
+                        '--output', str(output), '--control-types', '1000', '--candidate-types', '801',
+                        '--type-count-reason', 'Short-circuit avoids constructing unused types.'])
+        self.assertEqual(common.CACHE, previous)
+        report = json.loads((output / 'summary.json').read_text())
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['type_count_expectations'], {'control': 1000, 'candidate': 801})
+        self.assertEqual(report['type_count_reason'], 'Short-circuit avoids constructing unused types.')
 
 
 def pair(index, go_wall, rust_wall):

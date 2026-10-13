@@ -183,6 +183,21 @@ impl ProgramContext {
         self.bound(node).map(tsr_ast::BoundView::result)
     }
 
+    /// Retain one immutable core binding for a graph walk that also mutates
+    /// checker state. Bundle members keep the general owner-selection path.
+    pub(crate) fn shared_binding(&self, node: NodeId) -> Option<tsr_ast::SharedBoundFile> {
+        self.core_file_index(node)
+            .and_then(|index| self.shared[index].clone())
+    }
+
+    /// Borrow a shared core binding without validating a node slot. The caller
+    /// still performs its ordinary checked read, including on invalid input.
+    pub(crate) fn core_binding(&self, node: NodeId) -> Option<BoundView<'_>> {
+        self.core_file_index(node)
+            .and_then(|index| self.shared[index].as_ref())
+            .map(tsr_ast::SharedBoundFile::view)
+    }
+
     /// One node read by the shortest path; see `SharedBoundFile::node`.
     #[inline]
     pub(crate) fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, Error> {

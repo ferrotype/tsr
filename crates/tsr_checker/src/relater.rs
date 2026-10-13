@@ -1134,13 +1134,21 @@ impl Relations {
             census.add(
                 "relations",
                 0,
-                frame.maybe_keys.iter().map(|key| key.len()).sum(),
+                frame
+                    .maybe_keys
+                    .iter()
+                    .map(crate::CacheKey::heap_bytes)
+                    .sum(),
             );
             census.set("relations", &frame.maybe_set);
             census.add(
                 "relations",
                 0,
-                frame.maybe_set.iter().map(|key| key.len()).sum(),
+                frame
+                    .maybe_set
+                    .iter()
+                    .map(crate::CacheKey::heap_bytes)
+                    .sum(),
             );
             census.vec_capacity(
                 "relations",

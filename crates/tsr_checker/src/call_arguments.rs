@@ -233,11 +233,15 @@ impl CheckerState {
                     .intra_expression_sites
                     .clear();
             }
-            let contextual = self.instantiate_call_contextual_type(contextual, inference, false)?;
-            if self.maybe_type_of_kind(ty, tf::LITERAL)?
-                && self.literal_of_context(ty, Some(contextual))?
-            {
-                ty = self.get_regular_type_of_literal_type(ty)?;
+            // Go short-circuits before contextual instantiation. Non-literals
+            // cannot lose freshness, so instantiating their context is unused
+            // work and can create otherwise unrequested types.
+            if self.maybe_type_of_kind(ty, tf::LITERAL)? {
+                let contextual =
+                    self.instantiate_call_contextual_type(contextual, inference, false)?;
+                if self.literal_of_context(ty, Some(contextual))? {
+                    ty = self.get_regular_type_of_literal_type(ty)?;
+                }
             }
             Ok(ty)
         })();
@@ -996,5 +1000,65 @@ impl CheckerState {
             return Ok(false);
         };
         Ok(self.resolved_value_symbol(constructor)? == promise)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nonliteral_arguments_do_not_instantiate_discarded_contextual_types() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let parameter = state.new_type_parameter(None).unwrap();
+        let regular = state
+            .get_string_literal_type(tsr_ast::JsString::from_bytes(b"value".as_slice()))
+            .unwrap();
+        let fresh = state.get_fresh_type_of_literal_type(regular).unwrap();
+        let mapper = state
+            .alloc_mapper(crate::mapper::Mapper::Simple {
+                source: parameter,
+                target: regular,
+            })
+            .unwrap();
+        let inference = state.new_inference_context(&[parameter], None, 0).unwrap();
+        state
+            .inference_context_mut(inference)
+            .unwrap()
+            .return_mapper = Some(mapper);
+        let number = state.builtins.number_type;
+        let nonliteral = state.new_synthetic_expression(number, false, None).unwrap();
+        let before = state.instantiation.total_count;
+        assert_eq!(
+            state
+                .check_call_argument_ex(nonliteral, parameter, Some(inference), 0)
+                .unwrap(),
+            number
+        );
+        assert_eq!(state.instantiation.total_count, before);
+        assert!(state.calls.contexts.is_empty());
+        assert!(state.calls.inference_contexts.is_empty());
+
+        // Literal freshness still needs the instantiated context, exactly as in
+        // checkExpressionWithContextualType's short-circuit condition.
+        let literal = state.new_synthetic_expression(fresh, false, None).unwrap();
+        assert_eq!(
+            state
+                .check_call_argument_ex(literal, parameter, Some(inference), 0)
+                .unwrap(),
+            regular
+        );
+        assert_eq!(state.instantiation.total_count, before + 1);
+        assert!(state.calls.contexts.is_empty());
+        assert!(state.calls.inference_contexts.is_empty());
+
+        let invalid = TypeId::next(0, state.types.len() + 100).unwrap();
+        assert!(state
+            .check_call_argument_ex(literal, invalid, Some(inference), 0)
+            .is_err());
+        assert!(state.calls.contexts.is_empty());
+        assert!(state.calls.inference_contexts.is_empty());
     }
 }

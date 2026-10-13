@@ -26,6 +26,7 @@ pub(crate) struct CheckerState {
     pub(crate) counters: Counters,
     pub(crate) options: CheckerOptions,
     pub(crate) program: Option<crate::program::ProgramContext>,
+    pub(crate) ancestry: crate::ancestry::AncestryCache,
     /// Checker-owned symbols: merged clones, transient and synthetic symbols.
     /// Its arena identity is the checker identity (`CheckerIdentity::id`).
     pub(crate) symbols: SymbolArena<Symbol>,
@@ -125,6 +126,7 @@ impl CheckerState {
             counters: counters.clone(),
             options,
             program: None,
+            ancestry: crate::ancestry::AncestryCache::default(),
             symbols,
             symbol_count: 0,
             tables: SymbolTables::new(counters),

@@ -61,7 +61,7 @@ impl Census {
         map: &crate::types::Map<crate::CacheKey, V>,
     ) {
         self.map(family, map);
-        self.add(family, 0, map.keys().map(|key| key.len()).sum());
+        self.add(family, 0, map.keys().map(crate::CacheKey::heap_bytes).sum());
     }
 }
 
@@ -214,7 +214,7 @@ impl CheckerState {
             self.conditional
                 .instantiations
                 .keys()
-                .map(|(_, key)| key.len())
+                .map(|(_, key)| key.heap_bytes())
                 .sum(),
         );
         census.map("type_caches", &self.conditional.permissive);
@@ -274,7 +274,7 @@ impl CheckerState {
             self.signatures
                 .instantiations
                 .keys()
-                .map(|(_, key)| key.len())
+                .map(|(_, key)| key.heap_bytes())
                 .sum(),
         );
         let (known, escapes) = self.declarations.storage_bytes();
@@ -288,5 +288,28 @@ impl CheckerState {
         self.resolution.census(census);
         self.diagnostics.census(census);
         self.suggestions.census(census);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Census;
+    use crate::key::KeyBuilder;
+
+    #[test]
+    fn key_map_counts_bucket_storage_and_only_heap_key_backing() {
+        let mut inline = KeyBuilder::new();
+        inline.write_string(&[0; 13]);
+        let mut spilled = KeyBuilder::new();
+        spilled.write_string(&[1; 128]);
+        let mut cache = crate::types::Map::default();
+        cache.insert(inline.finish(), 1_u32);
+        cache.insert(spilled.finish(), 2);
+
+        let mut census = Census::default();
+        census.key_map("type_caches", &cache);
+        let family = &census.families["type_caches"];
+        assert_eq!(family.count, 2);
+        assert_eq!(family.bytes, cache.allocation_size() + 128);
     }
 }

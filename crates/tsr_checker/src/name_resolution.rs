@@ -2,10 +2,10 @@
 //! is scoped to one operation; cached checker links are updated after the walk.
 
 use crate::{CheckerState, Error};
-use tsr_arena::{NodeId, SymbolId};
+use tsr_arena::{ArenaId, NodeId, SymbolId};
 use tsr_ast::{
-    symbol_flags as sf, AstView, DeclarationRead, JsString, NodeBinding, SymbolFlags, SymbolRef,
-    SymbolTableId, SymbolTableRead,
+    symbol_flags as sf, AstView, BoundView, DeclarationRead, JsString, NodeBinding, NodeRead,
+    SymbolFlags, SymbolRef, SymbolTableId, SymbolTableRead,
 };
 use tsr_binder::name_resolver::{
     Hook, NameResolver, NameResolverHooks, ResolvedName, ResolverHost, ResolverOptions,
@@ -13,7 +13,33 @@ use tsr_binder::name_resolver::{
 use tsr_core::Tristate;
 use tsr_diagnostics::Message;
 
-struct ReadHost<'a>(&'a CheckerState);
+struct ReadHost<'a> {
+    state: &'a CheckerState,
+    core: Option<(ArenaId, BoundView<'a>)>,
+}
+
+impl<'a> ReadHost<'a> {
+    fn new(state: &'a CheckerState, location: Option<NodeId>) -> Self {
+        // Select only a retained immutable core owner. Slot validation belongs
+        // to the eventual read, so resolver shortcuts keep their error timing.
+        let core = location
+            .filter(|node| node.arena() != state.factory.id().arena())
+            .and_then(|node| {
+                state
+                    .program
+                    .as_ref()?
+                    .core_binding(node)
+                    .map(|view| (node.arena(), view))
+            });
+        Self { state, core }
+    }
+
+    fn core_view(&self, node: NodeId) -> Option<BoundView<'a>> {
+        self.core
+            .filter(|(arena, _)| *arena == node.arena())
+            .map(|(_, view)| view)
+    }
+}
 #[allow(
     clippy::needless_pass_by_value,
     reason = "Result::map_err owns the failure"
@@ -26,19 +52,31 @@ fn arena(error: Error) -> tsr_arena::Error {
 }
 impl ResolverHost for ReadHost<'_> {
     fn ast(&self, node: NodeId) -> Result<AstView<'_>, tsr_arena::Error> {
-        self.0.ast(node).map_err(arena)
+        match self.core_view(node) {
+            Some(view) => Ok(view.ast()),
+            None => self.state.ast(node).map_err(arena),
+        }
+    }
+    fn node(&self, node: NodeId) -> Result<NodeRead<'_>, tsr_arena::Error> {
+        match self.core_view(node) {
+            Some(view) => view.node(node),
+            None => self.state.node(node).map_err(arena),
+        }
     }
     fn binding(&self, node: NodeId) -> Result<Option<NodeBinding>, tsr_arena::Error> {
-        self.0.checker_node_binding(node).map_err(arena)
+        match self.core_view(node) {
+            Some(view) => view.node_binding(node),
+            None => self.state.checker_node_binding(node).map_err(arena),
+        }
     }
     fn symbol(&self, id: SymbolId) -> Result<SymbolRef<'_>, tsr_arena::Error> {
-        self.0.symbol(id).map_err(arena)
+        self.state.symbol(id).map_err(arena)
     }
     fn table(&self, id: SymbolTableId) -> Result<SymbolTableRead<'_>, tsr_arena::Error> {
-        self.0.table(id).map_err(arena)
+        self.state.table(id).map_err(arena)
     }
     fn declarations(&self, id: SymbolId) -> Result<DeclarationRead<'_>, tsr_arena::Error> {
-        self.0.symbol_declarations(id).map_err(arena)
+        self.state.symbol_declarations(id).map_err(arena)
     }
     fn new_transient_symbol(
         &mut self,
@@ -586,7 +624,7 @@ impl CheckerState {
                 suggestion,
             };
             let result = resolver.resolve(
-                &mut ReadHost(self),
+                &mut ReadHost::new(self, location),
                 &mut hooks,
                 location,
                 name,
@@ -867,5 +905,98 @@ pub(crate) fn suggested_library(name: &[u8]) -> Option<&'static [u8]> {
         | b"AsyncDisposableStack"
         | b"Date" => Some(b"esnext"),
         _ => None,
+    }
+}
+
+#[cfg(test)]
+mod read_host_tests {
+    use super::*;
+    use tsr_ast::{AstBuilder, Factory, FactoryMethods, Node, NodeData, SyntaxKind as K};
+
+    #[test]
+    fn scoped_reads_validate_slots_and_keep_factory_and_foreign_nodes_on_the_fallback() {
+        let (counters, _generation, _identity, owner) = crate::tests::owner();
+        let text = tsr_jsstring::SourceText::from_bytes(b"".as_slice());
+        let mut builder = AstBuilder::new(text.clone(), &counters);
+        let child = builder.new_identifier(JsString::from_bytes(b"x".as_slice()));
+        let source = builder.new_source_file(
+            tsr_ast::SourceFileParseOptions {
+                file_name: JsString::from_bytes(b"/resolver.ts".as_slice()),
+                ..tsr_ast::SourceFileParseOptions::default()
+            },
+            text,
+            None,
+            None,
+        );
+        builder.set_node_parent(child, Some(source));
+        let file = builder
+            .complete(source)
+            .unwrap()
+            .bind_and_publish(|binding| {
+                let symbol = binding.symbols_mut().push(tsr_ast::Symbol::new(
+                    sf::FUNCTION_SCOPED_VARIABLE,
+                    JsString::from_bytes(b"x".as_slice()),
+                ));
+                binding.binding_mut(child)?.symbol = Some(symbol);
+                Ok(())
+            })
+            .unwrap();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let factory_node = state.factory.new_token(K::ThisKeyword.into());
+        let invalid_factory = NodeId::from_parts(factory_node.arena(), u32::MAX).unwrap();
+        let invalid_core = NodeId::from_parts(source.arena(), u32::MAX).unwrap();
+        let mut foreign = AstBuilder::new(
+            tsr_jsstring::SourceText::from_bytes(b"".as_slice()),
+            &counters,
+        );
+        let foreign_node = foreign.new_token(K::ThisKeyword.into());
+
+        for expected in [K::ThisKeyword, K::SuperKeyword] {
+            *state.factory.node_mut(factory_node).unwrap() =
+                Node::from_factory_parts(expected.into(), NodeData::Token(tsr_ast::TokenData {}));
+            let host = ReadHost {
+                state,
+                core: Some((source.arena(), file.view())),
+            };
+            assert_eq!(host.node(child).unwrap().kind(), K::Identifier);
+            assert_eq!(
+                host.binding(child).unwrap().unwrap().symbol,
+                file.view().node_binding(child).unwrap().unwrap().symbol,
+            );
+            // Selecting a view never turns an unused bad slot into an eager error.
+            assert!(host.ast(invalid_core).is_ok());
+            assert!(matches!(
+                host.node(invalid_core),
+                Err(tsr_arena::Error::InvalidSlot)
+            ));
+            assert!(matches!(
+                host.binding(invalid_core),
+                Err(tsr_arena::Error::InvalidSlot)
+            ));
+            assert!(host.core_view(factory_node).is_none());
+            assert_eq!(host.node(factory_node).unwrap().kind(), expected);
+            assert!(matches!(
+                host.node(invalid_factory),
+                Err(tsr_arena::Error::InvalidSlot)
+            ));
+            assert!(matches!(
+                host.binding(invalid_factory),
+                Err(tsr_arena::Error::InvalidSlot)
+            ));
+            assert!(host.core_view(foreign_node).is_none());
+            assert!(matches!(
+                host.node(foreign_node),
+                Err(tsr_arena::Error::InvalidGraph)
+            ));
+            assert!(matches!(
+                host.binding(foreign_node),
+                Err(tsr_arena::Error::InvalidGraph)
+            ));
+        }
+        // No program is installed in this focused fixture. Construction must
+        // still be infallible, leaving validation to a read if one is requested.
+        assert!(ReadHost::new(state, Some(invalid_core)).core.is_none());
+        assert!(ReadHost::new(state, Some(factory_node)).core.is_none());
     }
 }
