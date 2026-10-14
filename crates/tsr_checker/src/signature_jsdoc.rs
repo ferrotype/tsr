@@ -569,19 +569,19 @@ impl CheckerState {
 impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.isDeprecatedSymbol
     pub(crate) fn is_deprecated_symbol(&mut self, symbol: SymbolId) -> Result<bool, Error> {
-        let declarations = self.symbol_declarations(symbol)?.to_vec();
         let parent = self.parent_of_symbol(symbol)?;
+        let declarations = self.symbol_declarations(symbol)?;
         if let Some(parent) = parent {
             if declarations.len() > 1 {
                 let interface = self.symbol(parent)?.flags() & sf::INTERFACE != 0;
-                let mut any = false;
-                let mut all = true;
+                // Interface overloads need one deprecated declaration; other
+                // merged symbols need every declaration to be deprecated.
                 for declaration in declarations.iter().flatten() {
-                    let deprecated = self.is_deprecated_declaration(*declaration)?;
-                    any |= deprecated;
-                    all &= deprecated;
+                    if self.is_deprecated_declaration(declaration)? == interface {
+                        return Ok(interface);
+                    }
                 }
-                return Ok(if interface { any } else { all });
+                return Ok(!interface);
             }
         }
         if let Some(value_declaration) = self.symbol(symbol)?.value_declaration() {
@@ -593,7 +593,7 @@ impl CheckerState {
             return Ok(false);
         }
         for declaration in declarations.iter().flatten() {
-            if !self.is_deprecated_declaration(*declaration)? {
+            if !self.is_deprecated_declaration(declaration)? {
                 return Ok(false);
             }
         }
@@ -626,13 +626,13 @@ impl CheckerState {
             if target == target_symbol {
                 break;
             }
-            let declarations = self.symbol_declarations(target)?.to_vec();
-            if declarations.is_empty() {
+            if self.symbol_declarations(target)?.is_empty() {
                 // The pin loops on the same symbol here; no recorded program
                 // reaches it, and the walk cannot advance, so it stops.
                 break;
             }
             if self.is_deprecated_symbol(target)? {
+                let declarations = self.symbol_declarations(target)?.to_vec();
                 let name = self.symbol(target)?.name_to_owned();
                 self.add_deprecated_suggestion(location, &declarations, name)?;
                 break;
@@ -673,9 +673,7 @@ impl CheckerState {
             ) && self.node(node)?.kind() == K::Identifier
                 && self.flow_has_matching_argument(parent, node)?);
         }
-        let declarations: Vec<NodeId> =
-            self.symbol_declarations(symbol)?.iter().flatten().collect();
-        for declaration in declarations {
+        for declaration in self.symbol_declarations(symbol)?.iter().flatten() {
             if tsr_ast::utilities::is_function_like(Some(&self.node(declaration)?))
                 && !self.is_deprecated_declaration(declaration)?
             {
@@ -712,5 +710,109 @@ impl CheckerState {
         }
         self.add_suggestion_diagnostic(diagnostic)?;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod deprecation_tests {
+    use super::*;
+    use tsr_ast::{Factory, FactoryMethods};
+
+    fn declaration(state: &mut CheckerState, deprecated: bool) -> NodeId {
+        let node = state.factory.new_token(K::Unknown.into());
+        if deprecated {
+            let tag = state.factory.new_js_doc_deprecated_tag(None, None);
+            let tags = state.factory.node_slice(vec![Some(tag)]).unwrap();
+            let tags = state
+                .factory
+                .new_list(tsr_core::TextRange::new(0, 0), tags)
+                .unwrap();
+            let doc = state.factory.new_js_doc(None, Some(tags));
+            state.factory.seed_jsdoc(node, vec![doc]).unwrap();
+            state
+                .factory
+                .set_node_flags(node, nf::HAS_JS_DOC | nf::POSSIBLY_CONTAINS_DEPRECATED_TAG);
+        }
+        node
+    }
+
+    fn symbol(
+        state: &mut CheckerState,
+        parent_flags: Option<u32>,
+        declarations: &[NodeId],
+    ) -> SymbolId {
+        let parent = parent_flags.map(|flags| {
+            state
+                .new_symbol(flags, JsString::from_bytes(b"Parent".as_slice()))
+                .unwrap()
+        });
+        let symbol = state
+            .new_symbol(sf::METHOD, JsString::from_bytes(b"member".as_slice()))
+            .unwrap();
+        let declarations = state
+            .declarations
+            .alloc(declarations.iter().copied().map(Some).collect())
+            .unwrap();
+        let record = state.symbol_mut(symbol).unwrap();
+        record.parent = parent;
+        record.declarations = declarations;
+        symbol
+    }
+
+    #[test]
+    fn merged_deprecation_uses_any_for_interfaces_and_all_for_namespaces() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let deprecated = declaration(state, true);
+        let current = declaration(state, false);
+        for flags in [sf::INTERFACE, sf::NAMESPACE_MODULE] {
+            for declarations in [
+                [deprecated, current],
+                [current, deprecated],
+                [deprecated, deprecated],
+                [current, current],
+            ] {
+                let symbol = symbol(state, Some(flags), &declarations);
+                let expected = if flags == sf::INTERFACE {
+                    declarations.contains(&deprecated)
+                } else {
+                    declarations.iter().all(|node| *node == deprecated)
+                };
+                assert_eq!(state.is_deprecated_symbol(symbol), Ok(expected));
+            }
+        }
+    }
+
+    #[test]
+    fn deprecation_reads_only_the_required_declaration_prefix() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let deprecated = declaration(state, true);
+        let current = declaration(state, false);
+        let invalid = NodeId::from_parts(state.factory.id().arena(), u32::MAX).unwrap();
+        for (flags, decisive, undecided, result) in [
+            (sf::INTERFACE, deprecated, current, true),
+            (sf::NAMESPACE_MODULE, current, deprecated, false),
+        ] {
+            let short = symbol(state, Some(flags), &[decisive, invalid]);
+            assert_eq!(state.is_deprecated_symbol(short), Ok(result));
+            let required = symbol(state, Some(flags), &[undecided, invalid]);
+            assert_eq!(
+                state.is_deprecated_symbol(required),
+                Err(Error::Arena(tsr_arena::Error::InvalidSlot)),
+            );
+        }
+        let value = symbol(state, None, &[invalid]);
+        state.symbol_mut(value).unwrap().value_declaration = Some(deprecated);
+        assert_eq!(state.is_deprecated_symbol(value), Ok(true));
+        state.symbol_mut(value).unwrap().value_declaration = Some(current);
+        assert_eq!(
+            state.is_deprecated_symbol(value),
+            Err(Error::Arena(tsr_arena::Error::InvalidSlot)),
+        );
+        let empty = symbol(state, None, &[]);
+        assert_eq!(state.is_deprecated_symbol(empty), Ok(false));
     }
 }

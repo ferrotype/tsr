@@ -1150,42 +1150,57 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.getTypeOfSymbol
     pub(crate) fn get_type_of_symbol(&mut self, symbol: SymbolId) -> Result<TypeId, Error> {
         let read = self.symbol(symbol)?;
-        if read.check_flags() & check_flags::DEFERRED_TYPE != 0 {
-            return self.get_type_of_symbol_with_deferred_type(symbol);
-        }
-        if read.check_flags() & check_flags::INSTANTIATED != 0 {
-            return self.get_type_of_instantiated_symbol(symbol);
-        }
-        if read.check_flags() & check_flags::MAPPED != 0 {
-            return self.type_of_mapped_symbol(symbol);
-        }
-        if read.check_flags() & check_flags::REVERSE_MAPPED != 0 {
-            return self.type_of_reverse_mapped_symbol(symbol);
-        }
-        // Each native value-type dispatcher starts with valueSymbolLinks.Get.
-        // Preserve that first access before this Rust-only shared cache read,
-        // but do not assign IDs to non-value symbols that return errorType.
-        if read.flags()
-            & (sf::ACCESSOR
-                | sf::VARIABLE
-                | sf::PROPERTY
-                | sf::FUNCTION
-                | sf::METHOD
-                | sf::CLASS
-                | sf::ENUM
-                | sf::VALUE_MODULE
-                | sf::ENUM_MEMBER
-                | sf::ALIAS)
+        let checks = read.check_flags();
+        // All four specialized dispatchers begin with the same completed
+        // value-type cache. Consult it once using the symbol already read,
+        // before routing a hit through another dispatcher and symbol lookup.
+        // Observing the lazy native ID still precedes the cache read; symbols
+        // outside these value families must not acquire one here.
+        if checks
+            & (check_flags::DEFERRED_TYPE
+                | check_flags::INSTANTIATED
+                | check_flags::MAPPED
+                | check_flags::REVERSE_MAPPED)
             != 0
+            || read.flags()
+                & (sf::ACCESSOR
+                    | sf::VARIABLE
+                    | sf::PROPERTY
+                    | sf::FUNCTION
+                    | sf::METHOD
+                    | sf::CLASS
+                    | sf::ENUM
+                    | sf::VALUE_MODULE
+                    | sf::ENUM_MEMBER
+                    | sf::ALIAS)
+                != 0
         {
-            self.value_symbol_key(symbol)?;
-        }
-        if let Some(ty) = self
+            let key = crate::links::ValueSymbolKey::observe(symbol, &read);
+            if let Some(ty) = self
+                .value_symbol_links
+                .try_get(key)
+                .and_then(|l| l.resolved_type)
+            {
+                return Ok(ty);
+            }
+        } else if let Some(ty) = self
             .value_symbol_links
             .peek(symbol)
-            .and_then(|links| links.resolved_type)
+            .and_then(|l| l.resolved_type)
         {
             return Ok(ty);
+        }
+        if checks & check_flags::DEFERRED_TYPE != 0 {
+            return self.get_type_of_symbol_with_deferred_type(symbol);
+        }
+        if checks & check_flags::INSTANTIATED != 0 {
+            return self.get_type_of_instantiated_symbol(symbol);
+        }
+        if checks & check_flags::MAPPED != 0 {
+            return self.type_of_mapped_symbol(symbol);
+        }
+        if checks & check_flags::REVERSE_MAPPED != 0 {
+            return self.type_of_reverse_mapped_symbol(symbol);
         }
         if read.flags() & sf::CLASS != 0 {
             return self.type_of_class(symbol);

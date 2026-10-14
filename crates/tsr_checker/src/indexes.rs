@@ -605,7 +605,9 @@ impl CheckerState {
         }
         match applicable.as_slice() {
             [] => Ok(
-                if self.applicable_index_type(key, self.builtins.string_type)? {
+                if string_index.is_some()
+                    && self.applicable_index_type(key, self.builtins.string_type)?
+                {
                     string_index
                 } else {
                     None
@@ -1095,4 +1097,135 @@ impl CheckerState {
 pub(crate) fn numeric_name(name: &[u8]) -> Option<f64> {
     let value = tsr_jsnum::from_string(name);
     (value.to_string().as_bytes() == name).then_some(value.value())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    #[cfg(feature = "relation-probe")]
+    fn no_index_signature_does_not_check_string_assignability() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let object = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        let key = state.new_type_parameter(None).unwrap();
+        let string = state.builtins.string_type;
+        // A valid generic string key must enter the structural relater to
+        // compare its constraint; a primitive key would hide the extra work.
+        state.types.type_parameter_mut(key).unwrap().constraint = Some(string);
+        state.relations.observer = Some(Vec::new());
+        let cache_sizes = state
+            .relations
+            .caches
+            .each_ref()
+            .map(hashbrown::HashMap::len);
+
+        assert_eq!(state.applicable_index_info(object, key).unwrap(), None);
+        assert!(state.relations.observer.as_ref().unwrap().is_empty());
+        assert_eq!(
+            state
+                .relations
+                .caches
+                .each_ref()
+                .map(hashbrown::HashMap::len),
+            cache_sizes
+        );
+
+        // Independently establish that the omitted fallback would do work.
+        assert!(state.applicable_index_type(key, string).unwrap());
+        assert!(!state.relations.observer.as_ref().unwrap().is_empty());
+    }
+
+    #[test]
+    fn string_index_fallback_checks_string_number_and_symbol_keys() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let string = state.builtins.string_type;
+        let number = state.builtins.number_type;
+        let symbol = state.builtins.es_symbol_type;
+        let index = state
+            .signatures
+            .new_index_info(string, number, true, None, None)
+            .unwrap();
+        let object = state
+            .new_anonymous_type(None, None, &[], &[], &[index])
+            .unwrap();
+
+        for key in [string, number] {
+            assert_eq!(
+                state.applicable_index_info(object, key).unwrap(),
+                Some(index)
+            );
+        }
+        assert_eq!(state.applicable_index_info(object, symbol).unwrap(), None);
+    }
+
+    #[test]
+    fn overlapping_pattern_indexes_take_precedence_over_string_fallback() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let string = state.builtins.string_type;
+        let number = state.builtins.number_type;
+        // The standalone checker has no standard library. Pattern comparisons
+        // also examine String's apparent object type; an empty String interface
+        // is sufficient for these tests of index selection.
+        let string_wrapper = state.new_anonymous_type(None, None, &[], &[], &[]).unwrap();
+        state.query.global_types.insert("String", string_wrapper);
+        let prefix = state
+            .get_template_literal_type(
+                &[
+                    JsString::from_bytes(b"data-".as_slice()),
+                    JsString::default(),
+                ],
+                &[string],
+            )
+            .unwrap();
+        let suffix = state
+            .get_template_literal_type(
+                &[JsString::default(), JsString::from_bytes(b"-id".as_slice())],
+                &[string],
+            )
+            .unwrap();
+        let fallback = state
+            .signatures
+            .new_index_info(string, string, true, None, None)
+            .unwrap();
+        let first = state
+            .signatures
+            .new_index_info(prefix, number, true, None, None)
+            .unwrap();
+        let second = state
+            .signatures
+            .new_index_info(suffix, number, false, None, None)
+            .unwrap();
+        let object = state
+            .new_anonymous_type(None, None, &[], &[], &[fallback, first, second])
+            .unwrap();
+
+        for (text, expected) in [
+            (b"data-name".as_slice(), first),
+            (b"other".as_slice(), fallback),
+        ] {
+            let key = state
+                .get_string_literal_type(JsString::from_bytes(text))
+                .unwrap();
+            assert_eq!(
+                state.applicable_index_info(object, key).unwrap(),
+                Some(expected)
+            );
+        }
+        let key = state
+            .get_string_literal_type(JsString::from_bytes(b"data-id".as_slice()))
+            .unwrap();
+        let combined = state.applicable_index_info(object, key).unwrap().unwrap();
+        assert!(![fallback, first, second].contains(&combined));
+        let combined = state.signatures.index_info(combined).unwrap();
+        assert_eq!(combined.key_type, state.builtins.unknown_type);
+        assert_eq!(combined.value_type, number);
+        assert!(!combined.is_readonly);
+    }
 }

@@ -154,12 +154,8 @@ impl CheckerState {
         nodes: &[NodeId],
         report: bool,
     ) -> Result<Option<Vec<TypeId>>, Error> {
-        let parameters = self
-            .signatures
-            .get(signature)?
-            .type_parameters
-            .clone()
-            .unwrap_or_else(|| [].into());
+        let parameters = self.signatures.get(signature)?.type_parameters.clone();
+        let parameters = parameters.as_deref().unwrap_or_default();
         let mut types = Vec::with_capacity(nodes.len());
         for &node in nodes {
             types.push(self.get_type_from_type_node(node)?);
@@ -176,14 +172,14 @@ impl CheckerState {
             })
             .transpose()?
             .unwrap_or(false);
-        let types = self.fill_missing_type_arguments(&types, &parameters, javascript)?;
+        let types = self.fill_missing_type_arguments(&types, parameters, javascript)?;
         let mut mapper = None;
         for (index, &node) in nodes.iter().enumerate() {
             if let Some(constraint) = self.constraint_of_type_parameter(parameters[index])? {
                 let mapper = if let Some(mapper) = mapper {
                     mapper
                 } else {
-                    let value = self.new_type_mapper(&parameters, &types)?;
+                    let value = self.new_type_mapper(parameters, &types)?;
                     mapper = Some(value);
                     value
                 };
@@ -280,9 +276,8 @@ impl CheckerState {
         if self.maybe_type_of_kind(ty, tf::INSTANTIABLE)? {
             if let Some(inference) = inference {
                 if signature {
-                    let infos = self.inference_context(inference)?.inferences.clone();
                     let mut candidates = false;
-                    for info in infos {
+                    for info in &self.inference_context(inference)?.inferences {
                         if !info.candidates.is_empty()
                             || !info.contra_candidates.is_empty()
                             || self.inference_parameter_has_default(info.parameter)?
@@ -352,18 +347,14 @@ impl CheckerState {
         signature: SignatureId,
         args: &[NodeId],
     ) -> Result<Vec<TypeId>, Error> {
-        let parameters = self
-            .signatures
-            .get(signature)?
-            .type_parameters
-            .clone()
-            .unwrap_or_else(|| [].into());
+        let parameters = self.signatures.get(signature)?.type_parameters.clone();
+        let parameters = parameters.as_deref().unwrap_or_default();
         let flags = if tsr_ast::utilities::is_in_js_file(Some(&self.node(node)?)) {
             crate::inference::ANY_DEFAULT
         } else {
             0
         };
-        let context = self.new_inference_context(&parameters, Some(signature), flags)?;
+        let context = self.new_inference_context(parameters, Some(signature), flags)?;
         self.infer_call_type_arguments_ex(node, signature, args, 4 | 8, context)
     }
 
@@ -378,18 +369,14 @@ impl CheckerState {
         if tsr_ast::utilities_middle::is_jsx_opening_like_element(&self.node(node)?) {
             return self.infer_jsx_type_arguments(node, signature, mode, context);
         }
-        let parameters = self
-            .signatures
-            .get(signature)?
-            .type_parameters
-            .clone()
-            .unwrap_or_else(|| [].into());
+        let parameters = self.signatures.get(signature)?.type_parameters.clone();
+        let parameters = parameters.as_deref().unwrap_or_default();
         if !matches!(
             self.node(node)?.kind().known(),
             Some(K::Decorator | K::BinaryExpression)
         ) {
             let mut skip_patterns = true;
-            for &parameter in parameters.iter() {
+            for &parameter in parameters {
                 let default = self.resolved_type_parameter_default(parameter)?;
                 if default == self.builtins.no_constraint_type
                     || default == self.builtins.circular_constraint_type
@@ -424,30 +411,26 @@ impl CheckerState {
                             })
                             .transpose()?;
                         let instantiated = self.instantiate_type(contextual, outer_mapper)?;
-                        let source = if let Some(signature) =
-                            self.call_single_signature(instantiated)?
-                        {
-                            let parameters = self
-                                .signatures
-                                .get(signature)?
-                                .type_parameters
-                                .clone()
-                                .unwrap_or_else(|| [].into());
-                            if parameters.is_empty() {
-                                instantiated
+                        let source =
+                            if let Some(signature) = self.call_single_signature(instantiated)? {
+                                let parameters =
+                                    self.signatures.get(signature)?.type_parameters.clone();
+                                let parameters = parameters.as_deref().unwrap_or_default();
+                                if parameters.is_empty() {
+                                    instantiated
+                                } else {
+                                    let instantiated_signature =
+                                        self.signature_instantiation(signature, parameters, false)?;
+                                    self.isolated_signature_type(instantiated_signature)?
+                                }
                             } else {
-                                let instantiated_signature =
-                                    self.signature_instantiation(signature, &parameters, false)?;
-                                self.isolated_signature_type(instantiated_signature)?
-                            }
-                        } else {
-                            instantiated
-                        };
+                                instantiated
+                            };
                         self.infer_types(context, source, target, priority::RETURN_TYPE, false)?;
                     }
                     let flags = self.inference_context(context)?.flags;
                     let returned =
-                        self.new_inference_context(&parameters, Some(signature), flags)?;
+                        self.new_inference_context(parameters, Some(signature), flags)?;
                     let outer_mapper = outer
                         .map(|outer| self.call_outer_return_mapper(outer))
                         .transpose()?;
@@ -569,30 +552,33 @@ impl CheckerState {
                 node, signature, relation, mode, report, output,
             );
         }
-        let skip_this = read.kind() == K::NewExpression
-            || read.kind() == K::CallExpression
-                && match read.expression() {
-                    Some(expression) => tsr_ast::utilities_tail::is_super_property(
-                        self.ast(expression)?,
-                        &self.node(expression)?,
-                    )?,
-                    None => false,
-                };
         if let Some(this) = self.signatures.get(signature)?.this_parameter {
             let target = self.get_type_of_symbol(this)?;
-            if target != self.builtins.void_type && !skip_this {
-                let source = self.call_this_argument_type(node)?;
-                let error_node = if report {
-                    self.call_this_argument_node(node)?.or(Some(node))
-                } else {
-                    None
-                };
-                let (related, diagnostic) = self.check_type_related_ex(source, target, relation, error_node, Some(messages::The_this_context_of_type_0_is_not_assignable_to_method_s_this_of_type_1))?;
-                if let Some(diagnostic) = diagnostic {
-                    output.push(diagnostic);
-                }
-                if !related {
-                    return Ok(false);
+            if target != self.builtins.void_type {
+                let read = self.node(node)?;
+                let skip_this = read.kind() == K::NewExpression
+                    || read.kind() == K::CallExpression
+                        && match read.expression() {
+                            Some(expression) => tsr_ast::utilities_tail::is_super_property(
+                                self.ast(expression)?,
+                                &self.node(expression)?,
+                            )?,
+                            None => false,
+                        };
+                if !skip_this {
+                    let source = self.call_this_argument_type(node)?;
+                    let error_node = if report {
+                        self.call_this_argument_node(node)?.or(Some(node))
+                    } else {
+                        None
+                    };
+                    let (related, diagnostic) = self.check_type_related_ex(source, target, relation, error_node, Some(messages::The_this_context_of_type_0_is_not_assignable_to_method_s_this_of_type_1))?;
+                    if let Some(diagnostic) = diagnostic {
+                        output.push(diagnostic);
+                    }
+                    if !related {
+                        return Ok(false);
+                    }
                 }
             }
         }
@@ -1006,6 +992,47 @@ impl CheckerState {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn contextual_candidate_scan_preserves_order_and_candidate_buffers() {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        let state = operation.state_mut();
+        let parameter = state.new_type_parameter(None).unwrap();
+        let invalid = TypeId::next(0, state.types.len() + 100).unwrap();
+        let number = state.builtins.number_type;
+        let string = state.builtins.string_type;
+        let context = state
+            .new_inference_context(&[parameter, invalid], None, 0)
+            .unwrap();
+        let mapper = state
+            .alloc_mapper(crate::mapper::Mapper::Simple {
+                source: parameter,
+                target: string,
+            })
+            .unwrap();
+        let inference = state.inference_context_mut(context).unwrap();
+        inference.non_fixing_mapper = mapper;
+        inference.inferences[0].candidates.push(number);
+        // The first candidate ends the default scan before the invalid later
+        // parameter. The scan must neither consume nor mutate its candidate list.
+        assert_eq!(
+            state.instantiate_call_contextual_type(parameter, Some(context), true),
+            Ok(string)
+        );
+        assert_eq!(
+            state.inference_context(context).unwrap().inferences[0].candidates,
+            [number]
+        );
+        state.inference_context_mut(context).unwrap().inferences[0]
+            .candidates
+            .clear();
+        // With no candidate, checking defaults reaches the same later error.
+        assert_eq!(
+            state.instantiate_call_contextual_type(parameter, Some(context), true),
+            Err(Error::Arena(tsr_arena::Error::InvalidSlot)),
+        );
+    }
 
     #[test]
     fn nonliteral_arguments_do_not_instantiate_discarded_contextual_types() {
