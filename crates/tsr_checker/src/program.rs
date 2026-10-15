@@ -61,7 +61,47 @@ pub(crate) struct ProgramContext {
     declarations: HashMap<ArenaId, usize>,
 }
 
+/// A retained immutable AST source selected once for a contextual operation.
+/// This holds no semantic results or decoded node facts. Its ordinary checked
+/// reads still observe binding overlays and reject invalid slots.
+#[cfg(feature = "operation-experiments")]
+pub(crate) struct ArgumentReadScope {
+    arena: ArenaId,
+    binding: tsr_ast::SharedBoundFile,
+}
+
+#[cfg(feature = "operation-experiments")]
+impl ArgumentReadScope {
+    pub(crate) fn arena(&self) -> ArenaId {
+        self.arena
+    }
+
+    pub(crate) fn new(binding: tsr_ast::SharedBoundFile) -> Self {
+        Self {
+            arena: binding.result().source().arena(),
+            binding,
+        }
+    }
+
+    pub(crate) fn for_node(state: &CheckerState, node: NodeId) -> Option<Self> {
+        if node.arena() == state.factory.id().arena() {
+            return None;
+        }
+        let binding = state.program.as_ref()?.shared_binding(node)?;
+        Some(Self::new(binding))
+    }
+
+    fn binding(&self, node: NodeId) -> Option<&tsr_ast::SharedBoundFile> {
+        (node.arena() == self.arena).then_some(&self.binding)
+    }
+}
+
 impl CheckerState {
+    #[cfg(feature = "operation-experiments")]
+    fn argument_core_binding(&self, node: NodeId) -> Option<&tsr_ast::SharedBoundFile> {
+        self.argument_read_scope.as_ref()?.binding(node)
+    }
+
     pub(crate) fn program(&self) -> Result<&ProgramContext, crate::Error> {
         self.program
             .as_ref()
@@ -73,6 +113,10 @@ impl CheckerState {
     /// selection in between.
     #[inline]
     pub(crate) fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, crate::Error> {
+        #[cfg(feature = "operation-experiments")]
+        if let Some(binding) = self.argument_core_binding(node) {
+            return Ok(binding.node(node)?);
+        }
         if self.factory.id().arena() == node.arena() {
             return Ok(self.factory.view().node(node)?);
         }
@@ -83,6 +127,10 @@ impl CheckerState {
     /// `node`: the text read validates the id itself.
     #[inline]
     pub(crate) fn node_text(&self, node: NodeId) -> Result<tsr_ast::NodeText<'_>, crate::Error> {
+        #[cfg(feature = "operation-experiments")]
+        if let Some(binding) = self.argument_core_binding(node) {
+            return Ok(binding.view().ast().node_text(node)?);
+        }
         if self.factory.id().arena() == node.arena() {
             return Ok(self.factory.view().node_text(node)?);
         }
@@ -96,6 +144,10 @@ impl CheckerState {
         &self,
         source: NodeId,
     ) -> Result<tsr_ast::SourceFileRead<'_>, crate::Error> {
+        #[cfg(feature = "operation-experiments")]
+        if let Some(binding) = self.argument_core_binding(source) {
+            return Ok(binding.view().ast().source_file(source)?);
+        }
         if self.factory.id().arena() == source.arena() {
             return Ok(self.factory.view().source_file(source)?);
         }
@@ -103,6 +155,10 @@ impl CheckerState {
     }
 
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, crate::Error> {
+        #[cfg(feature = "operation-experiments")]
+        if let Some(binding) = self.argument_core_binding(node) {
+            return Ok(binding.view().ast());
+        }
         if self.factory.id().arena() == node.arena() {
             let view = self.factory.view();
             view.node(node)?;

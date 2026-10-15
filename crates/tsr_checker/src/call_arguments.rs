@@ -204,7 +204,6 @@ impl CheckerState {
         Ok(Some(types.to_vec()))
     }
 
-    // port: tsc/internal/checker/checker.go:Checker.checkExpressionWithContextualType
     pub(crate) fn check_call_argument_ex(
         &mut self,
         node: NodeId,
@@ -212,58 +211,20 @@ impl CheckerState {
         inference: Option<InferenceId>,
         mode: u32,
     ) -> Result<TypeId, Error> {
-        let context_node = self.contextual_node_of(node)?;
-        self.calls.contexts.push(crate::calls::ArgumentContext {
-            node: context_node,
-            ty: Some(contextual),
-            is_cache: false,
-        });
-        self.calls
-            .inference_contexts
-            .push((context_node, inference));
-        let result = (|| {
-            let mode = mode | 1 | if inference.is_some() { 2 } else { 0 };
-            let mut ty = self.check_expression_ex(node, mode)?;
-            if let Some(inference) = inference {
-                self.inference_context_mut(inference)?
-                    .intra_expression_sites
-                    .clear();
-            }
-            // Go short-circuits before contextual instantiation. Non-literals
-            // cannot lose freshness, so instantiating their context is unused
-            // work and can create otherwise unrequested types.
-            if self.maybe_type_of_kind(ty, tf::LITERAL)? {
-                let contextual =
-                    self.instantiate_call_contextual_type(contextual, inference, false)?;
-                if self.literal_of_context(ty, Some(contextual))? {
-                    ty = self.get_regular_type_of_literal_type(ty)?;
-                }
-            }
-            Ok(ty)
-        })();
-        self.calls.inference_contexts.pop();
-        self.calls.contexts.pop();
-        result
-    }
-
-    /// Attributes of an element with children push their context on the
-    /// element, so that it encompasses the attributes _and_ the children
-    /// (which are essentially part of the attributes).
-    // port: tsc/internal/checker/checker.go:Checker.getContextNode
-    fn contextual_node_of(&self, node: NodeId) -> Result<NodeId, Error> {
-        let read = self.node(node)?;
-        if read.kind() == K::JsxAttributes {
-            let parent = read
-                .parent()
-                .ok_or(Error::MissingLink("JSX attributes parent"))?;
-            if self.node(parent)?.kind() != K::JsxSelfClosingElement {
-                return self
-                    .node(parent)?
-                    .parent()
-                    .ok_or(Error::MissingLink("JSX opening element parent"));
-            }
+        let request = crate::contextual_argument::ArgumentRequest {
+            node,
+            contextual,
+            inference,
+            mode,
+        };
+        #[cfg(feature = "operation-experiments")]
+        {
+            crate::operation_experiments::check_contextual_argument(self, request)
         }
-        Ok(node)
+        #[cfg(not(feature = "operation-experiments"))]
+        {
+            crate::contextual_argument::check(self, request)
+        }
     }
 
     // port: tsc/internal/checker/checker.go:Checker.instantiateContextualType

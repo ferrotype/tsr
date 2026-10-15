@@ -59,6 +59,14 @@ mod call_failure;
 mod call_spread;
 mod call_tagged;
 mod calls;
+mod contextual_argument;
+mod flow_reachability;
+#[cfg(feature = "operation-experiments")]
+pub mod operation_experiments;
+#[cfg(feature = "operation-experiments")]
+pub use flow_reachability::{
+    FlowReachabilityCapture, FlowReachabilityReplay, FlowReachabilityRequest,
+};
 mod check;
 mod check_bodies;
 mod check_generics;

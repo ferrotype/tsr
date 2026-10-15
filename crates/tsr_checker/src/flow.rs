@@ -20,7 +20,13 @@ pub(crate) struct FlowAnalysis {
     /// reference on every matching-reference check.
     pub(crate) this_type_queries: crate::types::Map<NodeId, bool>,
     // Upstream's lastFlowNode cache also covers unshared straight-line flows.
-    last_reachable: Option<(FlowId, bool)>,
+    pub(crate) last_reachable: Option<(FlowId, bool)>,
+    #[cfg(feature = "operation-experiments")]
+    pub(crate) capture: Option<crate::flow_reachability::CaptureState>,
+    #[cfg(feature = "operation-experiments")]
+    pub(crate) reachability_counters: crate::flow_reachability::ReachabilityCounters,
+    #[cfg(feature = "operation-experiments")]
+    pub(crate) local_reachability: bool,
     post_super: crate::types::Map<FlowId, bool>,
     pub(crate) synthetic: crate::types::Map<NodeId, (NodeId, FlowId)>,
     pub(crate) loop_cache: crate::types::Map<FlowLoopKey, TypeId>,
@@ -70,13 +76,16 @@ struct FlowQuery {
 /// One immutable binder graph selected before a walk mutates checker state.
 /// The shared file retains both the binding and all graph dependencies. Only
 /// completed core files use this path; other owners retain their routed reads.
-struct FlowGraph {
-    owner: NodeId,
-    shared: Option<tsr_ast::SharedBoundFile>,
+pub(crate) struct FlowGraph {
+    pub(crate) owner: NodeId,
+    pub(crate) shared: Option<tsr_ast::SharedBoundFile>,
 }
 
 impl FlowGraph {
-    fn binding<'a>(&'a self, state: &'a CheckerState) -> Result<&'a tsr_ast::BindResult, Error> {
+    pub(crate) fn binding<'a>(
+        &'a self,
+        state: &'a CheckerState,
+    ) -> Result<&'a tsr_ast::BindResult, Error> {
         match &self.shared {
             Some(shared) => Ok(shared.result()),
             None => Ok(state.program()?.bind_result(self.owner)?),
@@ -127,7 +136,7 @@ fn required<T>(value: Option<T>, context: &'static str) -> Result<T, Error> {
 }
 
 impl CheckerState {
-    fn flow_graph(&self, owner: NodeId) -> Result<FlowGraph, Error> {
+    pub(crate) fn flow_graph(&self, owner: NodeId) -> Result<FlowGraph, Error> {
         let owner = self
             .flow
             .synthetic
@@ -200,6 +209,8 @@ impl CheckerState {
 
     // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNode
     pub(crate) fn reachable_flow(&mut self, owner: NodeId, flow: FlowId) -> Result<bool, Error> {
+        #[cfg(feature = "operation-experiments")]
+        self.capture_reachability(owner, flow);
         // Completed hits need no graph retention or owner routing.
         if let Some((last, result)) = self.flow.last_reachable {
             if last == flow {
@@ -211,114 +222,13 @@ impl CheckerState {
             return Ok(result);
         }
         let graph = self.flow_graph(owner)?;
-        self.reachable_flow_in(&graph, flow)
+        crate::flow_reachability::run(self, &graph, flow)
     }
 
     fn reachable_flow_in(&mut self, graph: &FlowGraph, flow: FlowId) -> Result<bool, Error> {
-        let result = self.reachable_flow_worker(graph, flow, &mut Vec::new())?;
-        self.flow.last_reachable = Some((flow, result));
-        Ok(result)
-    }
-
-    // port: tsc/internal/checker/flow.go:Checker.isReachableFlowNodeWorker
-    fn reachable_flow_worker(
-        &mut self,
-        graph: &FlowGraph,
-        mut flow: FlowId,
-        reduced: &mut Vec<tsr_ast::FlowReduceLabelData>,
-    ) -> Result<bool, Error> {
-        stacker::maybe_grow(128 * 1024, 2 * 1024 * 1024, || {
-            // Every node passed on the way to the answer has the answer's
-            // reachability (a pass-through node is reachable exactly when its
-            // antecedent is), so all of them are memoized, not only the shared
-            // ones upstream caches. Nodes under temporary reduce-label
-            // antecedents stay uncached, as upstream. Without this, a chain of
-            // n assignments costs n walks of length n per reference query.
-            let mut passed = Vec::new();
-            let result = loop {
-                if let Some((last, result)) = self.flow.last_reachable {
-                    if last == flow {
-                        break result;
-                    }
-                }
-                if reduced.is_empty() {
-                    if let Some(&result) = self.flow.reachable.get(&flow) {
-                        break result;
-                    }
-                    passed.push(flow);
-                }
-                let node = graph.node(self, flow)?;
-                if node.flags & (ff::ASSIGNMENT | ff::CONDITION | ff::ARRAY_MUTATION) != 0 {
-                    flow = required(node.antecedent, "reachable antecedent")?;
-                } else if node.flags & ff::BRANCH_LABEL != 0 {
-                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowBranchLabel
-                    // port: tsc/internal/checker/flow.go:getBranchLabelAntecedents
-                    let mut list = reduced
-                        .iter()
-                        .rev()
-                        .find(|r| r.target == Some(flow))
-                        .map_or(node.antecedents, |r| r.antecedents);
-                    list = graph.antecedents(self, list)?;
-                    let mut reachable = false;
-                    while let Some(branch) = graph.next(self, &mut list)? {
-                        if self.reachable_flow_worker(graph, branch, reduced)? {
-                            reachable = true;
-                            break;
-                        }
-                    }
-                    break reachable;
-                } else if node.flags & ff::LOOP_LABEL != 0 {
-                    let mut list = graph.antecedents(self, node.antecedents)?;
-                    let Some(first) = graph.next(self, &mut list)? else {
-                        break false;
-                    };
-                    flow = first;
-                } else if node.flags & ff::REDUCE_LABEL != 0 {
-                    let Some(FlowData::ReduceLabel(data)) = node.node else {
-                        return Err(tsr_arena::Error::InvalidGraph.into());
-                    };
-                    // Temporary antecedents invalidate the last-flow shortcut,
-                    // just as they do in isReachableFlowNodeWorker upstream.
-                    self.flow.last_reachable = None;
-                    reduced.push(data);
-                    let result = self.reachable_flow_worker(
-                        graph,
-                        required(node.antecedent, "reduce antecedent")?,
-                        reduced,
-                    );
-                    reduced.pop();
-                    break result?;
-                } else if node.flags & ff::CALL != 0 {
-                    // port: tsc/internal/checker/flow.go:Checker.getTypeAtFlowCall
-                    let Some(FlowData::Ast(call)) = node.node else {
-                        return Err(tsr_arena::Error::InvalidGraph.into());
-                    };
-                    if self.flow_call_is_never(call)? {
-                        break false;
-                    }
-                    flow = required(node.antecedent, "reachable call antecedent")?;
-                } else if node.flags & ff::SWITCH_CLAUSE != 0 {
-                    let Some(FlowData::SwitchClause(data)) = node.node else {
-                        return Err(tsr_arena::Error::InvalidGraph.into());
-                    };
-                    if data.is_empty()
-                        && self.flow_switch_exhaustive(required(
-                            data.switch_statement,
-                            "reachable switch statement",
-                        )?)?
-                    {
-                        break false;
-                    }
-                    flow = required(node.antecedent, "reachable switch antecedent")?;
-                } else {
-                    break node.flags & ff::UNREACHABLE == 0;
-                }
-            };
-            for flow in passed {
-                self.flow.reachable.insert(flow, result);
-            }
-            Ok(result)
-        })
+        #[cfg(feature = "operation-experiments")]
+        self.capture_reachability(graph.owner, flow);
+        crate::flow_reachability::run(self, graph, flow)
     }
 
     // port: tsc/internal/checker/flow.go:Checker.isPostSuperFlowNode

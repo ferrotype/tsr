@@ -25,6 +25,11 @@ s08-phase-timer = []
 s08-allocation = ["tsr_checker/storage-pilot"]
 # Development-only node-read counters printed by the checkerbench child.
 access-stats = ["tsr_ast/access-stats"]
+operation-experiments = ["tsr_checker/operation-experiments"]
+
+[[example]]
+name = "checker_operations"
+required-features = ["operation-experiments"]
 
 [[test]]
 name = "c1_contracts"

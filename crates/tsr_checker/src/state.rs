@@ -21,6 +21,10 @@ pub struct CheckerOptions {
 }
 
 pub(crate) struct CheckerState {
+    #[cfg(feature = "operation-experiments")]
+    pub(crate) argument_read_scope: Option<crate::program::ArgumentReadScope>,
+    #[cfg(feature = "operation-experiments")]
+    pub(crate) operation_experiments: crate::operation_experiments::ExperimentState,
     #[cfg(feature = "recursion-probe")]
     pub(crate) c2_limits_probe: Option<crate::handles::c2_limits_probe::LimitsProbe>,
     pub(crate) counters: Counters,
@@ -123,6 +127,10 @@ impl CheckerState {
         let symbols = identity.adopt_symbol_arena(counters)?;
         let builtins = Builtins::uninitialized(symbols.id());
         Ok(Self {
+            #[cfg(feature = "operation-experiments")]
+            argument_read_scope: None,
+            #[cfg(feature = "operation-experiments")]
+            operation_experiments: crate::operation_experiments::ExperimentState::default(),
             counters: counters.clone(),
             options,
             program: None,
