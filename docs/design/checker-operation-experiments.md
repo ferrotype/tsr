@@ -418,9 +418,10 @@ All paths in this section are under
 repository root. The saved control is `baseline/tsrust`, SHA-256
 `b8f5e005c9408dc00887c36ad04a1e72b22278d3c7590a46ba89c819c84d2e9c`.
 Build manifests record the effective release configuration, compiler, feature
-set and source hashes. These builds report revision `284f0f36`, but the
-candidates contain subsequent uncommitted changes: the source maps and their
-recorded differences identify the measured code, not that revision alone.
+set and source hashes. The owner-scope and boxed builds report revision
+`284f0f36`, but their candidates contain subsequent uncommitted changes: the
+source maps and their recorded differences identify the measured code, not
+that revision alone.
 Documentation is outside the measured source closure.
 
 Every pair matches the frozen workload's diagnostics and file-output digest,
@@ -486,9 +487,10 @@ causes its small timing regression. The samples do not isolate that cause.
 
 **Keep the 24-byte representation experimental; do not promote it.** It
 delivers small TypeScript/VS Code checking gains, introduces allocation
-traffic and does not improve MUI consistently. The next bounded alternative
-is a 32-byte allocation-free read representation. Its CPU result is unknown;
-it must be measured against the saved control on these same workloads, not
+traffic and does not improve MUI consistently. At this checkpoint, the next
+bounded alternative was a 32-byte allocation-free read representation. Its
+CPU result was unknown; it had to be measured against the saved control on
+these same workloads, not
 predicted by subtracting the boxing cost or adding the owner-scope result.
 
 With both experimental features enabled, the focused compiler check passes
@@ -497,3 +499,128 @@ cases plus JSDoc rest parameters, typedefs and JSDoc contextual typing.
 `parity/validation.json` records actual Cargo features, stable source/runner
 identities and unchanged expectations. This is bounded correctness coverage,
 not a full-corpus claim.
+
+### Allocation-free 32-byte experiment: decision to promote
+
+The refinement keeps cold read metadata inline in a 32-byte representation.
+The measured candidate still selects it with `compact-node-read`, with owner
+scope disabled. `inline-reader/tsrust` is SHA-256
+`a74d89556ab70d90a80a6535560eb26032aa56c3bc45f0485474462dd3d4d169`;
+its build manifest names revision `1a24bcdd` and the full subsequent source
+changes. `inline-reader-pairs2/` and `inline-reader-pairs8/` contain five
+concurrent pairs for each row below against the same saved ordinary control.
+`inline-reader-audit.json` joins the independent audits. The methodology and
+work checks above apply unchanged; all sixty outputs and thirty overlapping
+pairs validate.
+
+| Workload | Checkers | Wall ratio; saved | Check ratio; saved | User CPU ratio; saved | Peak RSS ratio; saved | Extra allocation calls |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| TypeScript compiler | 2 | 0.9549; 59.45 ms | 0.9510; 49 ms | 0.9551; 114.80 ms | 1.0063; −2.11 MiB | 2 |
+| VS Code | 2 | 0.9645; 642.91 ms | 0.9599; 638 ms | 0.9642; 1,204.74 ms | 0.9992; 4.58 MiB | 0 |
+| MUI docs | 2 | 0.9996; 6.25 ms | 0.9989; 15 ms | 0.9985; 36.84 ms | 1.0021; −8.41 MiB | 2 |
+| TypeScript compiler | 8 | 0.9580; 46.12 ms | 0.9490; 44 ms | 0.9603; 129.51 ms | 1.0046; −2.17 MiB | −1 |
+| VS Code | 8 | 0.9863; 107.72 ms | 0.9792; 118 ms | 0.9740; 1,169.64 ms | 1.0002; −1.22 MiB | 6 |
+| MUI docs | 8 | 0.9943; 74.83 ms | 0.9950; 53 ms | 0.9974; 168.19 ms | 1.0006; −4.58 MiB | 4 |
+
+Every TypeScript and VS Code pair improves both wall and checking time. Their
+check ratios range from 0.9481–0.9521 and 0.9579–0.9616 at two checkers, and
+0.9447–0.9581 and 0.9747–0.9819 at eight. MUI is effectively neutral at two
+checkers (wall range 0.9974–1.0008); all five eight-checker wall pairs improve,
+with ratios 0.9897–0.9984. RSS remains within sample variability; this is a CPU
+improvement, not a measured memory reduction. Allocation-count differences
+across all samples range from −13 to +19 calls, removing the boxed candidate's
+systematic extra allocation traffic. This does not retrospectively attribute
+MUI's boxed timing result to those allocations.
+
+**Decision: make the allocation-free 32-byte representation unconditional.**
+The TypeScript/VS Code gains survive both concurrency settings without the
+boxed candidate's allocation tradeoff, and the JS-heavy workload shows no
+material regression. The feature-selected binary above was the evidence for
+that decision. The final ordinary binary was then checked separately below.
+No Go-relative or PGO result is inferred from either comparison.
+
+### Final ordinary production check: keep the 32-byte representation
+
+The final implementation removes `compact-node-read` and makes the
+allocation-free representation unconditional. Historical checkpoint
+`1a24bcdd` holds the boxed 24-byte experiment; `952b80cc` holds the
+feature-selected 32-byte experiment. Their removed selectors cannot be enabled
+on current code; their patches and executables remain archived.
+
+The final ordinary native executable is `production-reader/tsrust`, SHA-256
+`c0f00bfbac03ed513cf2ab6a2eedbf9609795901c89ff0fa1213759a91c6076b`,
+with **no requested features and no PGO**. Its exact source map matches the
+final measured implementation. The strict ordinary-feature validator also
+accepts its actual Cargo artifact graph: all 45 workspace packages have only
+empty or `default` feature sets. The exact build helper used is archived as
+`production-reader/build-tool.py`, with its hash matching the build manifest.
+
+`production-pairs/<scenario>-checkers<count>/` contains five concurrent pairs
+per row, using committed `pairs.py` with both build manifests and the same
+saved control. `production-audit.json` independently validates all sixty raw
+outputs, thirty process overlaps, binary/build/source identities, input and
+options preflights, and exact work counters. Maximum launch skew is 0.121 ms.
+
+| Workload | Checkers | Wall ratio; saved | Check ratio; saved | User CPU ratio; saved | Peak RSS ratio; saved | Extra allocation calls |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| TypeScript compiler | 2 | 0.9671; 42.98 ms | 0.9520; 48 ms | 0.9576; 107.13 ms | 0.9988; 0.41 MiB | 0 |
+| VS Code | 2 | 0.9672; 579.98 ms | 0.9619; 600 ms | 0.9676; 1,073.75 ms | 1.0002; −0.92 MiB | −3 |
+| MUI docs | 2 | 1.0001; −1.09 ms | 0.9999; 2 ms | 0.9986; 35.27 ms | 0.9976; 9.31 MiB | 1 |
+| TypeScript compiler | 8 | 0.9575; 47.09 ms | 0.9507; 43 ms | 0.9648; 116.14 ms | 1.0029; −1.39 MiB | 0 |
+| VS Code | 8 | 0.9878; 95.62 ms | 0.9797; 119 ms | 0.9764; 1,087.79 ms | 0.9991; 6.47 MiB | −7 |
+| MUI docs | 8 | 0.9996; 5.85 ms | 0.9983; 18 ms | 0.9976; 157.55 ms | 1.0005; −3.63 MiB | 1 |
+
+Every TypeScript and VS Code pair improves wall and checking time. Their
+check ratios range from 0.9488–0.9578 and 0.9600–0.9668 at two checkers, and
+0.9468–0.9634 and 0.9776–0.9822 at eight. MUI is neutral: wall ratios range
+from 0.9962–1.0026 and 0.9930–1.0029. Allocation-count differences range from
+−17 to +15 calls, with no systematic added traffic. Peak RSS remains within
+sample variability; no memory reduction is claimed.
+
+**Keep the unconditional 32-byte representation.** The final ordinary build
+retains approximately 4.8–4.9% less checking time on TypeScript, 3.8% / 2.0%
+less on VS Code at two/eight checkers, and neutral MUI performance. These are
+Rust-versus-Rust results, not fresh Go-relative or PGO measurements.
+
+Final focused validation passes 199 normal AST unit tests, 32 integration
+tests and 26 doctests; the combined experimental/stats configuration passes
+202 unit tests plus the same integration/doctest counts. AST clippy passes in
+both configurations. Ordinary compiler parity passes 13 variants / 117
+sub-tests with unchanged expectations (`parity-production32/`). The build and
+pairing helpers pass 46 focused Python tests. Full-corpus validation remains
+CI's job.
+
+### Reproducing the ordinary comparison
+
+The helpers are committed in `7dcb11a2`. Choose a new archive directory outside
+`target/`, the saved baseline above, and an already provisioned scenario cache.
+Finish builds/tests before the loop; keep sources and binaries unchanged
+during it. Neither external `build.py` nor `measure.py` is needed:
+
+```sh
+ARCHIVE=/absolute/path/to/new-node-read-capture
+CONTROL=/absolute/path/to/checker-native-scope/baseline
+CACHE=/absolute/path/to/provisioned/phase7.noindex
+
+python3 tools/phase7/bench/build.py --output "$ARCHIVE/production-reader" || exit
+for checkers in 2 8; do
+  for scenario in self-compiler vscode mui-docs; do
+    python3 tools/phase7/bench/pairs.py \
+      --scenario "$scenario" --mode check --checkers "$checkers" \
+      --pairs 5 --timeout 600 --cache "$CACHE" \
+      --control "$CONTROL/tsrust" \
+      --candidate "$ARCHIVE/production-reader/tsrust" \
+      --control-build "$CONTROL/build.json" \
+      --candidate-build "$ARCHIVE/production-reader/build.json" \
+      --output "$ARCHIVE/$scenario-checkers$checkers" || exit
+  done
+done
+```
+
+Manifest mode verifies the current candidate's sources/configuration, both
+builds' compiler/release settings, equal work counters and input bytes/options
+before and after timing. The baseline may have older sources; exact changes
+remain recorded. Each pair is saved as it completes; invalid runs stay
+incomplete with raw output preserved. New builds record resolved workspace
+features and reject instrumentation; historical manifests retain their
+original explicit feature metadata.

@@ -20,10 +20,8 @@ access-stats = []
 # Diagnostic-only ADR 0010 observer. Absent from corpus and timing binaries.
 creation-trace = ["dep:serde_json"]
 # Alternate semantic-field decoding for isolated checker operation experiments.
-# Normal compiler builds retain the existing NodeRead representation.
+# Normal compiler builds use the standard semantic-field decoder.
 contextual-payload-experiment = []
-# Experiment: two-word contexts and an owned lazy-payload guard.
-compact-node-read = []
 
 [dependencies]
 serde_json = { version = "1", optional = true }

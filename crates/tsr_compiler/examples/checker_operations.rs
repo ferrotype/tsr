@@ -280,7 +280,7 @@ fn main() {
             // Count the extra payload retains separately from existing page guards.
             #[cfg(feature = "access-stats")]
             eprintln!("node-read-counts {}", tsr_ast::access_stats::report());
-            #[cfg(all(feature = "access-stats", feature = "compact-node-read"))]
+            #[cfg(feature = "access-stats")]
             eprintln!(
                 "lazy-read-node-retains {}",
                 tsr_ast::access_stats::lazy_read_node_retains()

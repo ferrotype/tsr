@@ -5,10 +5,10 @@ use tsr_jsstring::SourceText;
 
 #[test]
 #[cfg(target_pointer_width = "64")]
-fn compact_read_layout_records_the_feature_costs() {
-    // A layout assertion for the experiment, not a portable ABI promise.
+fn node_read_layout_keeps_contexts_compact() {
+    // An internal layout budget, not a portable ABI promise.
     // The enum uses a bool niche when typed selection is compiled in; that
-    // selector fits without growing the ordinary experimental record.
+    // selector fits without growing the ordinary record.
     assert_eq!(
         size_of::<NodeRead<'_>>(),
         32 + 8 * usize::from(cfg!(feature = "access-stats"))

@@ -117,7 +117,10 @@ fn typed_selection_preserves_open_kind_shape_pairs_and_panic_text() {
                 std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| read.expression()))
                     .unwrap_err();
             let message = error.downcast_ref::<String>().unwrap();
-            assert_eq!(message, "interface conversion: ast.nodeData is *ast.FunctionExpression, not *ast.CallExpression");
+            assert_eq!(
+                message,
+                "interface conversion: ast.nodeData is *ast.FunctionExpression, not *ast.CallExpression"
+            );
         }
     }
     drop(owned_read);

@@ -15,7 +15,6 @@ include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/lice
 [features]
 # Uninstrumented, default-off contextual owner-routing candidate.
 contextual-owner-scope = ["tsr_compiler/contextual-owner-scope"]
-compact-node-read = ["tsr_compiler/compact-node-read"]
 
 [dependencies]
 tsr_build = { version = "0.4.0", path = "../tsr_build" }
