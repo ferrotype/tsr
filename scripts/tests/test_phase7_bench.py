@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'scripts'))
 from tools.phase7.api import capture as api  # noqa: E402
-from tools.phase7.bench import capture, common, pairs  # noqa: E402
+from tools.phase7.bench import build as ordinary_build, capture, common, pairs, pgo  # noqa: E402
 import perf  # noqa: E402
 
 SHA = 'a' * 64
@@ -201,6 +201,98 @@ class ConcurrentPairTests(unittest.TestCase):
     def screen(self, output, mode='check', count=1, **options):
         return pairs.screen(self.descriptor, self.control, self.candidate, output,
                             mode=mode, checkers=4, pairs=count, timeout=17, **options)
+
+    def saved_builds(self):
+        paths = {}
+        for name, binary in [('control', self.control), ('candidate', self.candidate)]:
+            path = self.root / (name + '-build.json')
+            path.write_text(json.dumps({'complete': True, 'source_stable': True, 'exit': 0, 'pgo': False,
+                                       'binary': common.identity(binary), 'sources': {'code.rs': name},
+                                       'release_configuration': ['fat-lto'], 'cargo_configuration': {},
+                                       'toolchain': {'channel': 'pinned', 'host': 'host', 'rustc': 'pinned compiler'},
+                                       'features': []}))
+            paths[name + '_build'] = path
+        self.enterContext(mock.patch.object(pgo, 'environment', return_value={}))
+        self.enterContext(mock.patch.object(pgo, 'source_identity', return_value={'code.rs': 'candidate'}))
+        self.enterContext(mock.patch.object(pgo.benchmark, 'cargo_configuration', return_value={}))
+        return paths
+
+    def exact_result(self):
+        result = self.result()
+        result['stdout'] += 'Identifiers: 20\nSymbols: 30\nInstantiations: 40\nMemory allocs: 100\nBind time: 0.000s\n'
+        return result
+
+    def test_build_verified_screen_keeps_sources_preflights_and_phase_summaries(self):
+        builds = self.saved_builds()
+        with mock.patch.object(pgo, 'preflight', return_value={'content': 'same'}) as preflight, \
+                mock.patch.object(common, 'run', side_effect=lambda *a, **k: self.exact_result()):
+            report = self.screen(self.root / 'verified', **builds)
+        self.assertTrue(report['complete'])
+        self.assertEqual(preflight.call_count, 4)
+        self.assertEqual([call.args[-1].name for call in preflight.call_args_list],
+                         ['before-control', 'before-candidate', 'after-control', 'after-candidate'])
+        self.assertEqual(report['source_changes'], [{'path': 'code.rs', 'control_sha256': 'control',
+                                                     'candidate_sha256': 'candidate'}])
+        self.assertEqual(report['diagnostic_summary']['Memory allocs']['paired_median_saved'], 0)
+        self.assertIsNone(report['diagnostic_summary']['Bind time']['paired_median_ratio'])
+
+    def test_manifest_mismatch_or_stale_source_cannot_start_timing(self):
+        builds = self.saved_builds()
+        for name, mutate, message in [
+            ('configuration', lambda value: value.update(release_configuration=['thin']), 'release_configuration'),
+            ('binary', lambda value: value['binary'].update(sha256='bad'), 'executable differs'),
+            ('instrumented', lambda value: value.update(features=['operation-experiments']), 'instrumented'),
+            ('creation-trace', lambda value: value.update(features=['creation-trace']), 'instrumented'),
+            ('hidden-trace', lambda value: value.update(workspace_features={'crates/tsr_checker/Cargo.toml': ['creation-trace']}), 'instrumented'),
+            ('source', lambda value: value.update(sources={'code.rs': 'stale'}), 'current source'),
+        ]:
+            with self.subTest(name=name):
+                path = builds['candidate_build']
+                original = path.read_text()
+                value = json.loads(original)
+                mutate(value)
+                path.write_text(json.dumps(value))
+                with mock.patch.object(common, 'run') as run, mock.patch.object(pgo, 'preflight') as preflight, \
+                        self.assertRaisesRegex(ValueError, message):
+                    self.screen(self.root / name, **builds)
+                run.assert_not_called()
+                preflight.assert_not_called()
+                path.write_text(original)
+
+    def test_preflight_disagreement_stops_before_timing_and_postflight_change_keeps_raw_pair(self):
+        builds = self.saved_builds()
+        for name, values, count in [('before', [{'hash': 1}, {'hash': 2}], 0),
+                                    ('after', [{'hash': 1}] * 3 + [{'hash': 2}], 1)]:
+            with self.subTest(name=name), mock.patch.object(pgo, 'preflight', side_effect=values), \
+                    mock.patch.object(common, 'run', side_effect=lambda *a, **k: self.exact_result()) as run, \
+                    self.assertRaisesRegex(ValueError, 'inputs or options'):
+                self.screen(self.root / name, **builds)
+            self.assertEqual(run.call_count, count * 2)
+            report = json.loads((self.root / name / 'summary.json').read_text())
+            self.assertFalse(report['complete'])
+            self.assertEqual(len(report['pairs']), count)
+
+    def test_manifest_mode_requires_all_work_counters_to_match(self):
+        builds = self.saved_builds()
+        def run(binary, *args, **kwargs):
+            result = self.exact_result()
+            if binary == self.candidate:
+                result['stdout'] = result['stdout'].replace('Symbols: 30', 'Symbols: 31')
+            return result
+        with mock.patch.object(pgo, 'preflight', return_value={}), mock.patch.object(common, 'run', side_effect=run), \
+                self.assertRaisesRegex(ValueError, 'work counter Symbols'):
+            self.screen(self.root / 'work-drift', **builds)
+        self.assertTrue((self.root / 'work-drift/0-candidate.stdout').exists())
+
+    def test_binary_changes_during_even_an_unverified_screen_are_rejected(self):
+        def run(binary, *args, **kwargs):
+            if binary == self.candidate:
+                binary.write_bytes(b'replaced executable')
+            return self.result()
+        with mock.patch.object(common, 'run', side_effect=run), \
+                self.assertRaisesRegex(ValueError, 'executable changed'):
+            self.screen(self.root / 'changed-binary')
+        self.assertFalse(json.loads((self.root / 'changed-binary/summary.json').read_text())['complete'])
 
     def test_pairs_overlap_and_hash_after_both_finish_with_paired_medians(self):
         rendezvous = threading.Barrier(2)
@@ -493,6 +585,67 @@ class ConcurrentPairTests(unittest.TestCase):
         report = json.loads((output / 'summary.json').read_text())
         self.assertTrue(report['complete'])
         self.assertEqual(report['method'], 'serial pairs; alternating execution order; no profiler')
+
+
+class OrdinaryBuildTests(unittest.TestCase):
+    def setUp(self):
+        self.root = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
+        self.executable = self.root / 'built-tsrust'
+        self.executable.write_bytes(b'ordinary compiler')
+        self.enterContext(mock.patch.object(pgo, 'environment', return_value={}))
+        self.enterContext(mock.patch.object(pgo, 'source_identity', return_value={'a.rs': SHA}))
+        self.enterContext(mock.patch.object(pgo.benchmark, 'release_configuration', return_value=['--config', 'fat-lto']))
+        self.enterContext(mock.patch.object(pgo.benchmark, 'cargo_configuration', return_value={}))
+        self.enterContext(mock.patch.object(pgo.benchmark, 'rust_native_toolchain', return_value=('pinned', 'host')))
+        self.enterContext(mock.patch.object(ordinary_build.subprocess, 'check_output', return_value='version\n'))
+        artifact = {'reason': 'compiler-artifact', 'target': {'name': 'tsrust', 'kind': ['bin']},
+                    'manifest_path': str(ROOT / 'crates/tsrust/Cargo.toml'),
+                    'features': ['compact-node-read'], 'executable': str(self.executable)}
+        self.result = {'exit': 0, 'stdout': json.dumps(artifact)}
+
+    def test_build_saves_selected_artifact_sources_and_explicit_features(self):
+        with mock.patch.object(pgo, 'execute', return_value=self.result) as execute:
+            report = ordinary_build.build(self.root / 'saved', ['compact-node-read'])
+        self.assertTrue(report['complete'])
+        self.assertEqual(report['binary'], common.identity(self.root / 'saved/tsrust'))
+        self.assertEqual(report['features'], ['compact-node-read'])
+        self.assertEqual(report['workspace_features'], {'crates/tsrust/Cargo.toml': ['compact-node-read']})
+        self.assertEqual(report['sources'], {'a.rs': SHA})
+        self.assertEqual(execute.call_args.args[0][-2:], ['--features', 'compact-node-read'])
+        self.assertIn('--locked', execute.call_args.args[0])
+        self.assertFalse(report['pgo'])
+
+    def test_instrumented_requests_and_resolved_dependency_features_are_rejected(self):
+        for feature in ('creation-trace', 'relation-probe', 'storage-pilot', 'tsr_checker/creation-trace'):
+            with self.subTest(feature=feature), mock.patch.object(pgo, 'execute') as execute, \
+                    self.assertRaisesRegex(ValueError, 'instrumented'):
+                ordinary_build.build(self.root / feature.replace('/', '-'), [feature])
+            execute.assert_not_called()
+        trace = {'reason': 'compiler-artifact', 'target': {'name': 'tsr_checker', 'kind': ['lib']},
+                 'manifest_path': str(ROOT / 'crates/tsr_checker/Cargo.toml'), 'features': ['creation-trace']}
+        result = {**self.result, 'stdout': self.result['stdout'] + '\n' + json.dumps(trace)}
+        with mock.patch.object(pgo, 'execute', return_value=result), self.assertRaisesRegex(ValueError, 'instrumented'):
+            ordinary_build.build(self.root / 'hidden-dependency-feature')
+        self.assertFalse((self.root / 'hidden-dependency-feature/tsrust').exists())
+
+    def test_failed_build_or_source_change_preserves_an_incomplete_record(self):
+        for name in ('failure', 'source-change'):
+            with self.subTest(name=name), mock.patch.object(pgo, 'execute', return_value={**self.result, 'exit': 1 if name == 'failure' else 0}), \
+                    mock.patch.object(pgo, 'source_identity', side_effect=[{'a.rs': SHA}, {'a.rs': 'changed'}]), \
+                    self.assertRaises(ValueError):
+                ordinary_build.build(self.root / name)
+            record = json.loads((self.root / name / 'build.json').read_text())
+            self.assertFalse(record['complete'])
+            self.assertIn('error', record)
+            self.assertFalse((self.root / name / 'tsrust').exists())
+
+    def test_existing_or_target_output_never_builds(self):
+        with mock.patch.object(pgo, 'execute') as execute:
+            with self.assertRaises(ValueError):
+                ordinary_build.build(self.root / 'target/saved')
+            with self.assertRaises(FileExistsError):
+                ordinary_build.build(self.root)
+        execute.assert_not_called()
 
 
 def pair(index, go_wall, rust_wall):
