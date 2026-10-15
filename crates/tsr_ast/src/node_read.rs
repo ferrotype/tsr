@@ -5,7 +5,7 @@ use tsr_arena::{AuxId, FileId, StorageOwner, StorageRead, StorageTransaction, St
 use tsr_jsstring::SourceText;
 
 /// A node read borrows its physical owner. Lazy payload references cannot outlive
-/// the read's publication guard. Escaping requires `RetainedNode`.
+/// the read's retained lazy guard. Escaping requires `RetainedNode`.
 ///
 /// ```compile_fail
 /// use tsr_ast::{AstFile, NodeId};
@@ -30,44 +30,6 @@ pub struct NodeRead<'a> {
     #[cfg(feature = "access-stats")]
     used: std::cell::Cell<u8>,
 }
-// The normal build retains its original four-way record. The experiment puts
-// the non-core representations behind one allocation; a core read remains
-// two direct borrows. In particular, a lazy read still owns its StorageRead
-// publication guard and never fabricates an owner-lifetime borrow from it.
-macro_rules! define_cold_variants {
-    ($name:ident $(, $($extra:tt)*)?) => {
-        enum $name<'a> {
-            $($($extra)*)?
-            TransactionCore {
-                header: &'a StoredNode,
-                owner: &'a StorageTransaction<'a, StoredNode>,
-                #[cfg(feature = "contextual-payload-experiment")]
-                typed_payload_fields: bool,
-            },
-            Owned {
-                node: &'a Node,
-                source: &'a SourceText,
-                owner_id: FileId,
-            },
-            Lazy {
-                record: StorageRead<'a, AstStorageData>,
-                owner: &'a StorageOwner<StoredNode>,
-            },
-        }
-    };
-}
-#[cfg(not(feature = "compact-node-read"))]
-define_cold_variants!(ReadRecord,
-    Core {
-        header: &'a StoredNode,
-        owner: &'a StorageOwner<StoredNode>,
-        #[cfg(feature = "contextual-payload-experiment")]
-        typed_payload_fields: bool,
-    },
-);
-#[cfg(feature = "compact-node-read")]
-define_cold_variants!(ColdRead);
-#[cfg(feature = "compact-node-read")]
 enum ReadRecord<'a> {
     Core {
         header: &'a StoredNode,
@@ -75,50 +37,64 @@ enum ReadRecord<'a> {
         #[cfg(feature = "contextual-payload-experiment")]
         typed_payload_fields: bool,
     },
-    Cold(Box<ColdRead<'a>>),
+    TransactionCore {
+        header: &'a StoredNode,
+        owner: &'a StorageTransaction<'a, StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
+    },
+    #[cfg(not(feature = "compact-node-read"))]
+    Owned {
+        node: &'a Node,
+        source: &'a SourceText,
+        owner_id: FileId,
+    },
+    #[cfg(feature = "compact-node-read")]
+    OwnedFile {
+        node: &'a Node,
+        owner: &'a StorageOwner<StoredNode>,
+    },
+    #[cfg(feature = "compact-node-read")]
+    OwnedTransaction {
+        node: &'a Node,
+        owner: &'a StorageTransaction<'a, StoredNode>,
+    },
+    Lazy {
+        #[cfg(not(feature = "compact-node-read"))]
+        record: StorageRead<'a, AstStorageData>,
+        #[cfg(feature = "compact-node-read")]
+        record: std::sync::Arc<Node>,
+        owner: &'a StorageOwner<StoredNode>,
+    },
+}
+// Select the physical context directly, without reconstructing a large read
+// enum. The experimental owned variants each carry only the node and context.
+#[cfg(not(feature = "compact-node-read"))]
+macro_rules! file_context {
+    ($owner:pat) => {
+        ReadRecord::Core { owner: $owner, .. } | ReadRecord::Lazy { owner: $owner, .. }
+    };
 }
 #[cfg(feature = "compact-node-read")]
-impl<'a> ReadRecord<'a> {
-    #[inline]
-    fn cold(record: ColdRead<'a>) -> Self {
-        #[cfg(feature = "access-stats")]
-        crate::access_stats::bump(&crate::access_stats::COLD_READ_ALLOCATIONS);
-        Self::Cold(Box::new(record))
-    }
+macro_rules! file_context {
+    ($owner:pat) => {
+        ReadRecord::Core { owner: $owner, .. }
+            | ReadRecord::Lazy { owner: $owner, .. }
+            | ReadRecord::OwnedFile { owner: $owner, .. }
+    };
 }
-// Keep the accessor logic shared without normalizing the compact record back
-// into a large temporary enum. Core access is a direct outer match; the cold
-// match only borrows the existing box. `as_mut` is used only for the optional
-// typed-field selector, and never moves or reacquires a lazy page guard.
-macro_rules! match_read_record {
-    ($record:expr, $borrow:ident, $cold:ident, $core:pat => $core_result:expr, $($cold_arms:tt)*) => {{
-        #[cfg(not(feature = "compact-node-read"))]
-        {
-            use ReadRecord as $cold;
-            match $record {
-                $core => $core_result,
-                $($cold_arms)*
-            }
-        }
-        #[cfg(feature = "compact-node-read")]
-        {
-            use ColdRead as $cold;
-            match $record {
-                $core => $core_result,
-                ReadRecord::Cold(record) => match record.$borrow() {
-                    $($cold_arms)*
-                },
-            }
-        }
-    }};
+#[cfg(not(feature = "compact-node-read"))]
+macro_rules! transaction_context {
+    ($owner:pat) => {
+        ReadRecord::TransactionCore { owner: $owner, .. }
+    };
 }
-macro_rules! cold_record {
-    ($variant:ident { $($fields:tt)* }) => {{
-        #[cfg(not(feature = "compact-node-read"))]
-        { ReadRecord::$variant { $($fields)* } }
-        #[cfg(feature = "compact-node-read")]
-        { ReadRecord::cold(ColdRead::$variant { $($fields)* }) }
-    }};
+#[cfg(feature = "compact-node-read")]
+macro_rules! transaction_context {
+    ($owner:pat) => {
+        ReadRecord::TransactionCore { owner: $owner, .. }
+            | ReadRecord::OwnedTransaction { owner: $owner, .. }
+    };
 }
 impl std::fmt::Debug for NodeRead<'_> {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -160,16 +136,30 @@ impl<'a> NodeRead<'a> {
         crate::access_stats::bump(&crate::access_stats::READS_LAZY);
         let aux = AuxId::from_parts(owner.lazy_auxiliary_arena(), record.ordinal)
             .expect("lazy payload slot");
+        let record = crate::auxiliary::AuxRead::resolved(
+            owner.aux(aux).expect("published lazy payload"),
+            owner,
+        )
+        .into_full()
+        .expect("lazy payload is full");
+        #[cfg(feature = "compact-node-read")]
+        let record = {
+            // Clone only the published payload while its page guard is alive.
+            // Published lazy records cannot be edited by a later transaction.
+            // The physical-owner borrow below still keeps source/dependencies
+            // live, and every payload borrow remains bounded by this read.
+            let AstStorageData::FallbackNode(node) = &*record else {
+                unreachable!("lazy header names its owned payload")
+            };
+            #[cfg(feature = "access-stats")]
+            crate::access_stats::bump(&crate::access_stats::LAZY_READ_NODE_RETAINS);
+            std::sync::Arc::clone(node)
+        };
         Self {
-            record: cold_record!(Lazy {
-                record: crate::auxiliary::AuxRead::resolved(
-                    owner.aux(aux).expect("published lazy payload"),
-                    owner,
-                )
-                .into_full()
-                .expect("lazy payload is full"),
+            record: ReadRecord::Lazy {
+                record,
                 owner: owner.physical_owner(),
-            }),
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -203,31 +193,54 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_TRANSACTION);
         Self {
-            record: cold_record!(TransactionCore {
+            record: ReadRecord::TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
                 typed_payload_fields: false,
-            }),
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
         }
     }
-    pub(crate) fn owned(
+    pub(crate) fn owned_file(
         id: NodeId,
         node: &'a Node,
-        owner_id: FileId,
-        source: &'a SourceText,
+        owner: &'a StorageOwner<StoredNode>,
     ) -> Self {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_OWNED);
         Self {
-            record: cold_record!(Owned {
+            #[cfg(not(feature = "compact-node-read"))]
+            record: ReadRecord::Owned {
                 node,
-                source,
-                owner_id,
-            }),
+                source: owner.source_text(),
+                owner_id: owner.id(),
+            },
+            #[cfg(feature = "compact-node-read")]
+            record: ReadRecord::OwnedFile { node, owner },
+            id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
+        }
+    }
+    pub(crate) fn owned_transaction(
+        id: NodeId,
+        node: &'a Node,
+        owner: &'a StorageTransaction<'a, StoredNode>,
+    ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_OWNED);
+        Self {
+            #[cfg(not(feature = "compact-node-read"))]
+            record: ReadRecord::Owned {
+                node,
+                source: owner.source(),
+                owner_id: owner.owner_id(),
+            },
+            #[cfg(feature = "compact-node-read")]
+            record: ReadRecord::OwnedTransaction { node, owner },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -259,36 +272,45 @@ impl<'a> NodeRead<'a> {
     #[inline]
     #[must_use]
     pub fn with_typed_payload_fields(mut self, enabled: bool) -> Self {
-        match_read_record!(&mut self.record, as_mut, Cold,
-            ReadRecord::Core { typed_payload_fields, .. } => *typed_payload_fields = enabled,
-            Cold::TransactionCore { typed_payload_fields, .. } => *typed_payload_fields = enabled,
-            Cold::Owned { .. } | Cold::Lazy { .. } => {},
-        );
+        match &mut self.record {
+            ReadRecord::Core {
+                typed_payload_fields,
+                ..
+            }
+            | ReadRecord::TransactionCore {
+                typed_payload_fields,
+                ..
+            } => *typed_payload_fields = enabled,
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Owned { .. } | ReadRecord::Lazy { .. } => {}
+            #[cfg(feature = "compact-node-read")]
+            ReadRecord::OwnedFile { .. }
+            | ReadRecord::OwnedTransaction { .. }
+            | ReadRecord::Lazy { .. } => {}
+        }
         self
     }
     pub fn owner_id(&self) -> FileId {
-        match_read_record!(&self.record, as_ref, Cold,
-            ReadRecord::Core { owner, .. } => owner.id(),
-            Cold::Lazy { owner, .. } => owner.id(),
-            Cold::TransactionCore { owner, .. } => owner.owner_id(),
-            Cold::Owned { owner_id, .. } => *owner_id,
-        )
+        match self.record {
+            file_context!(owner) => owner.id(),
+            transaction_context!(owner) => owner.owner_id(),
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Owned { owner_id, .. } => owner_id,
+        }
     }
     pub fn source(&self) -> &'a SourceText {
         self.touch(2);
-        match_read_record!(&self.record, as_ref, Cold,
-            ReadRecord::Core { owner, .. } => owner.source_text(),
-            Cold::Lazy { owner, .. } => owner.source_text(),
-            Cold::TransactionCore { owner, .. } => owner.source(),
-            Cold::Owned { source, .. } => *source,
-        )
+        match self.record {
+            file_context!(owner) => owner.source_text(),
+            transaction_context!(owner) => owner.source(),
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Owned { source, .. } => source,
+        }
     }
     /// A directly borrowed read can retain its owner's lifetime. A directory
-    /// resolved lazy read must stay bounded by its publication guard instead.
-    /// Under the compact-read experiment, reborrowing a transaction or owned
-    /// read also allocates a fresh cold box; the allocation counter includes it.
+    /// resolved lazy read must stay bounded by its retained payload guard instead.
     pub fn as_borrowed(&self) -> Option<Self> {
-        let record = match_read_record!(&self.record, as_ref, Cold,
+        let record = match self.record {
             ReadRecord::Core {
                 header,
                 owner,
@@ -298,26 +320,37 @@ impl<'a> NodeRead<'a> {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
-                typed_payload_fields: *typed_payload_fields,
+                typed_payload_fields,
             },
-            Cold::TransactionCore {
+            ReadRecord::TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
                 typed_payload_fields,
-            } => cold_record!(TransactionCore {
+            } => ReadRecord::TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
-                typed_payload_fields: *typed_payload_fields,
-            }),
-            Cold::Owned { node, source, owner_id } => cold_record!(Owned {
+                typed_payload_fields,
+            },
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Owned {
                 node,
                 source,
-                owner_id: *owner_id,
-            }),
-            Cold::Lazy { .. } => return None,
-        );
+                owner_id,
+            } => ReadRecord::Owned {
+                node,
+                source,
+                owner_id,
+            },
+            #[cfg(feature = "compact-node-read")]
+            ReadRecord::OwnedFile { node, owner } => ReadRecord::OwnedFile { node, owner },
+            #[cfg(feature = "compact-node-read")]
+            ReadRecord::OwnedTransaction { node, owner } => {
+                ReadRecord::OwnedTransaction { node, owner }
+            }
+            ReadRecord::Lazy { .. } => return None,
+        };
         Some(Self {
             record,
             id: self.id,
@@ -326,42 +359,50 @@ impl<'a> NodeRead<'a> {
         })
     }
     fn owned_record(&self) -> Option<&Node> {
-        match_read_record!(&self.record, as_ref, Cold,
-            ReadRecord::Core { .. } => None,
-            Cold::Owned { node, .. } => Some(*node),
-            Cold::Lazy { record, .. } => match &**record {
+        match &self.record {
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Owned { node, .. } => Some(node),
+            #[cfg(feature = "compact-node-read")]
+            ReadRecord::OwnedFile { node, .. } | ReadRecord::OwnedTransaction { node, .. } => {
+                Some(node)
+            }
+            #[cfg(feature = "compact-node-read")]
+            ReadRecord::Lazy { record, .. } => Some(record),
+            #[cfg(not(feature = "compact-node-read"))]
+            ReadRecord::Lazy { record, .. } => match &**record {
                 AstStorageData::FallbackNode(node) => Some(node),
                 _ => unreachable!("lazy header names its owned payload"),
             },
-            Cold::TransactionCore { .. } => None,
-        )
+            ReadRecord::Core { .. } | ReadRecord::TransactionCore { .. } => None,
+        }
     }
     #[inline]
     fn core_header(&self) -> Option<&'a StoredNode> {
-        match_read_record!(&self.record, as_ref, Cold,
-            ReadRecord::Core { header, .. } => Some(*header),
-            Cold::TransactionCore { header, .. } => Some(*header),
-            Cold::Owned { .. } | Cold::Lazy { .. } => None,
-        )
+        match self.record {
+            ReadRecord::Core { header, .. } | ReadRecord::TransactionCore { header, .. } => {
+                Some(header)
+            }
+            _ => None,
+        }
     }
     /// Assemble decode context only when a compact field is actually requested.
     #[inline]
     pub(crate) fn compact_context(&self) -> CompactContext<'_> {
-        match_read_record!(&self.record, as_ref, Cold,
+        match self.record {
             ReadRecord::Core { owner, .. } => CompactContext {
                 nodes: owner.id().arena(),
                 auxiliary: owner.auxiliary_arena(),
                 source: owner.source_text(),
                 store: owner.store(),
             },
-            Cold::TransactionCore { owner, .. } => CompactContext {
+            ReadRecord::TransactionCore { owner, .. } => CompactContext {
                 nodes: owner.owner_id().arena(),
                 auxiliary: owner.core_auxiliary_arena(),
                 source: owner.source(),
                 store: owner.store(),
             },
-            Cold::Owned { .. } | Cold::Lazy { .. } => unreachable!("compact decode requires a core header"),
-        )
+            _ => unreachable!("compact decode requires a core header"),
+        }
     }
     /// Explicit construction copy used by unrestricted exclusive edits and cold
     /// published overlays; ordinary payload reads never reconstruct a node.
@@ -541,15 +582,21 @@ impl crate::NodeAccess for NodeRead<'_> {
     #[cfg(feature = "contextual-payload-experiment")]
     #[inline]
     fn typed_payload_shape(&self) -> Option<u16> {
-        let shape = match_read_record!(&self.record, as_ref, Cold,
-            ReadRecord::Core { header, typed_payload_fields, .. } => typed_payload_fields.then(|| header.actual_shape()),
-            Cold::TransactionCore { header, typed_payload_fields, .. } => typed_payload_fields.then(|| header.actual_shape()),
-            Cold::Owned { .. } | Cold::Lazy { .. } => None,
-        );
-        if shape.is_some() {
-            self.touch(2);
+        let (ReadRecord::Core {
+            header,
+            typed_payload_fields: true,
+            ..
         }
-        shape
+        | ReadRecord::TransactionCore {
+            header,
+            typed_payload_fields: true,
+            ..
+        }) = self.record
+        else {
+            return None;
+        };
+        self.touch(2);
+        Some(header.actual_shape())
     }
     fn kind(&self) -> crate::NodeKind {
         self.kind()

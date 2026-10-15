@@ -277,13 +277,13 @@ fn main() {
     match run() {
         Ok(report) => {
             // Counting runs are separate from uninstrumented compiler timings.
-            // Include cold reborrows, which do not enter a read constructor.
+            // Count the extra payload retains separately from existing page guards.
             #[cfg(feature = "access-stats")]
             eprintln!("node-read-counts {}", tsr_ast::access_stats::report());
             #[cfg(all(feature = "access-stats", feature = "compact-node-read"))]
             eprintln!(
-                "cold-read-allocations {}",
-                tsr_ast::access_stats::cold_read_allocations()
+                "lazy-read-node-retains {}",
+                tsr_ast::access_stats::lazy_read_node_retains()
             );
             println!("{report}");
         }

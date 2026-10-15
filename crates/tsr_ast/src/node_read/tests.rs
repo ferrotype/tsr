@@ -350,3 +350,13 @@ fn payload_views_preserve_shape_dispatch_lists_and_owned_text() {
     drop(file);
     assert_eq!(owned.as_bytes(), bytes);
 }
+
+#[test]
+#[cfg(all(target_pointer_width = "64", not(feature = "compact-node-read")))]
+fn ordinary_node_read_layout_is_unchanged() {
+    assert_eq!(
+        size_of::<crate::NodeRead<'_>>(),
+        40 + 8 * usize::from(cfg!(feature = "access-stats"))
+    );
+    assert_eq!(align_of::<crate::NodeRead<'_>>(), 8);
+}

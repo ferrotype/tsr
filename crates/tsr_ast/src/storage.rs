@@ -628,7 +628,7 @@ impl RetainedNode {
             .for_arena(self.id().arena())
             .expect("retained node owner");
         if let Some(node) = &self.fallback {
-            NodeRead::owned(self.id(), node, owner.id(), owner.source())
+            NodeRead::owned_file(self.id(), node, owner.physical_owner())
         } else {
             NodeRead::resolved(self.id(), &StorageRead::borrowed(&self.record), owner)
         }
@@ -721,7 +721,7 @@ impl<'a> AstView<'a> {
             // its retained owner without reading the parsed record or locking
             // its lazy directory a second time.
             let owner = self.0.for_arena(id.arena())?;
-            return Ok(NodeRead::owned(id, node, owner.id(), owner.source()));
+            return Ok(NodeRead::owned_file(id, node, owner.physical_owner()));
         }
         let (record, owner) = self.0.node_with_owner(id)?;
         Ok(NodeRead::resolved(id, &record, owner))
@@ -1024,12 +1024,9 @@ impl AstTransaction<'_, '_> {
         } else {
             let aux = AuxId::from_parts(self.storage.lazy_auxiliary_arena(), header.ordinal)?;
             match self.auxiliary(aux)?.full_borrowed() {
-                Some(AstStorageData::FallbackNode(node)) => Ok(NodeRead::owned(
-                    id,
-                    node,
-                    self.storage.owner_id(),
-                    self.storage.source(),
-                )),
+                Some(AstStorageData::FallbackNode(node)) => {
+                    Ok(NodeRead::owned_transaction(id, node, self.storage))
+                }
                 _ => Err(Error::InvalidGraph),
             }
         }

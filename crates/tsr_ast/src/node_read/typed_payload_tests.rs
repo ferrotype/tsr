@@ -87,9 +87,8 @@ fn typed_selection_preserves_open_kind_shape_pairs_and_panic_text() {
     // fields select by shape, whereas expression must retain its kind-specific
     // interface-conversion panic. Test both compact and owned construction.
     let root = builder.new_node(K::CallExpression.into(), data.clone().into());
-    let source = SourceText::default();
     let owned = Node::from_factory_parts(K::CallExpression.into(), data.clone().into());
-    let owned_read = NodeRead::owned(root, &owned, builder.id(), &source);
+    let owned_read = NodeRead::owned_file(root, &owned, builder.view().0.physical_owner());
     for typed in [false, true] {
         let owned_read = owned_read
             .as_borrowed()
@@ -121,6 +120,7 @@ fn typed_selection_preserves_open_kind_shape_pairs_and_panic_text() {
             assert_eq!(message, "interface conversion: ast.nodeData is *ast.FunctionExpression, not *ast.CallExpression");
         }
     }
+    drop(owned_read);
     let token = builder.new_node(K::Identifier.into(), NodeData::Token(crate::TokenData {}));
     let read = builder
         .view()

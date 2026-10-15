@@ -1,4 +1,4 @@
-use super::{ColdRead, NodeRead, ReadRecord};
+use super::{NodeRead, ReadRecord};
 use crate::{AstBuilder, FactoryMethods, JsString, SyntaxKind as K};
 use tsr_arena::{Counters, Error};
 use tsr_jsstring::SourceText;
@@ -6,15 +6,14 @@ use tsr_jsstring::SourceText;
 #[test]
 #[cfg(target_pointer_width = "64")]
 fn compact_read_layout_records_the_feature_costs() {
-    // These are layout checks for the experiment, not a portable ABI promise.
-    // The optional typed selector and access-statistics cell each need another
-    // word; neither belongs in an ordinary compiler timing build.
-    let expected = 24
-        + 8 * usize::from(cfg!(feature = "contextual-payload-experiment"))
-        + 8 * usize::from(cfg!(feature = "access-stats"));
-    assert_eq!(size_of::<NodeRead<'_>>(), expected);
+    // A layout assertion for the experiment, not a portable ABI promise.
+    // The enum uses a bool niche when typed selection is compiled in; that
+    // selector fits without growing the ordinary experimental record.
+    assert_eq!(
+        size_of::<NodeRead<'_>>(),
+        32 + 8 * usize::from(cfg!(feature = "access-stats"))
+    );
     assert_eq!(align_of::<NodeRead<'_>>(), 8);
-    assert_eq!(size_of::<ColdRead<'_>>(), 32);
 }
 
 #[test]
@@ -42,11 +41,7 @@ fn cold_reads_keep_transaction_reborrow_and_lazy_publication_guards() {
             .view()
             .jsdoc(first, |transaction| {
                 let core = transaction.node(first)?;
-                assert!(matches!(
-                    &core.record,
-                    ReadRecord::Cold(record)
-                        if matches!(**record, ColdRead::TransactionCore { .. })
-                ));
+                assert!(matches!(&core.record, ReadRecord::TransactionCore { .. }));
                 #[cfg(feature = "contextual-payload-experiment")]
                 let core = core.with_typed_payload_fields(true);
                 let borrowed = core.as_borrowed().unwrap();
@@ -63,7 +58,7 @@ fn cold_reads_keep_transaction_reborrow_and_lazy_publication_guards() {
                 let staged = transaction.node(lazy)?;
                 assert!(matches!(
                     &staged.record,
-                    ReadRecord::Cold(record) if matches!(**record, ColdRead::Owned { .. })
+                    ReadRecord::OwnedTransaction { .. }
                 ));
                 assert_eq!(staged.as_borrowed().unwrap().parent(), Some(first));
                 Ok(vec![lazy])
@@ -71,14 +66,30 @@ fn cold_reads_keep_transaction_reborrow_and_lazy_publication_guards() {
             .unwrap();
         let lazy = roots[0];
         let read = file.view().node(lazy).unwrap();
-        assert!(matches!(
-            &read.record,
-            ReadRecord::Cold(record) if matches!(**record, ColdRead::Lazy { .. })
-        ));
+        assert!(matches!(&read.record, ReadRecord::Lazy { .. }));
         assert!(read.as_borrowed().is_none());
+        let ReadRecord::Lazy {
+            record: payload, ..
+        } = &read.record
+        else {
+            unreachable!()
+        };
+        // This node belongs only to this test. The published page and this
+        // read each retain it once; an escaped handle adds exactly one more.
+        assert_eq!(std::sync::Arc::strong_count(payload), 2);
+        let temporary_retained = file.retain_node(lazy).unwrap();
+        assert_eq!(std::sync::Arc::strong_count(payload), 3);
+        {
+            let borrowed = temporary_retained.read();
+            let again = borrowed.as_borrowed().unwrap();
+            assert_eq!(again.as_identifier().unwrap().text(), b"lazy\xff");
+            assert_eq!(std::sync::Arc::strong_count(payload), 3);
+        }
+        drop(temporary_retained);
+        assert_eq!(std::sync::Arc::strong_count(payload), 2);
         // Hold the read and its typed payload while another transaction grows
-        // the same owner's lazy directory. Boxing must not discard the page
-        // guard or replace it with a directory-relative reference.
+        // the same owner's lazy directory. The read must keep the payload
+        // Arc alive instead of borrowing a directory-relative reference.
         let identifier = read.as_identifier().unwrap();
         file.view()
             .jsdoc(second, |transaction| {
@@ -98,10 +109,7 @@ fn cold_reads_keep_transaction_reborrow_and_lazy_publication_guards() {
         let retained = file.retain_node(lazy).unwrap();
         drop(file);
         let read = retained.read();
-        assert!(matches!(
-            &read.record,
-            ReadRecord::Cold(record) if matches!(**record, ColdRead::Owned { .. })
-        ));
+        assert!(matches!(&read.record, ReadRecord::OwnedFile { .. }));
         assert_eq!(read.id(), lazy);
         assert_eq!(read.kind(), K::Identifier);
         assert_eq!(read.owner_id(), owner_id);
