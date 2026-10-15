@@ -401,3 +401,99 @@ pass with both experiment and recursion-probe features. The 22 runner tests,
 clippy, formatting, generator and tracker validation also pass. Full-corpus
 wasm execution, production timings and PGO timings were not rerun for these
 non-promoted experiments.
+
+## Ordinary compiler screens: owner scope and compact node reads
+
+The next screens use the ordinary `tsrust` executable, rather than the
+operation adapter. Each row contains five concurrent fresh-process
+candidate/control pairs, with alternating submission order. Both children
+finish before output parsing or hashing. The commands use the production
+`--listFiles --extendedDiagnostics` counters; operation instrumentation,
+profilers and PGO are disabled. Two-checker and eight-checker configurations
+are separate comparisons, with the same checker count on both sides. No
+builds, source edits or other tests overlap a timed batch.
+
+All paths in this section are under
+`../ts-rust-benchmarks/2026-10-15/checker-native-scope/`, relative to the
+repository root. The saved control is `baseline/tsrust`, SHA-256
+`b8f5e005c9408dc00887c36ad04a1e72b22278d3c7590a46ba89c819c84d2e9c`.
+Build manifests record the effective release configuration, compiler, feature
+set and source hashes. These builds report revision `284f0f36`, but the
+candidates contain subsequent uncommitted changes: the source maps and their
+recorded differences identify the measured code, not that revision alone.
+Documentation is outside the measured source closure.
+
+Every pair matches the frozen workload's diagnostics and file-output digest,
+and the two executables agree on files, lines, identifiers, symbols, types and
+instantiations. Preflight runs before and after each configuration compare
+actual input bytes and compiler options. Saved executables, build manifests
+and runner helpers are hashed; the independent audits reparse all raw timed
+outputs, recompute the reported ratios and verify process overlap. These are
+Rust-versus-Rust screens, not new Go-relative acceptance measurements.
+
+### Owner selection alone: reject promotion
+
+`owner-scoped/tsrust` enables only `contextual-owner-scope`; its SHA-256 is
+`fd7eb412a7e99cb52bbca5c89682b4eb03626faa5c1a316d13210e594602c20e`.
+`scoped-pairs2/` holds the ten pairs and `independent-audit.json`. Ratios below
+are paired medians, candidate/control; a positive saved value means a faster
+or smaller candidate. They are not ratios or differences of separate medians.
+
+| Workload | Checkers | Wall ratio; saved | Check ratio; saved | User CPU ratio; saved | Peak RSS ratio; saved |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| TypeScript compiler | 2 | 0.9992; 1.06 ms | 1.0020; −2 ms | 1.0002; −0.44 ms | 0.9972; 0.95 MiB |
+| VS Code | 2 | 0.9992; 15.32 ms | 0.9998; 3 ms | 0.9981; 66.79 ms | 0.9979; 11.86 MiB |
+
+The wall pair ranges are 0.9938–1.0028 and 0.9974–1.0017 respectively. The
+earlier operation-level improvement does not produce a useful ordinary
+compiler improvement. **Do not promote owner selection alone, and do not
+spend an eight-checker confirmation on this neutral result.** The feature
+remains available for controlled structural combinations.
+
+### Compact 24-byte read: small tradeoff, still experimental
+
+The `compact-node-read` candidate reduces the read handle to 24 bytes by
+boxing its cold representation. It changes the ordinary AST read path;
+`contextual-owner-scope` is disabled in this comparison. The saved executable
+is `boxed-reader/tsrust`, SHA-256
+`8baf298fc129e58ed1f454fa792b12e1514e23fbb89aea81681a2fb4732ec73f`.
+The thirty pairs are in `boxed-reader-pairs2/` and `boxed-reader-pairs8/`, each
+with an independent audit. `boxed-reader-audit.json` joins the six rows.
+
+| Workload | Checkers | Wall ratio; saved | Check ratio; saved | User CPU ratio; saved | Peak RSS ratio; saved | Extra allocation calls |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| TypeScript compiler | 2 | 0.9847; 20.46 ms | 0.9834; 17 ms | 0.9786; 55.56 ms | 0.9961; 1.31 MiB | 23,391 |
+| VS Code | 2 | 0.9884; 216.37 ms | 0.9867; 220 ms | 0.9880; 412.86 ms | 1.0032; −17.81 MiB | 205,277 |
+| MUI docs | 2 | 1.0053; −86.35 ms | 1.0061; −85 ms | 1.0036; −88.23 ms | 1.0011; −4.13 MiB | 5,582 |
+| TypeScript compiler | 8 | 0.9901; 11.24 ms | 0.9899; 9 ms | 0.9840; 52.68 ms | 1.0024; −1.13 MiB | 23,441 |
+| VS Code | 8 | 0.9916; 78.32 ms | 0.9930; 41 ms | 0.9928; 342.24 ms | 0.9993; 4.59 MiB | 207,460 |
+| MUI docs | 8 | 1.0000; 0.00 ms | 1.0000; 0 ms | 0.9987; 82.07 ms | 1.0054; −34.84 MiB | 5,706 |
+
+At two checkers, the check-time pair ranges are 0.9794–0.9853 for TypeScript,
+0.9843–0.9871 for VS Code and 0.9984–1.0085 for MUI. At eight checkers they
+are 0.9807–0.9977, 0.9884–1.0000 and 0.9932–1.0089 respectively. RSS is
+noisier: individual pair ratios span as much as 4.28 percentage points.
+The allocation column is the paired median difference in the production
+`Memory allocs` counter, not allocated bytes. Deltas vary by at most thirty
+calls across the five samples in each row.
+
+MUI supplies the JS-heavy check missing from the other two workloads:
+11,306 of its 16,766 input files are JavaScript, while the TypeScript and
+VS Code file lists contain none. This establishes input coverage, not how
+often any particular cold AST field is read. In particular, MUI's roughly
+5,600 additional allocation calls do **not** establish that allocator cost
+causes its small timing regression. The samples do not isolate that cause.
+
+**Keep the 24-byte representation experimental; do not promote it.** It
+delivers small TypeScript/VS Code checking gains, introduces allocation
+traffic and does not improve MUI consistently. The next bounded alternative
+is a 32-byte allocation-free read representation. Its CPU result is unknown;
+it must be measured against the saved control on these same workloads, not
+predicted by subtracting the boxing cost or adding the owner-scope result.
+
+With both experimental features enabled, the focused compiler check passes
+13 variants / 117 sub-tests, including the seven prior contextual/control-flow
+cases plus JSDoc rest parameters, typedefs and JSDoc contextual typing.
+`parity/validation.json` records actual Cargo features, stable source/runner
+identities and unchanged expectations. This is bounded correctness coverage,
+not a full-corpus claim.

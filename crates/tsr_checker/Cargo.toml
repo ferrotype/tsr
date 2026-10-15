@@ -13,6 +13,8 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = []
 storage-pilot = ["dep:serde_json"]
 relation-probe = ["dep:serde_json"]
 # Contract-only stack/depth observation and panic injection; excluded from the

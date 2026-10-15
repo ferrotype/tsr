@@ -30,6 +30,44 @@ pub struct NodeRead<'a> {
     #[cfg(feature = "access-stats")]
     used: std::cell::Cell<u8>,
 }
+// The normal build retains its original four-way record. The experiment puts
+// the non-core representations behind one allocation; a core read remains
+// two direct borrows. In particular, a lazy read still owns its StorageRead
+// publication guard and never fabricates an owner-lifetime borrow from it.
+macro_rules! define_cold_variants {
+    ($name:ident $(, $($extra:tt)*)?) => {
+        enum $name<'a> {
+            $($($extra)*)?
+            TransactionCore {
+                header: &'a StoredNode,
+                owner: &'a StorageTransaction<'a, StoredNode>,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields: bool,
+            },
+            Owned {
+                node: &'a Node,
+                source: &'a SourceText,
+                owner_id: FileId,
+            },
+            Lazy {
+                record: StorageRead<'a, AstStorageData>,
+                owner: &'a StorageOwner<StoredNode>,
+            },
+        }
+    };
+}
+#[cfg(not(feature = "compact-node-read"))]
+define_cold_variants!(ReadRecord,
+    Core {
+        header: &'a StoredNode,
+        owner: &'a StorageOwner<StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
+    },
+);
+#[cfg(feature = "compact-node-read")]
+define_cold_variants!(ColdRead);
+#[cfg(feature = "compact-node-read")]
 enum ReadRecord<'a> {
     Core {
         header: &'a StoredNode,
@@ -37,21 +75,50 @@ enum ReadRecord<'a> {
         #[cfg(feature = "contextual-payload-experiment")]
         typed_payload_fields: bool,
     },
-    TransactionCore {
-        header: &'a StoredNode,
-        owner: &'a StorageTransaction<'a, StoredNode>,
-        #[cfg(feature = "contextual-payload-experiment")]
-        typed_payload_fields: bool,
-    },
-    Owned {
-        node: &'a Node,
-        source: &'a SourceText,
-        owner_id: FileId,
-    },
-    Lazy {
-        record: StorageRead<'a, AstStorageData>,
-        owner: &'a StorageOwner<StoredNode>,
-    },
+    Cold(Box<ColdRead<'a>>),
+}
+#[cfg(feature = "compact-node-read")]
+impl<'a> ReadRecord<'a> {
+    #[inline]
+    fn cold(record: ColdRead<'a>) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::COLD_READ_ALLOCATIONS);
+        Self::Cold(Box::new(record))
+    }
+}
+// Keep the accessor logic shared without normalizing the compact record back
+// into a large temporary enum. Core access is a direct outer match; the cold
+// match only borrows the existing box. `as_mut` is used only for the optional
+// typed-field selector, and never moves or reacquires a lazy page guard.
+macro_rules! match_read_record {
+    ($record:expr, $borrow:ident, $cold:ident, $core:pat => $core_result:expr, $($cold_arms:tt)*) => {{
+        #[cfg(not(feature = "compact-node-read"))]
+        {
+            use ReadRecord as $cold;
+            match $record {
+                $core => $core_result,
+                $($cold_arms)*
+            }
+        }
+        #[cfg(feature = "compact-node-read")]
+        {
+            use ColdRead as $cold;
+            match $record {
+                $core => $core_result,
+                ReadRecord::Cold(record) => match record.$borrow() {
+                    $($cold_arms)*
+                },
+            }
+        }
+    }};
+}
+macro_rules! cold_record {
+    ($variant:ident { $($fields:tt)* }) => {{
+        #[cfg(not(feature = "compact-node-read"))]
+        { ReadRecord::$variant { $($fields)* } }
+        #[cfg(feature = "compact-node-read")]
+        { ReadRecord::cold(ColdRead::$variant { $($fields)* }) }
+    }};
 }
 impl std::fmt::Debug for NodeRead<'_> {
     fn fmt(&self, out: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -94,7 +161,7 @@ impl<'a> NodeRead<'a> {
         let aux = AuxId::from_parts(owner.lazy_auxiliary_arena(), record.ordinal)
             .expect("lazy payload slot");
         Self {
-            record: ReadRecord::Lazy {
+            record: cold_record!(Lazy {
                 record: crate::auxiliary::AuxRead::resolved(
                     owner.aux(aux).expect("published lazy payload"),
                     owner,
@@ -102,7 +169,7 @@ impl<'a> NodeRead<'a> {
                 .into_full()
                 .expect("lazy payload is full"),
                 owner: owner.physical_owner(),
-            },
+            }),
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -136,12 +203,12 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_TRANSACTION);
         Self {
-            record: ReadRecord::TransactionCore {
+            record: cold_record!(TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
                 typed_payload_fields: false,
-            },
+            }),
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -156,11 +223,11 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_OWNED);
         Self {
-            record: ReadRecord::Owned {
+            record: cold_record!(Owned {
                 node,
                 source,
                 owner_id,
-            },
+            }),
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -192,38 +259,36 @@ impl<'a> NodeRead<'a> {
     #[inline]
     #[must_use]
     pub fn with_typed_payload_fields(mut self, enabled: bool) -> Self {
-        match &mut self.record {
-            ReadRecord::Core {
-                typed_payload_fields,
-                ..
-            }
-            | ReadRecord::TransactionCore {
-                typed_payload_fields,
-                ..
-            } => *typed_payload_fields = enabled,
-            ReadRecord::Owned { .. } | ReadRecord::Lazy { .. } => {}
-        }
+        match_read_record!(&mut self.record, as_mut, Cold,
+            ReadRecord::Core { typed_payload_fields, .. } => *typed_payload_fields = enabled,
+            Cold::TransactionCore { typed_payload_fields, .. } => *typed_payload_fields = enabled,
+            Cold::Owned { .. } | Cold::Lazy { .. } => {},
+        );
         self
     }
     pub fn owner_id(&self) -> FileId {
-        match self.record {
-            ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.id(),
-            ReadRecord::TransactionCore { owner, .. } => owner.owner_id(),
-            ReadRecord::Owned { owner_id, .. } => owner_id,
-        }
+        match_read_record!(&self.record, as_ref, Cold,
+            ReadRecord::Core { owner, .. } => owner.id(),
+            Cold::Lazy { owner, .. } => owner.id(),
+            Cold::TransactionCore { owner, .. } => owner.owner_id(),
+            Cold::Owned { owner_id, .. } => *owner_id,
+        )
     }
     pub fn source(&self) -> &'a SourceText {
         self.touch(2);
-        match self.record {
-            ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.source_text(),
-            ReadRecord::TransactionCore { owner, .. } => owner.source(),
-            ReadRecord::Owned { source, .. } => source,
-        }
+        match_read_record!(&self.record, as_ref, Cold,
+            ReadRecord::Core { owner, .. } => owner.source_text(),
+            Cold::Lazy { owner, .. } => owner.source_text(),
+            Cold::TransactionCore { owner, .. } => owner.source(),
+            Cold::Owned { source, .. } => *source,
+        )
     }
     /// A directly borrowed read can retain its owner's lifetime. A directory
     /// resolved lazy read must stay bounded by its publication guard instead.
+    /// Under the compact-read experiment, reborrowing a transaction or owned
+    /// read also allocates a fresh cold box; the allocation counter includes it.
     pub fn as_borrowed(&self) -> Option<Self> {
-        let record = match self.record {
+        let record = match_read_record!(&self.record, as_ref, Cold,
             ReadRecord::Core {
                 header,
                 owner,
@@ -233,30 +298,26 @@ impl<'a> NodeRead<'a> {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
-                typed_payload_fields,
+                typed_payload_fields: *typed_payload_fields,
             },
-            ReadRecord::TransactionCore {
+            Cold::TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
                 typed_payload_fields,
-            } => ReadRecord::TransactionCore {
+            } => cold_record!(TransactionCore {
                 header,
                 owner,
                 #[cfg(feature = "contextual-payload-experiment")]
-                typed_payload_fields,
-            },
-            ReadRecord::Owned {
+                typed_payload_fields: *typed_payload_fields,
+            }),
+            Cold::Owned { node, source, owner_id } => cold_record!(Owned {
                 node,
                 source,
-                owner_id,
-            } => ReadRecord::Owned {
-                node,
-                source,
-                owner_id,
-            },
-            ReadRecord::Lazy { .. } => return None,
-        };
+                owner_id: *owner_id,
+            }),
+            Cold::Lazy { .. } => return None,
+        );
         Some(Self {
             record,
             id: self.id,
@@ -265,42 +326,42 @@ impl<'a> NodeRead<'a> {
         })
     }
     fn owned_record(&self) -> Option<&Node> {
-        match &self.record {
-            ReadRecord::Owned { node, .. } => Some(node),
-            ReadRecord::Lazy { record, .. } => match &**record {
+        match_read_record!(&self.record, as_ref, Cold,
+            ReadRecord::Core { .. } => None,
+            Cold::Owned { node, .. } => Some(*node),
+            Cold::Lazy { record, .. } => match &**record {
                 AstStorageData::FallbackNode(node) => Some(node),
                 _ => unreachable!("lazy header names its owned payload"),
             },
-            ReadRecord::Core { .. } | ReadRecord::TransactionCore { .. } => None,
-        }
+            Cold::TransactionCore { .. } => None,
+        )
     }
     #[inline]
     fn core_header(&self) -> Option<&'a StoredNode> {
-        match self.record {
-            ReadRecord::Core { header, .. } | ReadRecord::TransactionCore { header, .. } => {
-                Some(header)
-            }
-            _ => None,
-        }
+        match_read_record!(&self.record, as_ref, Cold,
+            ReadRecord::Core { header, .. } => Some(*header),
+            Cold::TransactionCore { header, .. } => Some(*header),
+            Cold::Owned { .. } | Cold::Lazy { .. } => None,
+        )
     }
     /// Assemble decode context only when a compact field is actually requested.
     #[inline]
     pub(crate) fn compact_context(&self) -> CompactContext<'_> {
-        match self.record {
+        match_read_record!(&self.record, as_ref, Cold,
             ReadRecord::Core { owner, .. } => CompactContext {
                 nodes: owner.id().arena(),
                 auxiliary: owner.auxiliary_arena(),
                 source: owner.source_text(),
                 store: owner.store(),
             },
-            ReadRecord::TransactionCore { owner, .. } => CompactContext {
+            Cold::TransactionCore { owner, .. } => CompactContext {
                 nodes: owner.owner_id().arena(),
                 auxiliary: owner.core_auxiliary_arena(),
                 source: owner.source(),
                 store: owner.store(),
             },
-            _ => unreachable!("compact decode requires a core header"),
-        }
+            Cold::Owned { .. } | Cold::Lazy { .. } => unreachable!("compact decode requires a core header"),
+        )
     }
     /// Explicit construction copy used by unrestricted exclusive edits and cold
     /// published overlays; ordinary payload reads never reconstruct a node.
@@ -480,21 +541,15 @@ impl crate::NodeAccess for NodeRead<'_> {
     #[cfg(feature = "contextual-payload-experiment")]
     #[inline]
     fn typed_payload_shape(&self) -> Option<u16> {
-        let (ReadRecord::Core {
-            header,
-            typed_payload_fields: true,
-            ..
+        let shape = match_read_record!(&self.record, as_ref, Cold,
+            ReadRecord::Core { header, typed_payload_fields, .. } => typed_payload_fields.then(|| header.actual_shape()),
+            Cold::TransactionCore { header, typed_payload_fields, .. } => typed_payload_fields.then(|| header.actual_shape()),
+            Cold::Owned { .. } | Cold::Lazy { .. } => None,
+        );
+        if shape.is_some() {
+            self.touch(2);
         }
-        | ReadRecord::TransactionCore {
-            header,
-            typed_payload_fields: true,
-            ..
-        }) = self.record
-        else {
-            return None;
-        };
-        self.touch(2);
-        Some(header.actual_shape())
+        shape
     }
     fn kind(&self) -> crate::NodeKind {
         self.kind()
@@ -546,3 +601,6 @@ impl crate::NodeAccess for NodeRead<'_> {
 mod tests;
 #[cfg(all(test, feature = "contextual-payload-experiment"))]
 mod typed_payload_tests;
+
+#[cfg(all(test, feature = "compact-node-read"))]
+mod compact_read_tests;

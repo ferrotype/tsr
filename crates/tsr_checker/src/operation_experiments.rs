@@ -185,7 +185,7 @@ pub(crate) fn check_contextual_argument(
     request: ArgumentRequest,
 ) -> Result<TypeId, Error> {
     let Some((backend, mode)) = state.operation_experiments.configuration else {
-        return crate::contextual_argument::check(state, request);
+        return crate::contextual_argument::check_default(state, request);
     };
     let depth = state.operation_experiments.depth;
     let ordinal = state.operation_experiments.report.calls;

@@ -183,7 +183,7 @@ fn jsx_children_share_the_element_context_but_self_closing_attributes_do_not() {
     }
 }
 
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 fn completed_literal(counters: &tsr_arena::Counters) -> (tsr_ast::CompletedFile, NodeId) {
     let text = tsr_jsstring::SourceText::from_loaded_bytes(b"'value';".as_slice());
     let mut builder = tsr_ast::AstBuilder::new(text.clone(), counters);
@@ -215,7 +215,7 @@ fn completed_literal(counters: &tsr_arena::Counters) -> (tsr_ast::CompletedFile,
 }
 
 #[test]
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 fn retained_scope_checks_real_expression_and_restores_on_type_error() {
     let (counters, _generation, _identity, owner) = crate::tests::owner();
     let (completed, literal) = completed_literal(&counters);
@@ -257,7 +257,7 @@ fn retained_scope_checks_real_expression_and_restores_on_type_error() {
 }
 
 #[test]
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 fn retained_scope_preserves_checked_reads_and_factory_fallback() {
     let (counters, _generation, _identity, owner) = crate::tests::owner();
     let (completed, literal) = completed_literal(&counters);
@@ -308,6 +308,124 @@ fn retained_scope_preserves_checked_reads_and_factory_fallback() {
     );
     assert!(state.argument_read_scope.is_some());
     assert_eq!(state.node(literal).unwrap().kind(), K::StringLiteral);
+}
+
+#[test]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
+fn nested_contextual_calls_keep_the_outer_owner_and_restore_context_after_errors() {
+    let (counters, _generation, _identity, owner) = crate::tests::owner();
+    let (completed, literal) = completed_literal(&counters);
+    let arena = literal.arena();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    state.argument_read_scope = Some(crate::program::ArgumentReadScope::new(
+        completed.shared().unwrap(),
+    ));
+    drop(completed);
+    let number = state.builtins.number_type;
+    let outer = state.new_synthetic_expression(number, false, None).unwrap();
+    let regular = state
+        .get_string_literal_type(JsString::from_bytes(b"value".as_slice()))
+        .unwrap();
+    let invalid = TypeId::next(0, state.types.len() + 100).unwrap();
+    let result = check_with_expression(
+        state,
+        ArgumentRequest {
+            node: outer,
+            contextual: number,
+            inference: None,
+            mode: 0,
+        },
+        |state, _, _| {
+            assert_eq!(state.calls.contexts.len(), 1);
+            for (contextual, expected) in [
+                (regular, Ok(regular)),
+                (invalid, Err(Error::Arena(tsr_arena::Error::InvalidSlot))),
+            ] {
+                assert_eq!(
+                    check_scoped(
+                        state,
+                        ArgumentRequest {
+                            node: literal,
+                            contextual,
+                            inference: None,
+                            mode: 0,
+                        }
+                    ),
+                    expected
+                );
+                assert_eq!(state.argument_read_scope.as_ref().unwrap().arena(), arena);
+                assert_eq!(state.calls.contexts.len(), 1);
+                assert_eq!(state.calls.contexts[0].node, outer);
+                assert_eq!(state.calls.inference_contexts, [(outer, None)]);
+            }
+            Ok(number)
+        },
+    );
+    assert_eq!(result, Ok(number));
+    assert_eq!(state.argument_read_scope.as_ref().unwrap().arena(), arena);
+    assert!(state.calls.contexts.is_empty());
+    assert!(state.calls.inference_contexts.is_empty());
+}
+
+#[test]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
+fn scoped_owner_leaves_materialized_lazy_jsdoc_on_the_program_route() {
+    use tsr_ast::JsDocProvider;
+    let (counters, _generation, _identity, owner) = crate::tests::owner();
+    let parsed = tsr_parser::parse_source_file_with_counters(
+        tsr_jsstring::SourceText::from_loaded_bytes(
+            b"/** @type {string} */\nlet value;".as_slice(),
+        ),
+        tsr_core::ScriptKind::TS,
+        tsr_ast::SourceFileParseOptions {
+            file_name: JsString::from_bytes(b"/lazy.ts".as_slice()),
+            ..Default::default()
+        },
+        &counters,
+    );
+    let file = tsr_binder::bind_parsed_file(parsed).unwrap();
+    let source = file.source();
+    let view = file.view().ast();
+    let statements = view
+        .node(source)
+        .unwrap()
+        .data_source()
+        .as_source_file()
+        .unwrap()
+        .statements()
+        .unwrap();
+    let statement = view
+        .node_slice(view.list(statements).unwrap().nodes())
+        .unwrap()
+        .at(0)
+        .unwrap();
+    let roots = tsr_parser::ParserJsDocProvider::default()
+        .jsdoc(view, source, statement)
+        .unwrap();
+    let lazy = roots[0];
+    assert_ne!(lazy.arena(), source.arena());
+    assert_eq!(view.node(lazy).unwrap().kind(), K::JSDoc);
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    state.argument_read_scope = Some(crate::program::ArgumentReadScope::new(
+        file.shared().unwrap(),
+    ));
+    // The retained AST can resolve its lazy owner, but the contextual shortcut
+    // is deliberately core-only. Without a program this must reach the ordinary
+    // missing-program error, not silently treat the lazy id as a core slot.
+    assert_eq!(
+        state.ast(source).unwrap().node(lazy).unwrap().kind(),
+        K::JSDoc
+    );
+    assert!(matches!(
+        state.node(lazy),
+        Err(Error::Unsupported("query without a checker program"))
+    ));
+    assert!(matches!(
+        state.ast(lazy),
+        Err(Error::Unsupported("query without a checker program"))
+    ));
 }
 
 #[test]

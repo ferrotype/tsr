@@ -16,6 +16,23 @@ pub(crate) struct ArgumentRequest {
     pub(crate) mode: u32,
 }
 
+/// Ordinary compiler selection, without operation observation or timers.
+/// The default-off feature permits a whole-compiler comparison of owner routing
+/// without enabling typed-payload or execution-state experiments.
+pub(crate) fn check_default(
+    state: &mut CheckerState,
+    request: ArgumentRequest,
+) -> Result<TypeId, Error> {
+    #[cfg(feature = "contextual-owner-scope")]
+    {
+        check_scoped(state, request)
+    }
+    #[cfg(not(feature = "contextual-owner-scope"))]
+    {
+        check(state, request)
+    }
+}
+
 pub(crate) fn check(state: &mut CheckerState, request: ArgumentRequest) -> Result<TypeId, Error> {
     check_with_expression(state, request, CheckerState::check_expression_ex)
 }
@@ -92,7 +109,7 @@ fn contextual_node_of(state: &CheckerState, node: NodeId) -> Result<NodeId, Erro
 /// retain their ordinary routing. Retention and release are part of this call.
 /// As in the ordinary checker, a panic retires the enclosing checker operation;
 /// only normal results and `Error` returns restore reusable state here.
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 pub(crate) fn check_scoped(
     state: &mut CheckerState,
     request: ArgumentRequest,
@@ -121,7 +138,7 @@ pub(crate) fn check_execution(
     result
 }
 
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 fn check_in_scope(
     state: &mut CheckerState,
     request: ArgumentRequest,

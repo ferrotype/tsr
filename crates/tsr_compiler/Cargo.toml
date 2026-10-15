@@ -13,6 +13,10 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = ["tsr_checker/contextual-owner-scope"]
+# Uninstrumented representation experiment; cold node reads allocate.
+compact-node-read = ["tsr_ast/compact-node-read"]
 relation-probe = ["tsr_checker/relation-probe"]
 recursion-probe = ["relation-probe", "tsr_checker/recursion-probe"]
 creation-trace = ["relation-probe", "tsr_checker/creation-trace"]

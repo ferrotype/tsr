@@ -223,7 +223,7 @@ impl CheckerState {
         }
         #[cfg(not(feature = "operation-experiments"))]
         {
-            crate::contextual_argument::check(self, request)
+            crate::contextual_argument::check_default(self, request)
         }
     }
 

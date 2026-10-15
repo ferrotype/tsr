@@ -7,6 +7,15 @@ pub static READS_CORE: AtomicU64 = AtomicU64::new(0);
 pub static READS_TRANSACTION: AtomicU64 = AtomicU64::new(0);
 pub static READS_OWNED: AtomicU64 = AtomicU64::new(0);
 pub static READS_LAZY: AtomicU64 = AtomicU64::new(0);
+/// Allocations introduced by compact-node-read, including cold as_borrowed
+/// calls. Kept outside the existing 13-column phase report so its schema stays
+/// stable. Absent from uninstrumented and nonexperimental builds.
+#[cfg(feature = "compact-node-read")]
+pub static COLD_READ_ALLOCATIONS: AtomicU64 = AtomicU64::new(0);
+#[cfg(feature = "compact-node-read")]
+pub fn cold_read_allocations() -> u64 {
+    COLD_READ_ALLOCATIONS.load(Relaxed)
+}
 pub static KIND: AtomicU64 = AtomicU64::new(0);
 pub static PARENT: AtomicU64 = AtomicU64::new(0);
 pub static FLAGS: AtomicU64 = AtomicU64::new(0);

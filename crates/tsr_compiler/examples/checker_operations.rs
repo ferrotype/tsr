@@ -275,7 +275,18 @@ fn run() -> Result<Value> {
 
 fn main() {
     match run() {
-        Ok(report) => println!("{report}"),
+        Ok(report) => {
+            // Counting runs are separate from uninstrumented compiler timings.
+            // Include cold reborrows, which do not enter a read constructor.
+            #[cfg(feature = "access-stats")]
+            eprintln!("node-read-counts {}", tsr_ast::access_stats::report());
+            #[cfg(all(feature = "access-stats", feature = "compact-node-read"))]
+            eprintln!(
+                "cold-read-allocations {}",
+                tsr_ast::access_stats::cold_read_allocations()
+            );
+            println!("{report}");
+        }
         Err(error) => {
             eprintln!("checker operation experiment failed: {error}");
             std::process::exit(1);

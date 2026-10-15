@@ -22,6 +22,8 @@ creation-trace = ["dep:serde_json"]
 # Alternate semantic-field decoding for isolated checker operation experiments.
 # Normal compiler builds retain the existing NodeRead representation.
 contextual-payload-experiment = []
+# Experiment: keep core reads inline and box the guarded/fallback records.
+compact-node-read = []
 
 [dependencies]
 serde_json = { version = "1", optional = true }

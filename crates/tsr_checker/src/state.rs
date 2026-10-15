@@ -21,7 +21,7 @@ pub struct CheckerOptions {
 }
 
 pub(crate) struct CheckerState {
-    #[cfg(feature = "operation-experiments")]
+    #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
     pub(crate) argument_read_scope: Option<crate::program::ArgumentReadScope>,
     #[cfg(feature = "operation-experiments")]
     pub(crate) argument_typed_payloads: bool,
@@ -133,7 +133,7 @@ impl CheckerState {
         let symbols = identity.adopt_symbol_arena(counters)?;
         let builtins = Builtins::uninitialized(symbols.id());
         Ok(Self {
-            #[cfg(feature = "operation-experiments")]
+            #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
             argument_read_scope: None,
             #[cfg(feature = "operation-experiments")]
             argument_typed_payloads: false,

@@ -64,14 +64,15 @@ pub(crate) struct ProgramContext {
 /// A retained immutable AST source selected once for a contextual operation.
 /// This holds no semantic results or decoded node facts. Its ordinary checked
 /// reads still observe binding overlays and reject invalid slots.
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 pub(crate) struct ArgumentReadScope {
     arena: ArenaId,
     binding: tsr_ast::SharedBoundFile,
 }
 
-#[cfg(feature = "operation-experiments")]
+#[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
 impl ArgumentReadScope {
+    #[cfg(any(feature = "operation-experiments", test))]
     pub(crate) fn arena(&self) -> ArenaId {
         self.arena
     }
@@ -97,7 +98,7 @@ impl ArgumentReadScope {
 }
 
 impl CheckerState {
-    #[cfg(feature = "operation-experiments")]
+    #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
     fn argument_core_binding(&self, node: NodeId) -> Option<&tsr_ast::SharedBoundFile> {
         self.argument_read_scope.as_ref()?.binding(node)
     }
@@ -121,7 +122,7 @@ impl CheckerState {
 
     #[inline]
     fn node_routed(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, crate::Error> {
-        #[cfg(feature = "operation-experiments")]
+        #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
         if let Some(binding) = self.argument_core_binding(node) {
             return Ok(binding.node(node)?);
         }
@@ -135,7 +136,7 @@ impl CheckerState {
     /// `node`: the text read validates the id itself.
     #[inline]
     pub(crate) fn node_text(&self, node: NodeId) -> Result<tsr_ast::NodeText<'_>, crate::Error> {
-        #[cfg(feature = "operation-experiments")]
+        #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
         if let Some(binding) = self.argument_core_binding(node) {
             return Ok(binding.view().ast().node_text(node)?);
         }
@@ -152,7 +153,7 @@ impl CheckerState {
         &self,
         source: NodeId,
     ) -> Result<tsr_ast::SourceFileRead<'_>, crate::Error> {
-        #[cfg(feature = "operation-experiments")]
+        #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
         if let Some(binding) = self.argument_core_binding(source) {
             return Ok(binding.view().ast().source_file(source)?);
         }
@@ -163,7 +164,7 @@ impl CheckerState {
     }
 
     pub(crate) fn ast(&self, node: NodeId) -> Result<AstView<'_>, crate::Error> {
-        #[cfg(feature = "operation-experiments")]
+        #[cfg(any(feature = "operation-experiments", feature = "contextual-owner-scope"))]
         if let Some(binding) = self.argument_core_binding(node) {
             return Ok(binding.view().ast());
         }

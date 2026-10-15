@@ -17,6 +17,9 @@ name = "tsrust"
 path = "src/main.rs"
 
 [features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = ["tsr_execute/contextual-owner-scope"]
+compact-node-read = ["tsr_execute/compact-node-read"]
 # Instrumentation must use the allocator intercepted by ThreadSanitizer.
 system-allocator = []
 
