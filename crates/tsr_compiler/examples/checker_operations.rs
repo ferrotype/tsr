@@ -88,7 +88,7 @@ fn run() -> Result<Value> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
     if args.len() != 4 {
         return Err(
-            "usage: checker_operations ABSOLUTE_TSCONFIG argument|flow routed|scoped observe|time"
+            "usage: checker_operations ABSOLUTE_TSCONFIG argument|flow routed|scoped|typed|state|combined observe|time"
                 .into(),
         );
     }
@@ -102,8 +102,19 @@ fn run() -> Result<Value> {
     let backend = match backend.as_str() {
         "routed" => ArgumentBackend::Routed,
         "scoped" => ArgumentBackend::ScopedCore,
-        _ => return Err("backend must be routed or scoped".into()),
+        "typed" => ArgumentBackend::TypedPayload,
+        "state" => ArgumentBackend::ExecutionState,
+        "combined" => ArgumentBackend::Combined,
+        _ => return Err("unknown operation backend".into()),
     };
+    if experiment == "flow"
+        && !matches!(
+            backend,
+            ArgumentBackend::Routed | ArgumentBackend::ScopedCore
+        )
+    {
+        return Err("flow backend must be routed or scoped".into());
+    }
     let mode = match mode.as_str() {
         "observe" => ObservationMode::Observe,
         "time" => ObservationMode::Time,
@@ -189,6 +200,7 @@ fn run() -> Result<Value> {
         );
     }
     let semantic_ns = semantic_start.elapsed().as_nanos();
+    let (frame_capacity, frame_retained_bytes) = op.argument_frame_storage();
     let types_after_check = op.type_count();
     let operations = if experiment == "argument" {
         argument_report(&op.finish_argument_experiment(), mode)
@@ -257,6 +269,7 @@ fn run() -> Result<Value> {
             "diagnostics_count": diagnostics.len(), "types": op.type_count(),
             "signatures": op.signature_count(), "instantiations": op.instantiation_count()},
         "operations": operations,
+        "experiment_storage": {"frame_capacity": frame_capacity, "frame_retained_bytes": frame_retained_bytes},
     }))
 }
 

@@ -114,7 +114,11 @@ mod enums;
 mod exports;
 mod expression_context;
 mod expression_errors;
-#[cfg(any(target_arch = "wasm32", feature = "recursion-probe"))]
+#[cfg(any(
+    target_arch = "wasm32",
+    feature = "recursion-probe",
+    feature = "operation-experiments"
+))]
 mod expression_stack;
 mod expressions;
 mod external_aliases;

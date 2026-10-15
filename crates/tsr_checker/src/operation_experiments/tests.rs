@@ -101,3 +101,36 @@ fn malformed_location_keeps_the_failed_request_and_result() {
     assert!(report.samples[0].error.is_some());
     assert!(report.kinds.is_empty());
 }
+
+#[test]
+fn structural_backends_restore_selection_after_recoverable_errors() {
+    for backend in [
+        ArgumentBackend::TypedPayload,
+        ArgumentBackend::ExecutionState,
+        ArgumentBackend::Combined,
+    ] {
+        let (_counters, _generation, _identity, owner) = crate::tests::owner();
+        let mut operation = owner.operation().unwrap();
+        operation
+            .begin_argument_experiment(backend, ObservationMode::Observe)
+            .unwrap();
+        let state = operation.state_mut();
+        let missing = state.factory.new_parenthesized_expression(None);
+        let number = state.builtins.number_type;
+        assert_eq!(
+            state.check_call_argument_ex(missing, number, None, 0),
+            Err(Error::MissingLink("parenthesized expression")),
+        );
+        assert!(!state.argument_typed_payloads);
+        assert!(!state.argument_explicit_execution);
+        let valid = state.new_synthetic_expression(number, false, None).unwrap();
+        assert_eq!(
+            state.check_call_argument_ex(valid, number, None, 0),
+            Ok(number)
+        );
+        let report = operation.finish_argument_experiment();
+        assert_eq!(report.calls, 2);
+        assert_eq!(report.errors, 1);
+        assert_eq!(report.cleanup_errors, 0);
+    }
+}

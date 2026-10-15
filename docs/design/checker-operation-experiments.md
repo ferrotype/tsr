@@ -1,8 +1,8 @@
 # Checker operation experiments
 
-These development experiments compare two ways to read the same checker data:
-the existing routed accessors and a reader scoped to one retained source. They
-measure complete operations with their semantic callbacks. They do not replace
+These development experiments compare routed reads, owner-scoped reads, typed
+payload access and explicit expression continuations. They measure complete
+operations with their semantic callbacks. They do not replace
 whole-compiler parity or throughput measurements.
 
 The feature is `operation-experiments`, propagated from `tsr_compiler` to
@@ -251,3 +251,153 @@ AST unit tests, 125 checker unit tests plus the added common-entry regression,
 the two flow-scope compile-fail doctests, and 7 focused compiler variants (63
 sub-tests). The runner has 14 focused tests. Crate/example clippy and tracker
 validation pass. Full compiler and PGO timing remain required before promotion.
+
+## Typed fields and explicit contextual execution
+
+The next experiment separates two structural changes, both over the same live
+contextual operation. None adds a semantic cache or suppresses checker work.
+
+- `typed` keeps the retained-owner scope and opts checked node reads into direct
+  payload-shape selection for declaration names and the shape-based
+  `modifiers`, `body` and `function_fields` getters. These reads select a typed row without constructing `NodeDataRead`.
+  Expression, initializer and type-child access already used typed selectors;
+  this experiment does not claim to introduce those. Factory and lazy payloads
+  keep the existing path. Owner, slot and escaped-edge checks remain in place.
+- `state` keeps the retained-owner scope and executes binary and parenthesized
+  expressions through explicit continuations, using the same machine as the
+  wasm checker. One checker-owned frame vector holds suspended binary/parenthesized parents;
+  the active expression stays local. Recursive semantic callbacks operate above
+  their own base index. Expression
+  modes, current-node state, instantiation resets, postchecks and trace scope
+  order remain per expression. Native stack growth remains at machine-entry
+  boundaries because semantic callbacks can still recurse.
+- `combined` runs both changes together. Components are measured for attribution;
+  their separately measured savings are never added to predict this result.
+
+The saved control is the preceding experiment executable, with backend `scoped`.
+That isolates the new work from the previously measured owner-routing change.
+The candidate executable also runs with `scoped` against that saved control:
+compiling experimental fields can affect layout and optimization even when their
+selection is disabled. Observation equality is required before every batch.
+Timed processes start together, and each pair finishes before its output is
+parsed or written. Source edits and builds stop during timed batches.
+
+The runner accepts independent executable paths and backend names:
+
+```sh
+python3 tools/phase7/bench/operations.py run \
+  --binary "$CANDIDATE_BINARY" --build-manifest "$CANDIDATE_BUILD" \
+  --baseline-binary "$BASELINE_BINARY" --baseline-build-manifest "$BASELINE_BUILD" \
+  --baseline-backend scoped --candidate-backend combined \
+  --project "$PROJECT_CONFIG" --experiment argument --pairs 5 \
+  --output "$EXTERNAL_ARCHIVE/combined"
+```
+
+`setup_ns` and `semantic_ns` remain separate from the outermost contextual
+operation timer. The semantic interval contains the operation's shared timer
+bookkeeping; it is useful pipeline attribution, not an uninstrumented compiler
+acceptance result. A promising candidate still needs normal-build integration,
+full parity and a production timing comparison before promotion.
+
+### First implementation and representation correction
+
+The first implementation preserved the observed work on both projects, but its
+three concurrent pairs per row were slower than the saved scoped control:
+
+| Backend in new executable | TypeScript ratio | VS Code ratio |
+| --- | ---: | ---: |
+| Scoped, candidates disabled | 1.0374 | 1.0298 |
+| Typed payloads | 1.0408 | 1.0322 |
+| Explicit state | 1.0465 | 1.0404 |
+| Combined | 1.0461 | 1.0367 |
+
+These are operation-time ratios. The combined differences were **28.44 ms** and
+**433.86 ms** slower respectively. The disabled control regression prevents
+attributing that whole difference to the candidate mechanisms. The original
+executable, source hashes and raw results remain under the external
+`2026-10-15/contextual-typed-state/` archive, in `candidate-build-v2/` and
+`{typescript,vscode}-{scoped,typed,state,combined}/`.
+`first-batch-results.json` also records whole-semantic times and pair ranges.
+
+A layout probe found that the experimental bool had enlarged `NodeRead` from
+40 to 48 bytes on this host, even when disabled. Moving it inside the existing
+core-record variants restores 40 bytes; `layout.json` records the probe and
+source identities. This proves the size change, not its CPU contribution.
+The first continuation machine also stored every active scalar/worker frame in
+the vector. The revision stores only suspended parents and retains local state
+for the active expression; scalar and nested `typeof`-only calls now require no
+continuation capacity. Both revisions preserve the checked ownership path.
+
+The follow-up includes same-executable scoped controls, as well as comparison
+with the immutable previous executable. No separately measured deltas are
+subtracted to infer a mechanism's benefit.
+
+### Revised screen and decision
+
+The revised release executable is archived in `candidate-build-v3/`, SHA-256
+`5cba602f6cfee1efb4ac2527db739016b85995943baa6a2a6c16bc1a4a23031d`.
+It uses the same compiler, release profile and no-PGO policy as the saved
+control. Source hashes agree before and after building. Results are in
+`v3-{typescript,vscode}-{control,typed,state,combined,combined-saved}/`;
+`final-results.json` summarizes them. All paths in this section are within
+`../ts-rust-benchmarks/2026-10-15/contextual-typed-state/`, relative to the
+repository root. No capture depends on `target/`.
+
+Each table cell below is the median of three concurrent fresh-process pairs.
+The **same executable's scoped backend** is the baseline for the first table:
+
+| Candidate | TypeScript operation ratio | Paired time saved | VS Code operation ratio | Paired time saved |
+| --- | ---: | ---: | ---: | ---: |
+| Typed fields | 1.0003 | −0.16 ms | 1.0000 | −0.08 ms |
+| Execution state | 1.0047 | −2.78 ms | 1.0065 | −71.11 ms |
+| Combined | 1.0040 | −2.41 ms | 1.0069 | −75.68 ms |
+
+Whole-semantic ratios for these same pairs are 0.9994 / 1.0002 for typed
+fields, 1.0010 / 1.0027 for execution state, and 1.0001 / 1.0027 combined
+(TypeScript / VS Code). These are instrumented semantic intervals, not normal
+compiler throughput. Typed selection is effectively neutral. Explicit state
+and the combination show no CPU improvement. The revised frame vector retains
+16 frames / 1,920 bytes on each workload; this is experiment-owned capacity,
+not a whole-program memory result.
+
+Separate concurrent comparisons retain the **immutable previous executable**
+as the baseline:
+
+| Revised backend | TypeScript operation ratio | Paired time saved | VS Code operation ratio | Paired time saved |
+| --- | ---: | ---: | ---: | ---: |
+| Scoped, candidates disabled | 1.0328 | −19.01 ms | 1.0239 | −259.85 ms |
+| Combined | 1.0388 | −22.42 ms | 1.0302 | −331.00 ms |
+
+The combined whole-semantic ratios against that saved control are 1.0323 and
+1.0252, with paired losses of 58.39 and 731.42 ms. Packing the bool restores
+the read size but does not remove the common build/runtime-selection overhead.
+No timing claim attributes that overhead to one cause. We do not subtract the
+control row from another run or add component deltas.
+
+Every observed pair matches the ordered operation trace, input/options hashes,
+diagnostics, type/signature/instantiation counts and state-cleanup checks. Every
+timed sample matches the observed work. Calls remain 112,672 / 1,630,385, with
+87,345 / 1,021,623 outermost intervals. Tiny fixture screens also agree but are
+not performance evidence. Binaries are hashed before and after each batch,
+launch order alternates, and both timed children finish before report work. No
+builds, source edits or other test runs overlap a timed batch.
+
+**Decision: keep these as opt-in experiments; promote neither to native
+production checking.** This typed candidate removes an intermediate payload
+enum from four getter families; it still constructs `NodeRead`, resolves
+payload pages and checks encoded child references. This execution candidate
+flattens binary and parenthesized continuations; other semantic callbacks retain
+recursive worker entry and stack guards. The results reject these specific
+implementations as speedups, not every possible typed reader or execution
+model. Further work should change the remaining representation/operation cost,
+not retune these neutral selectors.
+
+The checker-owned frame storage remains feature-only. The existing wasm path
+shares the refactored continuation machine with its local frame storage; its
+error restoration, trace order and deep callbacks are exercised by native
+recursion-probe tests, and the wasm checker target compiles. Focused compiler
+parity passes 7 variants / 63 sub-tests. All 199 AST and 136 checker unit tests
+pass with both experiment and recursion-probe features. The 22 runner tests,
+clippy, formatting, generator and tracker validation also pass. Full-corpus
+wasm execution, production timings and PGO timings were not rerun for these
+non-promoted experiments.

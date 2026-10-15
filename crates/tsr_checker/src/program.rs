@@ -113,6 +113,14 @@ impl CheckerState {
     /// selection in between.
     #[inline]
     pub(crate) fn node(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, crate::Error> {
+        let read = self.node_routed(node)?;
+        #[cfg(feature = "operation-experiments")]
+        let read = read.with_typed_payload_fields(self.argument_typed_payloads);
+        Ok(read)
+    }
+
+    #[inline]
+    fn node_routed(&self, node: NodeId) -> Result<tsr_ast::NodeRead<'_>, crate::Error> {
         #[cfg(feature = "operation-experiments")]
         if let Some(binding) = self.argument_core_binding(node) {
             return Ok(binding.node(node)?);

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare routed/scoped checker operations in one saved experimental binary.
+"""Compare checker operation backends in saved experimental binaries.
 
 Observe both backends first. Timed pairs use fresh processes released from a
 launch barrier, with alternating submission order. No parsing or hashing runs
@@ -24,6 +24,7 @@ import time
 
 ROOT = Path(__file__).resolve().parents[3]
 BACKENDS = ('routed', 'scoped')
+ARGUMENT_BACKENDS = (*BACKENDS, 'typed', 'state', 'combined')
 SHA = re.compile(r'^[0-9a-f]{64}$')
 ARGUMENT_COUNTS = ('calls', 'outermost_calls', 'errors', 'location_errors', 'cleanup_errors')
 
@@ -42,6 +43,23 @@ def source_identity():
     status = subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True)
     return {'revision': revision, 'dirty': bool(status), 'status': status,
             'meaning': 'checkout at runner start; not a claim about binary build inputs'}
+
+
+def participants(binary, experiment, *, baseline_binary=None,
+                 baseline_backend='routed', candidate_backend='scoped'):
+    """Keep process identity distinct even when both executables use one backend."""
+    if experiment not in ('argument', 'flow'):
+        raise ValueError('unknown experiment')
+    allowed = ARGUMENT_BACKENDS if experiment == 'argument' else BACKENDS
+    if baseline_backend not in allowed or candidate_backend not in allowed:
+        raise ValueError(f'unsupported {experiment} backend')
+    labels = ((baseline_backend, candidate_backend) if baseline_backend != candidate_backend
+              else ('baseline', 'candidate'))
+    return {
+        labels[0]: {'role': 'baseline', 'backend': baseline_backend,
+                    'binary': Path(baseline_binary if baseline_binary is not None else binary)},
+        labels[1]: {'role': 'candidate', 'backend': candidate_backend, 'binary': Path(binary)},
+    }
 
 
 def execute(command, cwd, timeout):
@@ -85,6 +103,9 @@ def validate(data, experiment, backend, mode):
             raise ValueError(f'invalid {key}: expected {expected!r}')
     if 'error' in data or 'error_json' in data:
         raise ValueError('child reported an error')
+    for key in ('setup_ns', 'semantic_ns'):
+        if key in data:
+            count(data[key], key)
     workload = data.get('workload')
     if not isinstance(workload, dict):
         raise ValueError('missing workload')
@@ -178,30 +199,37 @@ def comparable(data, *, observed=False):
     return result
 
 
-def collect(binary, project, experiment, mode, output, index, timeout, baseline=None):
-    order = list(BACKENDS if index % 2 == 0 else reversed(BACKENDS))
+def collect(binary, project, experiment, mode, output, index, timeout, baseline=None, *,
+            baseline_binary=None, baseline_backend='routed', candidate_backend='scoped'):
+    sides = participants(binary, experiment, baseline_binary=baseline_binary,
+                         baseline_backend=baseline_backend, candidate_backend=candidate_backend)
+    baseline_label, candidate_label = sides
+    order = list(sides if index % 2 == 0 else reversed(sides))
     barrier = threading.Barrier(2) if mode == 'time' else None
 
-    def child(backend):
+    def child(label):
+        side = sides[label]
         if barrier is not None:
             barrier.wait(timeout=10)
-        return execute([str(binary), str(project), experiment, backend, mode], project.parent, timeout)
+        return execute([str(side['binary']), str(project), experiment, side['backend'], mode],
+                       project.parent, timeout)
 
     with concurrent.futures.ThreadPoolExecutor(2 if barrier else 1) as pool:
-        futures = {backend: pool.submit(child, backend) for backend in order}
+        futures = {label: pool.submit(child, label) for label in order}
     # Both processes have ended before any parsing, validation, or output IO.
     raw, reports, failures = {}, {}, []
-    for backend, future in futures.items():
+    for label, future in futures.items():
         try:
             result = future.result()
         except Exception as error:
             result = {'exit': None, 'stdout': '', 'stderr': '', 'error': str(error)}
-        raw[backend] = result
-        prefix = output / f'{mode}-{index}-{backend}'
+        result.update(role=sides[label]['role'], backend=sides[label]['backend'])
+        raw[label] = result
+        prefix = output / f'{mode}-{index}-{label}'
         prefix.with_suffix('.stdout').write_text(result['stdout'])
         prefix.with_suffix('.stderr').write_text(result['stderr'])
         write_json(prefix.with_suffix('.json'), {k: v for k, v in result.items() if k not in ('stdout', 'stderr')})
-    for backend, result in raw.items():
+    for label, result in raw.items():
         issues = []
         if result.get('error'):
             issues.append(result['error'])
@@ -210,66 +238,98 @@ def collect(binary, project, experiment, mode, output, index, timeout, baseline=
         try:
             data = json.loads(result['stdout'])
             result['report'] = data
-            reports[backend] = validate(data, experiment, backend, mode)
+            reports[label] = validate(data, experiment, sides[label]['backend'], mode)
             if baseline is not None and comparable(data) != comparable(baseline):
                 issues.append('workload or operation counts/outputs differ from observation')
         except (ValueError, TypeError) as error:
             issues.append(str(error))
         result['issues'] = issues
-        write_json(output / f'{mode}-{index}-{backend}.json',
+        write_json(output / f'{mode}-{index}-{label}.json',
                    {k: v for k, v in result.items() if k not in ('stdout', 'stderr')})
-        failures += [f'{backend}: {issue}' for issue in issues]
-    if len(reports) == 2 and comparable(reports['routed'], observed=mode == 'observe') != comparable(
-            reports['scoped'], observed=mode == 'observe'):
-        failures.append('routed/scoped workload or ordered operation counts/outputs differ')
+        failures += [f'{label}: {issue}' for issue in issues]
+    if len(reports) == 2 and comparable(reports[baseline_label], observed=mode == 'observe') != comparable(
+            reports[candidate_label], observed=mode == 'observe'):
+        failures.append('baseline/candidate workload or ordered operation counts/outputs differ')
     if failures:
         raise ValueError('; '.join(failures))
     if mode == 'observe':
-        return reports['routed']
-    elapsed = {backend: report['operations']['elapsed_ns'] for backend, report in reports.items()}
-    return {'pair': index, 'submission_order': order, 'elapsed_ns': elapsed,
-            'ratio': elapsed['scoped'] / elapsed['routed'],
-            'launch_skew_ms': abs(raw['scoped']['launch_ns'] - raw['routed']['launch_ns']) / 1e6}
+        return reports[baseline_label]
+    elapsed = {label: report['operations']['elapsed_ns'] for label, report in reports.items()}
+    result = {'pair': index, 'submission_order': order, 'elapsed_ns': elapsed,
+              'roles': {'baseline': baseline_label, 'candidate': candidate_label},
+              'ratio': elapsed[candidate_label] / elapsed[baseline_label],
+              'saved_ns': elapsed[baseline_label] - elapsed[candidate_label],
+              'launch_skew_ms': abs(raw[candidate_label]['launch_ns'] - raw[baseline_label]['launch_ns']) / 1e6}
+    # Useful attribution, but neither interval is substituted for the operation timer.
+    for key in ('setup_ns', 'semantic_ns'):
+        if all(key in report for report in reports.values()):
+            result[key] = {label: report[key] for label, report in reports.items()}
+    return result
 
 
-def run(binary, project, experiment, output, *, pairs=5, timeout=600, build_manifest=None):
+def run(binary, project, experiment, output, *, pairs=5, timeout=600, build_manifest=None,
+        baseline_binary=None, baseline_backend='routed', candidate_backend='scoped',
+        baseline_build_manifest=None):
     if type(pairs) is not int or pairs < 1 or not math.isfinite(timeout) or timeout <= 0:
         raise ValueError('pairs and timeout must be positive')
-    if experiment not in ('argument', 'flow'):
-        raise ValueError('unknown experiment')
     binary, project, output = [Path(path).resolve() for path in (binary, project, output)]
+    baseline_binary = Path(baseline_binary).resolve() if baseline_binary is not None else binary
+    sides = participants(binary, experiment, baseline_binary=baseline_binary,
+                         baseline_backend=baseline_backend, candidate_backend=candidate_backend)
     if output.is_relative_to(ROOT):
         raise ValueError('output must be outside the checkout, including target directories')
-    if not binary.is_file() or not project.is_file():
-        raise ValueError('binary and project must be existing files')
+    if not binary.is_file() or not baseline_binary.is_file() or not project.is_file():
+        raise ValueError('both binaries and project must be existing files')
     output.mkdir(parents=True)  # Never replace an earlier result, even a failed one.
     record = {'format': 1, 'experiment': experiment, 'project': str(project), 'requested_pairs': pairs,
               'timeout_seconds': timeout, 'complete': False, 'pairs': [],
+              'roles': {side['role']: label for label, side in sides.items()},
+              'backends': {side['role']: side['backend'] for side in sides.values()},
               'method': 'observe compatibility, then concurrent fresh-process operation timer pairs; alternating submission order',
               'metric': 'operations.elapsed_ns; not process wall time or throughput'}
     summary = output / 'summary.json'
     write_json(summary, record)
     try:
         record['binary'] = identity(binary)
+        record['baseline_binary'] = identity(baseline_binary)
         record['source'] = source_identity()
-        if build_manifest is not None:
-            manifest = Path(build_manifest).resolve()
-            record['build_manifest'] = {'identity': identity(manifest), 'metadata': json.loads(manifest.read_text()),
-                                        'meaning': 'supplied metadata only; build flags are not verified by this runner'}
+        for key, supplied in [('build_manifest', build_manifest),
+                              ('baseline_build_manifest', baseline_build_manifest)]:
+            if supplied is not None:
+                manifest = Path(supplied).resolve()
+                metadata = json.loads(manifest.read_text())
+                record[key] = {'identity': identity(manifest), 'metadata': metadata,
+                               'meaning': 'supplied metadata only; build flags are not verified by this runner'}
+                if not isinstance(metadata, dict):
+                    raise ValueError(f'{key} must contain an object')
+                expected = record['baseline_binary' if key == 'baseline_build_manifest' else 'binary']['sha256']
+                if 'binary_sha256' in metadata and metadata['binary_sha256'] != expected:
+                    raise ValueError(f'{key} binary_sha256 differs from the selected binary')
         write_json(summary, record)
-        baseline = collect(binary, project, experiment, 'observe', output, 0, timeout)
+        selected = {'baseline_binary': baseline_binary, 'baseline_backend': baseline_backend,
+                    'candidate_backend': candidate_backend}
+        baseline = collect(binary, project, experiment, 'observe', output, 0, timeout, **selected)
         record['observation_compatible'] = True
         write_json(summary, record)
         for index in range(pairs):
-            pair = collect(binary, project, experiment, 'time', output, index, timeout, baseline)
+            pair = collect(binary, project, experiment, 'time', output, index, timeout, baseline, **selected)
             record['pairs'].append(pair)
             write_json(summary, record)
             print(json.dumps(pair), flush=True)
         if identity(binary) != record['binary']:
-            raise ValueError('binary changed during the experiment')
+            raise ValueError('candidate binary changed during the experiment')
+        if identity(baseline_binary) != record['baseline_binary']:
+            raise ValueError('baseline binary changed during the experiment')
         record['median_ratio'] = statistics.median(pair['ratio'] for pair in record['pairs'])
         record['median_elapsed_ns'] = {backend: statistics.median(pair['elapsed_ns'][backend] for pair in record['pairs'])
-                                       for backend in BACKENDS}
+                                       for backend in sides}
+        baseline_label, candidate_label = sides
+        record['median_saved_ns'] = statistics.median(
+            pair['elapsed_ns'][baseline_label] - pair['elapsed_ns'][candidate_label] for pair in record['pairs'])
+        for key in ('setup_ns', 'semantic_ns'):
+            if all(key in pair for pair in record['pairs']):
+                record[f'median_{key}'] = {
+                    label: statistics.median(pair[key][label] for pair in record['pairs']) for label in sides}
         record['complete'] = True
     except Exception as error:
         record['error'] = str(error)
@@ -284,16 +344,22 @@ def main(argv=None):
     commands = parser.add_subparsers(dest='command', required=True)
     command = commands.add_parser('run')
     command.add_argument('--binary', type=Path, required=True)
+    command.add_argument('--baseline-binary', type=Path, help='saved control executable; defaults to --binary')
+    command.add_argument('--baseline-backend', choices=ARGUMENT_BACKENDS, default='routed')
+    command.add_argument('--candidate-backend', choices=ARGUMENT_BACKENDS, default='scoped')
     command.add_argument('--project', type=Path, required=True)
     command.add_argument('--experiment', choices=('argument', 'flow'), required=True)
     command.add_argument('--pairs', type=int, default=5)
     command.add_argument('--timeout', type=float, default=600, help='seconds per child')
     command.add_argument('--output', type=Path, required=True, help='new directory outside the checkout')
     command.add_argument('--build-manifest', type=Path, help='archive supplied build metadata; flags are not verified')
+    command.add_argument('--baseline-build-manifest', type=Path, help='metadata for the saved control executable')
     args = parser.parse_args(argv)
     try:
         run(args.binary, args.project, args.experiment, args.output, pairs=args.pairs,
-            timeout=args.timeout, build_manifest=args.build_manifest)
+            timeout=args.timeout, build_manifest=args.build_manifest,
+            baseline_binary=args.baseline_binary, baseline_backend=args.baseline_backend,
+            candidate_backend=args.candidate_backend, baseline_build_manifest=args.baseline_build_manifest)
     except (OSError, ValueError) as error:
         parser.exit(1, f'{error}\n')
 

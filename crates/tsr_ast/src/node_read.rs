@@ -34,10 +34,14 @@ enum ReadRecord<'a> {
     Core {
         header: &'a StoredNode,
         owner: &'a StorageOwner<StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
     },
     TransactionCore {
         header: &'a StoredNode,
         owner: &'a StorageTransaction<'a, StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
     },
     Owned {
         node: &'a Node,
@@ -113,7 +117,12 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_CORE);
         Self {
-            record: ReadRecord::Core { header, owner },
+            record: ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields: false,
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -127,7 +136,12 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_TRANSACTION);
         Self {
-            record: ReadRecord::TransactionCore { header, owner },
+            record: ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields: false,
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -171,6 +185,26 @@ impl<'a> NodeRead<'a> {
     pub fn id(&self) -> NodeId {
         self.id
     }
+    /// Select direct typed-row decoding for shape-based semantic fields in an
+    /// operation experiment. This changes no ownership or slot checks. Lazy and
+    /// owned construction payloads retain the ordinary checked reader.
+    #[cfg(feature = "contextual-payload-experiment")]
+    #[inline]
+    #[must_use]
+    pub fn with_typed_payload_fields(mut self, enabled: bool) -> Self {
+        match &mut self.record {
+            ReadRecord::Core {
+                typed_payload_fields,
+                ..
+            }
+            | ReadRecord::TransactionCore {
+                typed_payload_fields,
+                ..
+            } => *typed_payload_fields = enabled,
+            ReadRecord::Owned { .. } | ReadRecord::Lazy { .. } => {}
+        }
+        self
+    }
     pub fn owner_id(&self) -> FileId {
         match self.record {
             ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.id(),
@@ -190,10 +224,28 @@ impl<'a> NodeRead<'a> {
     /// resolved lazy read must stay bounded by its publication guard instead.
     pub fn as_borrowed(&self) -> Option<Self> {
         let record = match self.record {
-            ReadRecord::Core { header, owner } => ReadRecord::Core { header, owner },
-            ReadRecord::TransactionCore { header, owner } => {
-                ReadRecord::TransactionCore { header, owner }
-            }
+            ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            } => ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            },
+            ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            } => ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            },
             ReadRecord::Owned {
                 node,
                 source,
@@ -425,6 +477,25 @@ impl<'a> NodeRead<'a> {
     }
 }
 impl crate::NodeAccess for NodeRead<'_> {
+    #[cfg(feature = "contextual-payload-experiment")]
+    #[inline]
+    fn typed_payload_shape(&self) -> Option<u16> {
+        let (ReadRecord::Core {
+            header,
+            typed_payload_fields: true,
+            ..
+        }
+        | ReadRecord::TransactionCore {
+            header,
+            typed_payload_fields: true,
+            ..
+        }) = self.record
+        else {
+            return None;
+        };
+        self.touch(2);
+        Some(header.actual_shape())
+    }
     fn kind(&self) -> crate::NodeKind {
         self.kind()
     }
@@ -473,3 +544,5 @@ impl crate::NodeAccess for NodeRead<'_> {
 }
 #[cfg(test)]
 mod tests;
+#[cfg(all(test, feature = "contextual-payload-experiment"))]
+mod typed_payload_tests;

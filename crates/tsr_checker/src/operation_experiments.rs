@@ -15,6 +15,12 @@ pub enum ArgumentBackend {
     #[default]
     Routed,
     ScopedCore,
+    /// Retained owner plus shape-selected typed payload fields.
+    TypedPayload,
+    /// Retained owner plus checker-owned expression continuation frames.
+    ExecutionState,
+    /// Both structural changes in the same operation.
+    Combined,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -80,6 +86,13 @@ pub(crate) struct ExperimentState {
 }
 
 impl Operation<'_> {
+    /// Experiment-owned retained storage, read after the measured operation.
+    /// This is a capacity charge, not allocator traffic or whole-checker memory.
+    pub fn argument_frame_storage(&self) -> (usize, usize) {
+        let frames = &self.state().expression_execution_frames;
+        (frames.capacity(), frames.retained_bytes())
+    }
+
     pub fn begin_argument_experiment(
         &mut self,
         backend: ArgumentBackend,
@@ -180,6 +193,9 @@ pub(crate) fn check_contextual_argument(
     let inference_depth_before = state.calls.inference_contexts.len();
     let expression_mode_before = state.expression_mode;
     let current_node_before = state.current_node;
+    let typed_before = state.argument_typed_payloads;
+    let execution_before = state.argument_explicit_execution;
+    let frames_before = state.expression_execution_frames.len();
     let scope_before = state
         .argument_read_scope
         .as_ref()
@@ -239,6 +255,11 @@ pub(crate) fn check_contextual_argument(
     let result = match backend {
         ArgumentBackend::Routed => crate::contextual_argument::check(state, request),
         ArgumentBackend::ScopedCore => crate::contextual_argument::check_scoped(state, request),
+        ArgumentBackend::TypedPayload => check_typed_argument(state, request, false),
+        ArgumentBackend::ExecutionState => {
+            crate::contextual_argument::check_execution(state, request)
+        }
+        ArgumentBackend::Combined => check_typed_argument(state, request, true),
     };
     if let Some(started) = started {
         state.operation_experiments.report.elapsed += started.elapsed();
@@ -255,7 +276,10 @@ pub(crate) fn check_contextual_argument(
         && state.calls.inference_contexts.len() == inference_depth_before
         && state.expression_mode == expression_mode_before
         && current_node_restored
-        && read_scope_restored;
+        && read_scope_restored
+        && state.argument_typed_payloads == typed_before
+        && state.argument_explicit_execution == execution_before
+        && state.expression_execution_frames.len() == frames_before;
     state.operation_experiments.report.cleanup_errors += u64::from(!cleanup_restored);
     if let Some(mut observed) = observation {
         observed.types_after = state.types.len();
@@ -274,6 +298,21 @@ pub(crate) fn check_contextual_argument(
             experiment.report.samples.push(observed);
         }
     }
+    result
+}
+
+fn check_typed_argument(
+    state: &mut CheckerState,
+    request: ArgumentRequest,
+    explicit: bool,
+) -> Result<TypeId, Error> {
+    let previous = std::mem::replace(&mut state.argument_typed_payloads, true);
+    let result = if explicit {
+        crate::contextual_argument::check_execution(state, request)
+    } else {
+        crate::contextual_argument::check_scoped(state, request)
+    };
+    state.argument_typed_payloads = previous;
     result
 }
 

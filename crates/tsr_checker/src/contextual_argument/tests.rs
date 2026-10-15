@@ -309,3 +309,35 @@ fn retained_scope_preserves_checked_reads_and_factory_fallback() {
     assert!(state.argument_read_scope.is_some());
     assert_eq!(state.node(literal).unwrap().kind(), K::StringLiteral);
 }
+
+#[test]
+#[cfg(feature = "operation-experiments")]
+fn explicit_execution_restores_selection_and_context_after_error() {
+    let (_counters, _generation, _identity, owner) = crate::tests::owner();
+    let mut operation = owner.operation().unwrap();
+    let state = operation.state_mut();
+    let leaf = state.factory.new_token(K::TrueKeyword.into());
+    let node = state.factory.new_parenthesized_expression(Some(leaf));
+    let invalid = TypeId::next(0, state.types.len() + 100).unwrap();
+    for previous in [false, true] {
+        state.argument_explicit_execution = previous;
+        assert_eq!(
+            check_execution(
+                state,
+                ArgumentRequest {
+                    node,
+                    contextual: invalid,
+                    inference: None,
+                    mode: 0,
+                }
+            ),
+            Err(Error::Arena(tsr_arena::Error::InvalidSlot))
+        );
+        assert_eq!(state.argument_explicit_execution, previous);
+        assert_eq!(state.expression_execution_frames.len(), 0);
+        assert!(state.calls.contexts.is_empty());
+        assert!(state.calls.inference_contexts.is_empty());
+        assert!(state.current_node.is_none());
+        assert_eq!(state.expression_mode, 0);
+    }
+}

@@ -107,6 +107,20 @@ pub(crate) fn check_scoped(
     check_in_scope(state, request, scope)
 }
 
+/// Run the actual expression callbacks with explicit reusable continuations.
+/// Nested contextual calls inherit the mode; returning an ordinary error must
+/// restore the caller's selection just as it restores its contextual stacks.
+#[cfg(feature = "operation-experiments")]
+pub(crate) fn check_execution(
+    state: &mut CheckerState,
+    request: ArgumentRequest,
+) -> Result<TypeId, Error> {
+    let previous = std::mem::replace(&mut state.argument_explicit_execution, true);
+    let result = check_scoped(state, request);
+    state.argument_explicit_execution = previous;
+    result
+}
+
 #[cfg(feature = "operation-experiments")]
 fn check_in_scope(
     state: &mut CheckerState,
