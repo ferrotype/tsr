@@ -136,7 +136,9 @@ flow_id!(FlowListId);
 
 mod storage;
 pub use storage::{FlowListMut, FlowListRead, FlowLists, FlowNodeMut, FlowNodeRead, FlowNodes};
+#[cfg(feature = "flow-scope-experiment")]
 mod scoped;
+#[cfg(feature = "flow-scope-experiment")]
 pub use scoped::{FlowScope, LocalFlow, LocalFlowList, LocalFlowListRead, LocalFlowNodeRead};
 
 #[cfg(test)]

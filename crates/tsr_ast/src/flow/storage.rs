@@ -295,6 +295,7 @@ impl FlowNodeRead<'_> {
     // Completed binding publication validated these edges against their stores.
     // Keep the exceptional full-identity representation functional even for
     // the maximum slot, which shares the escape sentinel.
+    #[cfg(feature = "flow-scope-experiment")]
     pub(super) fn local_antecedent_slot(self) -> u32 {
         if self.record.antecedent == ESCAPED {
             self.antecedent().map_or(0, FlowId::slot)
@@ -302,6 +303,7 @@ impl FlowNodeRead<'_> {
             self.record.antecedent
         }
     }
+    #[cfg(feature = "flow-scope-experiment")]
     pub(super) fn local_antecedents_slot(self) -> u32 {
         if self.record.antecedents == ESCAPED {
             self.antecedents().map_or(0, FlowListId::slot)
@@ -513,6 +515,7 @@ pub struct FlowListRead<'a> {
     slot: u32,
 }
 impl FlowListRead<'_> {
+    #[cfg(feature = "flow-scope-experiment")]
     pub(super) fn local_flow_slot(self) -> u32 {
         if self.record.flow == ESCAPED {
             self.flow().map_or(0, FlowId::slot)
@@ -520,6 +523,7 @@ impl FlowListRead<'_> {
             self.record.flow
         }
     }
+    #[cfg(feature = "flow-scope-experiment")]
     pub(super) fn local_next_slot(self) -> u32 {
         if self.record.next == ESCAPED {
             self.next().map_or(0, FlowListId::slot)

@@ -12,6 +12,14 @@ the orchestration is
 [`tools/phase7/bench/operations.py`](../../tools/phase7/bench/operations.py).
 The feature is not enabled in normal builds.
 
+The completed-flow reader API (`FlowScope` and the `LocalFlow*` types) is
+available only with `tsr_ast/flow-scope-experiment`, which
+`operation-experiments` enables. Checker tests enable that AST feature through
+a development dependency for reader-equivalence tests; this does not select
+owner-scoped contextual routing. CI tests the default checker/compiler libraries
+and checker semantics integration target, and runs default checker/compiler
+clippy separately from the existing all-features checks.
+
 ## Why these two operations
 
 The archived profile analysis is at
@@ -180,7 +188,10 @@ can overlap the other child's measured interval. Shared-resource contention is
 part of this development screen's noise.
 
 Every timed sample must have positive elapsed time and nonzero operation
-coverage. Workload identity includes the ordered source-file list and byte
+coverage, and must write nothing to stderr. This rejects the `access-stats`
+build's counter report rather than accepting counter overhead as an ordinary
+operation timing. Observation runs may retain counter output on stderr.
+Workload identity includes the ordered source-file list and byte
 hashes, the effective compiler-options digest for the program and each source
 file, and the ordered config/dependency paths and byte hashes. All must match
 the observation, alongside the canonical diagnostic digest, diagnostic count,
@@ -624,3 +635,8 @@ remain recorded. Each pair is saved as it completes; invalid runs stay
 incomplete with raw output preserved. New builds record resolved workspace
 features and reject instrumentation; historical manifests retain their
 original explicit feature metadata.
+
+The source map now also includes `tsr_lsp/src/capabilities.json`, embedded in
+`tsrust`. Existing captures retain their original manifests and scope; this
+review fix does not rewrite them or claim new timings. Build-environment
+handling is unchanged.

@@ -235,6 +235,8 @@ def collect(binary, project, experiment, mode, output, index, timeout, baseline=
             issues.append(result['error'])
         if result['exit'] != 0:
             issues.append(f"child exited {result['exit']}")
+        if mode == 'time' and result['stderr']:
+            issues.append('timed child wrote to stderr: ' + result['stderr'][:200])
         try:
             data = json.loads(result['stdout'])
             result['report'] = data

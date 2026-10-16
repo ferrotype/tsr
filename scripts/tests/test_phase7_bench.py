@@ -587,6 +587,22 @@ class ConcurrentPairTests(unittest.TestCase):
         self.assertEqual(report['method'], 'serial pairs; alternating execution order; no profiler')
 
 
+class BuildSourceIdentityTests(unittest.TestCase):
+    def test_embedded_capabilities_change_the_build_source_identity(self):
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(pgo, 'ROOT', Path(directory)):
+            relative = 'crates/tsr_lsp/src/capabilities.json'
+            capabilities = Path(directory) / relative
+            capabilities.parent.mkdir(parents=True)
+            capabilities.write_bytes(b'{"hoverProvider":true}')
+            before = pgo.source_identity()
+            self.assertEqual(before[relative], common.sha256(capabilities.read_bytes()))
+            capabilities.write_bytes(b'{"hoverProvider":false}')
+            after = pgo.source_identity()
+            self.assertNotEqual(before[relative], after[relative])
+            capabilities.unlink()
+            self.assertNotIn(relative, pgo.source_identity())
+
+
 class OrdinaryBuildTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()

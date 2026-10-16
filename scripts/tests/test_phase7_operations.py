@@ -134,6 +134,7 @@ class CollectionTests(unittest.TestCase):
         self.finished = set()
         self.results = {backend: report(backend, 'time') for backend in operations.BACKENDS}
         self.exit_codes = {}
+        self.stderr = {}
         self.lock = threading.Lock()
 
     def execute(self, command, cwd, timeout):
@@ -144,7 +145,7 @@ class CollectionTests(unittest.TestCase):
         with self.lock:
             self.finished.add(backend)
         return {'exit': self.exit_codes.get(backend, 0), 'stdout': json.dumps(self.results[backend]),
-                'stderr': f'{backend} log', 'launch_ns': 100 if backend == 'routed' else 101}
+                'stderr': self.stderr.get(backend, ''), 'launch_ns': 100 if backend == 'routed' else 101}
 
     def collect(self, index=0, mode='time'):
         with mock.patch.object(operations, 'execute', side_effect=self.execute):
@@ -164,7 +165,23 @@ class CollectionTests(unittest.TestCase):
             result = self.collect(1)
         self.assertEqual(result['submission_order'], ['scoped', 'routed'])
         self.assertEqual(result['ratio'], 0.8)
-        self.assertEqual((self.root / 'time-1-scoped.stderr').read_text(), 'scoped log')
+        self.assertEqual((self.root / 'time-1-scoped.stderr').read_text(), '')
+
+    def test_timing_rejects_instrumentation_or_other_stderr_and_keeps_raw_output(self):
+        for backend in operations.BACKENDS:
+            for log in ('node-read-counts {"node_reads": 42}\n', 'unexpected warning\n'):
+                with self.subTest(backend=backend, log=log):
+                    self.stderr = {backend: log}
+                    with self.assertRaisesRegex(ValueError, f'{backend}: timed child wrote to stderr'):
+                        self.collect()
+                    self.assertEqual((self.root / f'time-0-{backend}.stderr').read_text(), log)
+                    self.assertEqual(self.finished, set(operations.BACKENDS))
+
+    def test_observation_can_keep_counter_output_without_accepting_it_as_timing(self):
+        self.results = {backend: report(backend) for backend in operations.BACKENDS}
+        self.stderr = {'scoped': 'node-read-counts {"node_reads": 42}\n'}
+        self.collect(mode='observe')
+        self.assertEqual((self.root / 'observe-0-scoped.stderr').read_text(), self.stderr['scoped'])
 
     def test_distinct_saved_binaries_wait_for_both_before_any_output_io(self):
         barrier = threading.Barrier(2)
@@ -213,7 +230,7 @@ class CollectionTests(unittest.TestCase):
             self.assertEqual(command[3], 'scoped')
             result = report('scoped', 'time')
             result['operations']['elapsed_ns'] = 100 if command[0] == '/control' else 70
-            return {'exit': 0, 'stdout': json.dumps(result), 'stderr': command[0], 'launch_ns': 100}
+            return {'exit': 0, 'stdout': json.dumps(result), 'stderr': '', 'launch_ns': 100}
 
         with mock.patch.object(operations, 'execute', side_effect=child):
             result = operations.collect(Path('/candidate'), Path('/fixture/tsconfig.json'), 'argument',
@@ -222,8 +239,8 @@ class CollectionTests(unittest.TestCase):
         self.assertEqual(result['submission_order'], ['baseline', 'candidate'])
         self.assertEqual(result['elapsed_ns'], {'baseline': 100, 'candidate': 70})
         self.assertEqual(result['ratio'], 0.7)
-        self.assertEqual((self.root / 'time-0-baseline.stderr').read_text(), '/control')
-        self.assertEqual((self.root / 'time-0-candidate.stderr').read_text(), '/candidate')
+        self.assertEqual(json.loads((self.root / 'time-0-baseline.json').read_text())['role'], 'baseline')
+        self.assertEqual(json.loads((self.root / 'time-0-candidate.json').read_text())['role'], 'candidate')
 
     def test_child_cannot_report_a_backend_other_than_selected(self):
         def child(command, *_):

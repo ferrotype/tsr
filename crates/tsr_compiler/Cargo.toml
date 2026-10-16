@@ -49,6 +49,14 @@ required-features = ["recursion-probe"]
 name = "c2_review_fixes"
 required-features = ["relation-probe"]
 
+[[test]]
+name = "c3_contracts"
+required-features = ["recursion-probe"]
+
+[[test]]
+name = "c4_contracts"
+required-features = ["relation-probe"]
+
 [[example]]
 name = "p3_relations"
 required-features = ["relation-probe"]
