@@ -171,6 +171,15 @@ fn emit_source(code: &mut String, nodes: &[Value]) -> Result<(), String> {
         let member = snake(name);
         code.push_str(&format!("    #[inline]\n    pub fn as_{member}(self) -> Option<{name}DataRead<'a>> {{\n        match self.storage {{\n            NodeDataSourceStorage::Owned(data) => data.as_{member}().map({name}DataRead::from_owned),\n            NodeDataSourceStorage::Stored {{ header, node }} => {{\n                if header.actual_shape() != {shape} {{ return None; }}\n                let context = node.compact_context();\n                Some(context.store.payloads.read_{member}(header.ordinal, context, header.end))\n            }}\n        }}\n    }}\n"));
     }
+    code.push_str("    #[cfg(feature = \"contextual-payload-experiment\")]\n    pub(crate) fn declaration_name_typed(self, shape: u16) -> Option<NodeId> {\n        match shape {\n");
+    for (shape, node) in nodes.iter().enumerate() {
+        if super::ast::has_declaration_name(node)? {
+            let name = string(node, "name")?;
+            let member = snake(name);
+            code.push_str(&format!("            {shape} => self.as_{member}().expect(\"stored shape selects its typed payload\").name(),\n"));
+        }
+    }
+    code.push_str("            _ => None,\n        }\n    }\n");
     code.push_str("    pub fn name(self) -> &'static str {\n        match self.storage {\n            NodeDataSourceStorage::Owned(data) => data.name(),\n            NodeDataSourceStorage::Stored { header, .. } => match header.actual_shape() {\n");
     for (shape, node) in nodes.iter().enumerate() {
         let name = string(node, "name")?;

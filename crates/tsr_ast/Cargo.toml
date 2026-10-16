@@ -19,6 +19,11 @@ layout-profile = []
 access-stats = []
 # Diagnostic-only ADR 0010 observer. Absent from corpus and timing binaries.
 creation-trace = ["dep:serde_json"]
+# Alternate semantic-field decoding for isolated checker operation experiments.
+# Normal compiler builds use the standard semantic-field decoder.
+contextual-payload-experiment = []
+# Experimental completed-flow readers; not part of the default public API.
+flow-scope-experiment = []
 
 [dependencies]
 serde_json = { version = "1", optional = true }

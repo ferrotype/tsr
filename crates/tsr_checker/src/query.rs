@@ -871,6 +871,10 @@ impl CheckerState {
     // port: tsc/internal/checker/checker.go:Checker.checkExpressionEx
     #[inline]
     pub(crate) fn check_expression_ex(&mut self, node: NodeId, mode: u32) -> Result<TypeId, Error> {
+        #[cfg(feature = "operation-experiments")]
+        if self.argument_explicit_execution {
+            return self.check_expression_explicit(node, mode);
+        }
         #[cfg(target_arch = "wasm32")]
         {
             self.check_expression_iterative(node, mode)

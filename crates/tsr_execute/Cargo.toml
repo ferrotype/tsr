@@ -12,6 +12,10 @@ categories.workspace = true
 readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
+[features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = ["tsr_compiler/contextual-owner-scope"]
+
 [dependencies]
 tsr_build = { version = "0.4.0", path = "../tsr_build" }
 tsr_arena = { version = "0.4.0", path = "../tsr_arena" }

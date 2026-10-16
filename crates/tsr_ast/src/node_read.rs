@@ -5,7 +5,7 @@ use tsr_arena::{AuxId, FileId, StorageOwner, StorageRead, StorageTransaction, St
 use tsr_jsstring::SourceText;
 
 /// A node read borrows its physical owner. Lazy payload references cannot outlive
-/// the read's publication guard. Escaping requires `RetainedNode`.
+/// the read's retained lazy guard. Escaping requires `RetainedNode`.
 ///
 /// ```compile_fail
 /// use tsr_ast::{AstFile, NodeId};
@@ -34,18 +34,25 @@ enum ReadRecord<'a> {
     Core {
         header: &'a StoredNode,
         owner: &'a StorageOwner<StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
     },
     TransactionCore {
         header: &'a StoredNode,
         owner: &'a StorageTransaction<'a, StoredNode>,
+        #[cfg(feature = "contextual-payload-experiment")]
+        typed_payload_fields: bool,
     },
-    Owned {
+    OwnedFile {
         node: &'a Node,
-        source: &'a SourceText,
-        owner_id: FileId,
+        owner: &'a StorageOwner<StoredNode>,
+    },
+    OwnedTransaction {
+        node: &'a Node,
+        owner: &'a StorageTransaction<'a, StoredNode>,
     },
     Lazy {
-        record: StorageRead<'a, AstStorageData>,
+        record: std::sync::Arc<Node>,
         owner: &'a StorageOwner<StoredNode>,
     },
 }
@@ -89,14 +96,27 @@ impl<'a> NodeRead<'a> {
         crate::access_stats::bump(&crate::access_stats::READS_LAZY);
         let aux = AuxId::from_parts(owner.lazy_auxiliary_arena(), record.ordinal)
             .expect("lazy payload slot");
+        let record = crate::auxiliary::AuxRead::resolved(
+            owner.aux(aux).expect("published lazy payload"),
+            owner,
+        )
+        .into_full()
+        .expect("lazy payload is full");
+        let record = {
+            // Clone only the published payload while its page guard is alive.
+            // Published lazy records cannot be edited by a later transaction.
+            // The physical-owner borrow below still keeps source/dependencies
+            // live, and every payload borrow remains bounded by this read.
+            let AstStorageData::FallbackNode(node) = &*record else {
+                unreachable!("lazy header names its owned payload")
+            };
+            #[cfg(feature = "access-stats")]
+            crate::access_stats::bump(&crate::access_stats::LAZY_READ_NODE_RETAINS);
+            std::sync::Arc::clone(node)
+        };
         Self {
             record: ReadRecord::Lazy {
-                record: crate::auxiliary::AuxRead::resolved(
-                    owner.aux(aux).expect("published lazy payload"),
-                    owner,
-                )
-                .into_full()
-                .expect("lazy payload is full"),
+                record,
                 owner: owner.physical_owner(),
             },
             id,
@@ -113,7 +133,12 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_CORE);
         Self {
-            record: ReadRecord::Core { header, owner },
+            record: ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields: false,
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -127,26 +152,40 @@ impl<'a> NodeRead<'a> {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_TRANSACTION);
         Self {
-            record: ReadRecord::TransactionCore { header, owner },
+            record: ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields: false,
+            },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
         }
     }
-    pub(crate) fn owned(
+    pub(crate) fn owned_file(
         id: NodeId,
         node: &'a Node,
-        owner_id: FileId,
-        source: &'a SourceText,
+        owner: &'a StorageOwner<StoredNode>,
     ) -> Self {
         #[cfg(feature = "access-stats")]
         crate::access_stats::bump(&crate::access_stats::READS_OWNED);
         Self {
-            record: ReadRecord::Owned {
-                node,
-                source,
-                owner_id,
-            },
+            record: ReadRecord::OwnedFile { node, owner },
+            id,
+            #[cfg(feature = "access-stats")]
+            used: std::cell::Cell::default(),
+        }
+    }
+    pub(crate) fn owned_transaction(
+        id: NodeId,
+        node: &'a Node,
+        owner: &'a StorageTransaction<'a, StoredNode>,
+    ) -> Self {
+        #[cfg(feature = "access-stats")]
+        crate::access_stats::bump(&crate::access_stats::READS_OWNED);
+        Self {
+            record: ReadRecord::OwnedTransaction { node, owner },
             id,
             #[cfg(feature = "access-stats")]
             used: std::cell::Cell::default(),
@@ -171,38 +210,77 @@ impl<'a> NodeRead<'a> {
     pub fn id(&self) -> NodeId {
         self.id
     }
+    /// Select direct typed-row decoding for shape-based semantic fields in an
+    /// operation experiment. This changes no ownership or slot checks. Lazy and
+    /// owned construction payloads retain the ordinary checked reader.
+    #[cfg(feature = "contextual-payload-experiment")]
+    #[inline]
+    #[must_use]
+    pub fn with_typed_payload_fields(mut self, enabled: bool) -> Self {
+        match &mut self.record {
+            ReadRecord::Core {
+                typed_payload_fields,
+                ..
+            }
+            | ReadRecord::TransactionCore {
+                typed_payload_fields,
+                ..
+            } => *typed_payload_fields = enabled,
+            ReadRecord::OwnedFile { .. }
+            | ReadRecord::OwnedTransaction { .. }
+            | ReadRecord::Lazy { .. } => {}
+        }
+        self
+    }
     pub fn owner_id(&self) -> FileId {
         match self.record {
-            ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.id(),
-            ReadRecord::TransactionCore { owner, .. } => owner.owner_id(),
-            ReadRecord::Owned { owner_id, .. } => owner_id,
+            ReadRecord::Core { owner, .. }
+            | ReadRecord::Lazy { owner, .. }
+            | ReadRecord::OwnedFile { owner, .. } => owner.id(),
+            ReadRecord::TransactionCore { owner, .. }
+            | ReadRecord::OwnedTransaction { owner, .. } => owner.owner_id(),
         }
     }
     pub fn source(&self) -> &'a SourceText {
         self.touch(2);
         match self.record {
-            ReadRecord::Core { owner, .. } | ReadRecord::Lazy { owner, .. } => owner.source_text(),
-            ReadRecord::TransactionCore { owner, .. } => owner.source(),
-            ReadRecord::Owned { source, .. } => source,
+            ReadRecord::Core { owner, .. }
+            | ReadRecord::Lazy { owner, .. }
+            | ReadRecord::OwnedFile { owner, .. } => owner.source_text(),
+            ReadRecord::TransactionCore { owner, .. }
+            | ReadRecord::OwnedTransaction { owner, .. } => owner.source(),
         }
     }
     /// A directly borrowed read can retain its owner's lifetime. A directory
-    /// resolved lazy read must stay bounded by its publication guard instead.
+    /// resolved lazy read must stay bounded by its retained payload guard instead.
     pub fn as_borrowed(&self) -> Option<Self> {
         let record = match self.record {
-            ReadRecord::Core { header, owner } => ReadRecord::Core { header, owner },
-            ReadRecord::TransactionCore { header, owner } => {
-                ReadRecord::TransactionCore { header, owner }
-            }
-            ReadRecord::Owned {
-                node,
-                source,
-                owner_id,
-            } => ReadRecord::Owned {
-                node,
-                source,
-                owner_id,
+            ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            } => ReadRecord::Core {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
             },
+            ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            } => ReadRecord::TransactionCore {
+                header,
+                owner,
+                #[cfg(feature = "contextual-payload-experiment")]
+                typed_payload_fields,
+            },
+            ReadRecord::OwnedFile { node, owner } => ReadRecord::OwnedFile { node, owner },
+            ReadRecord::OwnedTransaction { node, owner } => {
+                ReadRecord::OwnedTransaction { node, owner }
+            }
             ReadRecord::Lazy { .. } => return None,
         };
         Some(Self {
@@ -214,11 +292,10 @@ impl<'a> NodeRead<'a> {
     }
     fn owned_record(&self) -> Option<&Node> {
         match &self.record {
-            ReadRecord::Owned { node, .. } => Some(node),
-            ReadRecord::Lazy { record, .. } => match &**record {
-                AstStorageData::FallbackNode(node) => Some(node),
-                _ => unreachable!("lazy header names its owned payload"),
-            },
+            ReadRecord::OwnedFile { node, .. } | ReadRecord::OwnedTransaction { node, .. } => {
+                Some(node)
+            }
+            ReadRecord::Lazy { record, .. } => Some(record),
             ReadRecord::Core { .. } | ReadRecord::TransactionCore { .. } => None,
         }
     }
@@ -425,6 +502,25 @@ impl<'a> NodeRead<'a> {
     }
 }
 impl crate::NodeAccess for NodeRead<'_> {
+    #[cfg(feature = "contextual-payload-experiment")]
+    #[inline]
+    fn typed_payload_shape(&self) -> Option<u16> {
+        let (ReadRecord::Core {
+            header,
+            typed_payload_fields: true,
+            ..
+        }
+        | ReadRecord::TransactionCore {
+            header,
+            typed_payload_fields: true,
+            ..
+        }) = self.record
+        else {
+            return None;
+        };
+        self.touch(2);
+        Some(header.actual_shape())
+    }
     fn kind(&self) -> crate::NodeKind {
         self.kind()
     }
@@ -473,3 +569,8 @@ impl crate::NodeAccess for NodeRead<'_> {
 }
 #[cfg(test)]
 mod tests;
+#[cfg(all(test, feature = "contextual-payload-experiment"))]
+mod typed_payload_tests;
+
+#[cfg(test)]
+mod compact_read_tests;
