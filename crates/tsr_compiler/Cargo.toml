@@ -13,6 +13,8 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = ["tsr_checker/contextual-owner-scope"]
 relation-probe = ["tsr_checker/relation-probe"]
 recursion-probe = ["relation-probe", "tsr_checker/recursion-probe"]
 creation-trace = ["relation-probe", "tsr_checker/creation-trace"]
@@ -25,6 +27,11 @@ s08-phase-timer = []
 s08-allocation = ["tsr_checker/storage-pilot"]
 # Development-only node-read counters printed by the checkerbench child.
 access-stats = ["tsr_ast/access-stats"]
+operation-experiments = ["tsr_checker/operation-experiments"]
+
+[[example]]
+name = "checker_operations"
+required-features = ["operation-experiments"]
 
 [[test]]
 name = "c1_contracts"
@@ -40,6 +47,14 @@ required-features = ["recursion-probe"]
 
 [[test]]
 name = "c2_review_fixes"
+required-features = ["relation-probe"]
+
+[[test]]
+name = "c3_contracts"
+required-features = ["recursion-probe"]
+
+[[test]]
+name = "c4_contracts"
 required-features = ["relation-probe"]
 
 [[example]]

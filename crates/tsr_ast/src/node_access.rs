@@ -21,9 +21,22 @@ macro_rules! field {
 
 macro_rules! shape {
     ($node:expr; $($variant:ident $accessor:ident => |$data:ident| $value:expr,)*) => {
-        match $node.data() {
-            $(NodeDataRead::$variant($data) => $value,)*
-            _ => None,
+        {
+            #[cfg(feature = "contextual-payload-experiment")]
+            if let Some(shape) = $node.typed_payload_shape() {
+                return match shape {
+                    $($crate::local_read_generated::shapes::$variant => {
+                        let $data = $node.data_source().$accessor()
+                            .expect("stored shape selects its typed payload");
+                        $value
+                    },)*
+                    _ => None,
+                };
+            }
+            match $node.data() {
+                $(NodeDataRead::$variant($data) => $value,)*
+                _ => None,
+            }
         }
     };
 }
@@ -45,6 +58,12 @@ pub trait NodeAccess: sealed::Sealed {
     fn range(&self) -> TextRange;
     fn data(&self) -> NodeDataRead<'_>;
     fn data_source(&self) -> NodeDataSource<'_>;
+    /// An opt-in experiment may select a compact row without constructing the
+    /// full payload enum. Owned and lazy records use the ordinary path.
+    #[cfg(feature = "contextual-payload-experiment")]
+    fn typed_payload_shape(&self) -> Option<u16> {
+        None
+    }
     fn cached_subtree_facts(&self) -> u32;
     fn store_subtree_facts(&self, facts: u32);
     fn existing_runtime_id(&self) -> u64;
@@ -63,6 +82,10 @@ pub trait NodeAccess: sealed::Sealed {
 
     /// port: tsc/internal/ast/ast.go:Node.Name
     fn name(&self) -> Option<NodeId> {
+        #[cfg(feature = "contextual-payload-experiment")]
+        if let Some(shape) = self.typed_payload_shape() {
+            return self.data_source().declaration_name_typed(shape);
+        }
         self.data().declaration_name_generated()
     }
 

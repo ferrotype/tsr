@@ -7,6 +7,13 @@ pub static READS_CORE: AtomicU64 = AtomicU64::new(0);
 pub static READS_TRANSACTION: AtomicU64 = AtomicU64::new(0);
 pub static READS_OWNED: AtomicU64 = AtomicU64::new(0);
 pub static READS_LAZY: AtomicU64 = AtomicU64::new(0);
+/// Payload Arc retains for the node read's compact lazy guard. The existing
+/// page lookup/guard still runs before each retain.
+/// Kept separate from the stable 13-column phase report.
+pub static LAZY_READ_NODE_RETAINS: AtomicU64 = AtomicU64::new(0);
+pub fn lazy_read_node_retains() -> u64 {
+    LAZY_READ_NODE_RETAINS.load(Relaxed)
+}
 pub static KIND: AtomicU64 = AtomicU64::new(0);
 pub static PARENT: AtomicU64 = AtomicU64::new(0);
 pub static FLAGS: AtomicU64 = AtomicU64::new(0);

@@ -58,6 +58,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Format
         run: cargo fmt --all --check
+      - name: Default checker and compiler clippy
+        run: cargo clippy -p tsr_checker -p tsr_compiler --all-targets --locked -- -D warnings
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features --locked -- -D warnings
       - name: Dependency policy
@@ -127,6 +129,13 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           key: tests-${{ matrix.shard }}
+      # All-features selects experimental routing. Exercise the shipping
+      # configuration separately; the parity suites also use default builds.
+      - name: Default checker and compiler tests
+        if: matrix.shard == 'checker'
+        run: |
+          cargo test -p tsr_checker -p tsr_compiler --lib --locked
+          cargo test -p tsr_compiler --test checker_semantics --locked
       - name: Tests
         env:
           PACKAGES: ${{ matrix.packages }}

@@ -41,6 +41,8 @@ def source_identity():
                 if path.suffix in ('.rs', '.toml', '.lock') or 'bundled' in path.relative_to(ROOT).parts:
                     paths.add(path)
     paths.update(ROOT / name for name in ('Cargo.toml', 'Cargo.lock', 'rust-toolchain.toml'))
+    # Embedded by tsr_lsp and linked into tsrust, despite not being Rust source.
+    paths.add(ROOT / 'crates/tsr_lsp/src/capabilities.json')
     paths.update((ROOT / 'tools/phase7/scenarios').glob('*.json'))
     paths.update(ROOT / 'tools/phase7/bench' / name for name in ('pgo.py', 'common.py'))
     paths.update(ROOT / 'scripts' / name for name in ('s07_benchmark.py', 's04_common.py'))

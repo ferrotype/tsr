@@ -3725,6 +3725,176 @@ impl<'a> NodeDataSource<'a> {
             }
         }
     }
+    #[cfg(feature = "contextual-payload-experiment")]
+    pub(crate) fn declaration_name_typed(self, shape: u16) -> Option<NodeId> {
+        match shape {
+            27 => self
+                .as_variable_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            30 => self
+                .as_parameter_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            31 => self
+                .as_binding_element()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            33 => self
+                .as_function_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            34 => self
+                .as_class_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            35 => self
+                .as_class_expression()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            37 => self
+                .as_interface_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            38 => self
+                .as_type_alias_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            39 => self
+                .as_enum_member()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            40 => self
+                .as_enum_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            46 => self
+                .as_namespace_import()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            49 => self
+                .as_namespace_export_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            50 => self
+                .as_namespace_export()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            52 => self
+                .as_export_specifier()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            56 => self
+                .as_get_accessor_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            57 => self
+                .as_set_accessor_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            59 => self
+                .as_method_signature_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            60 => self
+                .as_method_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            61 => self
+                .as_property_signature_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            62 => self
+                .as_property_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            77 => self
+                .as_function_expression()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            81 => self
+                .as_property_access_expression()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            85 => self
+                .as_meta_property()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            95 => self
+                .as_property_assignment()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            96 => self
+                .as_shorthand_property_assignment()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            115 => self
+                .as_import_attribute()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            121 => self
+                .as_named_tuple_member()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            136 => self
+                .as_jsx_namespaced_name()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            142 => self
+                .as_jsx_attribute()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            172 => self
+                .as_js_doc_callback_tag()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            174 => self
+                .as_js_doc_typedef_tag()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            176 => self
+                .as_js_doc_name_reference()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            178 => self
+                .as_module_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            179 => self
+                .as_import_equals_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            182 => self
+                .as_import_clause()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            183 => self
+                .as_import_specifier()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            185 => self
+                .as_js_doc_link()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            186 => self
+                .as_js_doc_link_plain()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            187 => self
+                .as_js_doc_link_code()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            188 => self
+                .as_type_parameter_declaration()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            191 => self
+                .as_js_doc_parameter_or_property_tag()
+                .expect("stored shape selects its typed payload")
+                .name(),
+            _ => None,
+        }
+    }
     pub fn name(self) -> &'static str {
         match self.storage {
             NodeDataSourceStorage::Owned(data) => data.name(),

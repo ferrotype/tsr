@@ -13,6 +13,8 @@ readme = "README.md"
 include = ["/src/**", "/Cargo.toml", "/README.md", "/LICENSE", "/NOTICE", "/licenses/**"]
 
 [features]
+# Uninstrumented, default-off contextual owner-routing candidate.
+contextual-owner-scope = []
 storage-pilot = ["dep:serde_json"]
 relation-probe = ["dep:serde_json"]
 # Contract-only stack/depth observation and panic injection; excluded from the
@@ -21,6 +23,8 @@ recursion-probe = ["relation-probe"]
 creation-trace = ["relation-probe", "tsr_ast/creation-trace"]
 # Phase 2 C5.5: read-only type and signature views for the services replay.
 services-replay = []
+# Independent operation experiments; absent from normal compiler builds.
+operation-experiments = ["tsr_ast/contextual-payload-experiment", "tsr_ast/flow-scope-experiment"]
 
 [dependencies]
 stacker = "=0.1.25"
@@ -45,6 +49,9 @@ tsr_tspath = { version = "0.4.0", path = "../tsr_tspath" }
 tsr_vfs = { version = "0.4.0", path = "../tsr_vfs" }
 
 [dev-dependencies]
+# Reader-equivalence tests use the experimental API without enabling the
+# checker routing feature in ordinary tests or production dependencies.
+tsr_ast = { version = "0.4.0", path = "../tsr_ast", features = ["flow-scope-experiment"] }
 serde_json = "1"
 cap = { version = "=0.1.2", features = ["stats"] }
 mimalloc = "=0.1.48"
